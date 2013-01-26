@@ -1,5 +1,4 @@
-#define WIN32_LEAN_AND_MEAN
-#define _USE_MATH_DEFINES
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,14 +7,16 @@
 #include <assert.h>
 
 #ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#define _USE_MATH_DEFINES
 #include <windows.h>
 #include <Psapi.h>
 #endif
 
-#include "mvconstants.h"
-#include "mvmatrix.h"
-#include "mvmodel.h"
-#include "mvstats.h"
+#include <mvconstants.h>
+#include <mvmatrix.h>
+#include <mvmodel.h>
+#include <mvstats.h>
 
 #include "data.h"
 

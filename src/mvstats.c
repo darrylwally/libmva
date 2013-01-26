@@ -11,8 +11,8 @@ s
   */
 
 //#include <math.h>
+#include <cephes/protos.h>
 #include "mvstats.h"
-#include "cephes/protos.h"
 #include "mvmodel.h"
 
 // this is in gammaincinv.c
