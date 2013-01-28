@@ -18,7 +18,6 @@
 		58AE58F116B39397005DE0E7 /* besselpoly.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58A116B39397005DE0E7 /* besselpoly.c */; };
 		58AE58F216B39397005DE0E7 /* beta.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58A216B39397005DE0E7 /* beta.c */; };
 		58AE58F316B39397005DE0E7 /* btdtr.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58A316B39397005DE0E7 /* btdtr.c */; };
-		58AE58F416B39397005DE0E7 /* cbrt.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58A416B39397005DE0E7 /* cbrt.c */; };
 		58AE58F516B39397005DE0E7 /* chbevl.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58A616B39397005DE0E7 /* chbevl.c */; };
 		58AE58F616B39397005DE0E7 /* chdtr.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58A716B39397005DE0E7 /* chdtr.c */; };
 		58AE58F716B39397005DE0E7 /* const.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58A816B39397005DE0E7 /* const.c */; };
@@ -27,11 +26,8 @@
 		58AE58FA16B39397005DE0E7 /* ellie.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58AB16B39397005DE0E7 /* ellie.c */; };
 		58AE58FB16B39397005DE0E7 /* ellik.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58AC16B39397005DE0E7 /* ellik.c */; };
 		58AE58FC16B39397005DE0E7 /* ellpe.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58AD16B39397005DE0E7 /* ellpe.c */; };
-		58AE58FD16B39397005DE0E7 /* ellpj.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58AE16B39397005DE0E7 /* ellpj.c */; };
 		58AE58FE16B39397005DE0E7 /* ellpk.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58AF16B39397005DE0E7 /* ellpk.c */; };
 		58AE58FF16B39397005DE0E7 /* euclid.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58B016B39397005DE0E7 /* euclid.c */; };
-		58AE590016B39397005DE0E7 /* exp2.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58B116B39397005DE0E7 /* exp2.c */; };
-		58AE590116B39397005DE0E7 /* exp10.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58B216B39397005DE0E7 /* exp10.c */; };
 		58AE590216B39397005DE0E7 /* expn.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58B316B39397005DE0E7 /* expn.c */; };
 		58AE590316B39397005DE0E7 /* fabs.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58B416B39397005DE0E7 /* fabs.c */; };
 		58AE590416B39397005DE0E7 /* fdtr.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58B516B39397005DE0E7 /* fdtr.c */; };
@@ -41,27 +37,19 @@
 		58AE590816B39397005DE0E7 /* gammaincinv.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58B916B39397005DE0E7 /* gammaincinv.c */; };
 		58AE590916B39397005DE0E7 /* gdtr.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58BA16B39397005DE0E7 /* gdtr.c */; };
 		58AE590A16B39397005DE0E7 /* gels.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58BB16B39397005DE0E7 /* gels.c */; };
-		58AE590B16B39397005DE0E7 /* hyp2f1.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58BC16B39397005DE0E7 /* hyp2f1.c */; };
-		58AE590C16B39397005DE0E7 /* hyperg.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58BD16B39397005DE0E7 /* hyperg.c */; };
 		58AE590D16B39397005DE0E7 /* i0.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58BE16B39397005DE0E7 /* i0.c */; };
 		58AE590E16B39397005DE0E7 /* i1.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58BF16B39397005DE0E7 /* i1.c */; };
 		58AE590F16B39397005DE0E7 /* igam.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58C016B39397005DE0E7 /* igam.c */; };
 		58AE591016B39397005DE0E7 /* igami.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58C116B39397005DE0E7 /* igami.c */; };
 		58AE591116B39397005DE0E7 /* incbet.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58C216B39397005DE0E7 /* incbet.c */; };
 		58AE591216B39397005DE0E7 /* incbi.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58C316B39397005DE0E7 /* incbi.c */; };
-		58AE591316B39397005DE0E7 /* j0.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58C416B39397005DE0E7 /* j0.c */; };
-		58AE591416B39397005DE0E7 /* j1.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58C516B39397005DE0E7 /* j1.c */; };
 		58AE591516B39397005DE0E7 /* jv.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58C616B39397005DE0E7 /* jv.c */; };
-		58AE591616B39397005DE0E7 /* k0.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58C716B39397005DE0E7 /* k0.c */; };
-		58AE591716B39397005DE0E7 /* k1.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58C816B39397005DE0E7 /* k1.c */; };
-		58AE591816B39397005DE0E7 /* kn.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58C916B39397005DE0E7 /* kn.c */; };
 		58AE591916B39397005DE0E7 /* kolmogorov.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58CA16B39397005DE0E7 /* kolmogorov.c */; };
 		58AE591A16B39397005DE0E7 /* mmmpy.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58CD16B39397005DE0E7 /* mmmpy.c */; };
 		58AE591B16B39397005DE0E7 /* mtherr.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58CE16B39397005DE0E7 /* mtherr.c */; };
 		58AE591C16B39397005DE0E7 /* mtransp.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58CF16B39397005DE0E7 /* mtransp.c */; };
 		58AE591D16B39397005DE0E7 /* mvmpy.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58D016B39397005DE0E7 /* mvmpy.c */; };
 		58AE591E16B39397005DE0E7 /* nbdtr.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58D116B39397005DE0E7 /* nbdtr.c */; };
-		58AE591F16B39397005DE0E7 /* ndtr.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58D216B39397005DE0E7 /* ndtr.c */; };
 		58AE592016B39397005DE0E7 /* ndtri.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58D316B39397005DE0E7 /* ndtri.c */; };
 		58AE592116B39397005DE0E7 /* pdtr.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58D416B39397005DE0E7 /* pdtr.c */; };
 		58AE592216B39397005DE0E7 /* polevl.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58D516B39397005DE0E7 /* polevl.c */; };
@@ -72,21 +60,16 @@
 		58AE592716B39397005DE0E7 /* psi.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58DB16B39397005DE0E7 /* psi.c */; };
 		58AE592816B39397005DE0E7 /* rgamma.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58DC16B39397005DE0E7 /* rgamma.c */; };
 		58AE592916B39397005DE0E7 /* round.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58DD16B39397005DE0E7 /* round.c */; };
-		58AE592A16B39397005DE0E7 /* scipy_iv.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58DE16B39397005DE0E7 /* scipy_iv.c */; };
 		58AE592B16B39397005DE0E7 /* setprec.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58DF16B39397005DE0E7 /* setprec.c */; };
 		58AE592C16B39397005DE0E7 /* shichi.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58E016B39397005DE0E7 /* shichi.c */; };
-		58AE592D16B39397005DE0E7 /* sici.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58E116B39397005DE0E7 /* sici.c */; };
 		58AE592E16B39397005DE0E7 /* simpsn.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58E216B39397005DE0E7 /* simpsn.c */; };
 		58AE592F16B39397005DE0E7 /* simq.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58E316B39397005DE0E7 /* simq.c */; };
 		58AE593016B39397005DE0E7 /* sincos.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58E416B39397005DE0E7 /* sincos.c */; };
 		58AE593116B39397005DE0E7 /* sindg.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58E516B39397005DE0E7 /* sindg.c */; };
 		58AE593216B39397005DE0E7 /* spence.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58E616B39397005DE0E7 /* spence.c */; };
 		58AE593316B39397005DE0E7 /* stdtr.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58E716B39397005DE0E7 /* stdtr.c */; };
-		58AE593416B39397005DE0E7 /* struve.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58E816B39397005DE0E7 /* struve.c */; };
 		58AE593516B39397005DE0E7 /* tandg.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58E916B39397005DE0E7 /* tandg.c */; };
 		58AE593616B39397005DE0E7 /* tukey.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58EA16B39397005DE0E7 /* tukey.c */; };
-		58AE593716B39397005DE0E7 /* unity.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58EB16B39397005DE0E7 /* unity.c */; };
-		58AE593816B39397005DE0E7 /* yn.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58EC16B39397005DE0E7 /* yn.c */; };
 		58AE593916B39397005DE0E7 /* zeta.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58ED16B39397005DE0E7 /* zeta.c */; };
 		58AE593A16B39397005DE0E7 /* zetac.c in Sources */ = {isa = PBXBuildFile; fileRef = 58AE58EE16B39397005DE0E7 /* zetac.c */; };
 /* End PBXBuildFile section */
@@ -118,7 +101,6 @@
 		58AE58A116B39397005DE0E7 /* besselpoly.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = besselpoly.c; path = ../cephes/besselpoly.c; sourceTree = "<group>"; };
 		58AE58A216B39397005DE0E7 /* beta.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = beta.c; path = ../cephes/beta.c; sourceTree = "<group>"; };
 		58AE58A316B39397005DE0E7 /* btdtr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = btdtr.c; path = ../cephes/btdtr.c; sourceTree = "<group>"; };
-		58AE58A416B39397005DE0E7 /* cbrt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = cbrt.c; path = ../cephes/cbrt.c; sourceTree = "<group>"; };
 		58AE58A616B39397005DE0E7 /* chbevl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = chbevl.c; path = ../cephes/chbevl.c; sourceTree = "<group>"; };
 		58AE58A716B39397005DE0E7 /* chdtr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = chdtr.c; path = ../cephes/chdtr.c; sourceTree = "<group>"; };
 		58AE58A816B39397005DE0E7 /* const.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = const.c; path = ../cephes/const.c; sourceTree = "<group>"; };
@@ -127,11 +109,8 @@
 		58AE58AB16B39397005DE0E7 /* ellie.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ellie.c; path = ../cephes/ellie.c; sourceTree = "<group>"; };
 		58AE58AC16B39397005DE0E7 /* ellik.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ellik.c; path = ../cephes/ellik.c; sourceTree = "<group>"; };
 		58AE58AD16B39397005DE0E7 /* ellpe.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ellpe.c; path = ../cephes/ellpe.c; sourceTree = "<group>"; };
-		58AE58AE16B39397005DE0E7 /* ellpj.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ellpj.c; path = ../cephes/ellpj.c; sourceTree = "<group>"; };
 		58AE58AF16B39397005DE0E7 /* ellpk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ellpk.c; path = ../cephes/ellpk.c; sourceTree = "<group>"; };
 		58AE58B016B39397005DE0E7 /* euclid.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = euclid.c; path = ../cephes/euclid.c; sourceTree = "<group>"; };
-		58AE58B116B39397005DE0E7 /* exp2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = exp2.c; path = ../cephes/exp2.c; sourceTree = "<group>"; };
-		58AE58B216B39397005DE0E7 /* exp10.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = exp10.c; path = ../cephes/exp10.c; sourceTree = "<group>"; };
 		58AE58B316B39397005DE0E7 /* expn.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = expn.c; path = ../cephes/expn.c; sourceTree = "<group>"; };
 		58AE58B416B39397005DE0E7 /* fabs.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fabs.c; path = ../cephes/fabs.c; sourceTree = "<group>"; };
 		58AE58B516B39397005DE0E7 /* fdtr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fdtr.c; path = ../cephes/fdtr.c; sourceTree = "<group>"; };
@@ -141,27 +120,19 @@
 		58AE58B916B39397005DE0E7 /* gammaincinv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gammaincinv.c; path = ../cephes/gammaincinv.c; sourceTree = "<group>"; };
 		58AE58BA16B39397005DE0E7 /* gdtr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gdtr.c; path = ../cephes/gdtr.c; sourceTree = "<group>"; };
 		58AE58BB16B39397005DE0E7 /* gels.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = gels.c; path = ../cephes/gels.c; sourceTree = "<group>"; };
-		58AE58BC16B39397005DE0E7 /* hyp2f1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hyp2f1.c; path = ../cephes/hyp2f1.c; sourceTree = "<group>"; };
-		58AE58BD16B39397005DE0E7 /* hyperg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hyperg.c; path = ../cephes/hyperg.c; sourceTree = "<group>"; };
 		58AE58BE16B39397005DE0E7 /* i0.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = i0.c; path = ../cephes/i0.c; sourceTree = "<group>"; };
 		58AE58BF16B39397005DE0E7 /* i1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = i1.c; path = ../cephes/i1.c; sourceTree = "<group>"; };
 		58AE58C016B39397005DE0E7 /* igam.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = igam.c; path = ../cephes/igam.c; sourceTree = "<group>"; };
 		58AE58C116B39397005DE0E7 /* igami.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = igami.c; path = ../cephes/igami.c; sourceTree = "<group>"; };
 		58AE58C216B39397005DE0E7 /* incbet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = incbet.c; path = ../cephes/incbet.c; sourceTree = "<group>"; };
 		58AE58C316B39397005DE0E7 /* incbi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = incbi.c; path = ../cephes/incbi.c; sourceTree = "<group>"; };
-		58AE58C416B39397005DE0E7 /* j0.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = j0.c; path = ../cephes/j0.c; sourceTree = "<group>"; };
-		58AE58C516B39397005DE0E7 /* j1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = j1.c; path = ../cephes/j1.c; sourceTree = "<group>"; };
 		58AE58C616B39397005DE0E7 /* jv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jv.c; path = ../cephes/jv.c; sourceTree = "<group>"; };
-		58AE58C716B39397005DE0E7 /* k0.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = k0.c; path = ../cephes/k0.c; sourceTree = "<group>"; };
-		58AE58C816B39397005DE0E7 /* k1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = k1.c; path = ../cephes/k1.c; sourceTree = "<group>"; };
-		58AE58C916B39397005DE0E7 /* kn.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = kn.c; path = ../cephes/kn.c; sourceTree = "<group>"; };
 		58AE58CA16B39397005DE0E7 /* kolmogorov.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = kolmogorov.c; path = ../cephes/kolmogorov.c; sourceTree = "<group>"; };
 		58AE58CD16B39397005DE0E7 /* mmmpy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mmmpy.c; path = ../cephes/mmmpy.c; sourceTree = "<group>"; };
 		58AE58CE16B39397005DE0E7 /* mtherr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mtherr.c; path = ../cephes/mtherr.c; sourceTree = "<group>"; };
 		58AE58CF16B39397005DE0E7 /* mtransp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mtransp.c; path = ../cephes/mtransp.c; sourceTree = "<group>"; };
 		58AE58D016B39397005DE0E7 /* mvmpy.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mvmpy.c; path = ../cephes/mvmpy.c; sourceTree = "<group>"; };
 		58AE58D116B39397005DE0E7 /* nbdtr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nbdtr.c; path = ../cephes/nbdtr.c; sourceTree = "<group>"; };
-		58AE58D216B39397005DE0E7 /* ndtr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ndtr.c; path = ../cephes/ndtr.c; sourceTree = "<group>"; };
 		58AE58D316B39397005DE0E7 /* ndtri.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ndtri.c; path = ../cephes/ndtri.c; sourceTree = "<group>"; };
 		58AE58D416B39397005DE0E7 /* pdtr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = pdtr.c; path = ../cephes/pdtr.c; sourceTree = "<group>"; };
 		58AE58D516B39397005DE0E7 /* polevl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = polevl.c; path = ../cephes/polevl.c; sourceTree = "<group>"; };
@@ -172,21 +143,16 @@
 		58AE58DB16B39397005DE0E7 /* psi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = psi.c; path = ../cephes/psi.c; sourceTree = "<group>"; };
 		58AE58DC16B39397005DE0E7 /* rgamma.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = rgamma.c; path = ../cephes/rgamma.c; sourceTree = "<group>"; };
 		58AE58DD16B39397005DE0E7 /* round.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = round.c; path = ../cephes/round.c; sourceTree = "<group>"; };
-		58AE58DE16B39397005DE0E7 /* scipy_iv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = scipy_iv.c; path = ../cephes/scipy_iv.c; sourceTree = "<group>"; };
 		58AE58DF16B39397005DE0E7 /* setprec.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = setprec.c; path = ../cephes/setprec.c; sourceTree = "<group>"; };
 		58AE58E016B39397005DE0E7 /* shichi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = shichi.c; path = ../cephes/shichi.c; sourceTree = "<group>"; };
-		58AE58E116B39397005DE0E7 /* sici.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sici.c; path = ../cephes/sici.c; sourceTree = "<group>"; };
 		58AE58E216B39397005DE0E7 /* simpsn.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = simpsn.c; path = ../cephes/simpsn.c; sourceTree = "<group>"; };
 		58AE58E316B39397005DE0E7 /* simq.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = simq.c; path = ../cephes/simq.c; sourceTree = "<group>"; };
 		58AE58E416B39397005DE0E7 /* sincos.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sincos.c; path = ../cephes/sincos.c; sourceTree = "<group>"; };
 		58AE58E516B39397005DE0E7 /* sindg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sindg.c; path = ../cephes/sindg.c; sourceTree = "<group>"; };
 		58AE58E616B39397005DE0E7 /* spence.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = spence.c; path = ../cephes/spence.c; sourceTree = "<group>"; };
 		58AE58E716B39397005DE0E7 /* stdtr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = stdtr.c; path = ../cephes/stdtr.c; sourceTree = "<group>"; };
-		58AE58E816B39397005DE0E7 /* struve.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = struve.c; path = ../cephes/struve.c; sourceTree = "<group>"; };
 		58AE58E916B39397005DE0E7 /* tandg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tandg.c; path = ../cephes/tandg.c; sourceTree = "<group>"; };
 		58AE58EA16B39397005DE0E7 /* tukey.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = tukey.c; path = ../cephes/tukey.c; sourceTree = "<group>"; };
-		58AE58EB16B39397005DE0E7 /* unity.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = unity.c; path = ../cephes/unity.c; sourceTree = "<group>"; };
-		58AE58EC16B39397005DE0E7 /* yn.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = yn.c; path = ../cephes/yn.c; sourceTree = "<group>"; };
 		58AE58ED16B39397005DE0E7 /* zeta.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zeta.c; path = ../cephes/zeta.c; sourceTree = "<group>"; };
 		58AE58EE16B39397005DE0E7 /* zetac.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zetac.c; path = ../cephes/zetac.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -249,7 +215,6 @@
 				58AE58A116B39397005DE0E7 /* besselpoly.c */,
 				58AE58A216B39397005DE0E7 /* beta.c */,
 				58AE58A316B39397005DE0E7 /* btdtr.c */,
-				58AE58A416B39397005DE0E7 /* cbrt.c */,
 				58AE58A616B39397005DE0E7 /* chbevl.c */,
 				58AE58A716B39397005DE0E7 /* chdtr.c */,
 				58AE58A816B39397005DE0E7 /* const.c */,
@@ -258,11 +223,8 @@
 				58AE58AB16B39397005DE0E7 /* ellie.c */,
 				58AE58AC16B39397005DE0E7 /* ellik.c */,
 				58AE58AD16B39397005DE0E7 /* ellpe.c */,
-				58AE58AE16B39397005DE0E7 /* ellpj.c */,
 				58AE58AF16B39397005DE0E7 /* ellpk.c */,
 				58AE58B016B39397005DE0E7 /* euclid.c */,
-				58AE58B116B39397005DE0E7 /* exp2.c */,
-				58AE58B216B39397005DE0E7 /* exp10.c */,
 				58AE58B316B39397005DE0E7 /* expn.c */,
 				58AE58B416B39397005DE0E7 /* fabs.c */,
 				58AE58B516B39397005DE0E7 /* fdtr.c */,
@@ -272,27 +234,19 @@
 				58AE58B916B39397005DE0E7 /* gammaincinv.c */,
 				58AE58BA16B39397005DE0E7 /* gdtr.c */,
 				58AE58BB16B39397005DE0E7 /* gels.c */,
-				58AE58BC16B39397005DE0E7 /* hyp2f1.c */,
-				58AE58BD16B39397005DE0E7 /* hyperg.c */,
 				58AE58BE16B39397005DE0E7 /* i0.c */,
 				58AE58BF16B39397005DE0E7 /* i1.c */,
 				58AE58C016B39397005DE0E7 /* igam.c */,
 				58AE58C116B39397005DE0E7 /* igami.c */,
 				58AE58C216B39397005DE0E7 /* incbet.c */,
 				58AE58C316B39397005DE0E7 /* incbi.c */,
-				58AE58C416B39397005DE0E7 /* j0.c */,
-				58AE58C516B39397005DE0E7 /* j1.c */,
 				58AE58C616B39397005DE0E7 /* jv.c */,
-				58AE58C716B39397005DE0E7 /* k0.c */,
-				58AE58C816B39397005DE0E7 /* k1.c */,
-				58AE58C916B39397005DE0E7 /* kn.c */,
 				58AE58CA16B39397005DE0E7 /* kolmogorov.c */,
 				58AE58CD16B39397005DE0E7 /* mmmpy.c */,
 				58AE58CE16B39397005DE0E7 /* mtherr.c */,
 				58AE58CF16B39397005DE0E7 /* mtransp.c */,
 				58AE58D016B39397005DE0E7 /* mvmpy.c */,
 				58AE58D116B39397005DE0E7 /* nbdtr.c */,
-				58AE58D216B39397005DE0E7 /* ndtr.c */,
 				58AE58D316B39397005DE0E7 /* ndtri.c */,
 				58AE58D416B39397005DE0E7 /* pdtr.c */,
 				58AE58D516B39397005DE0E7 /* polevl.c */,
@@ -303,21 +257,16 @@
 				58AE58DB16B39397005DE0E7 /* psi.c */,
 				58AE58DC16B39397005DE0E7 /* rgamma.c */,
 				58AE58DD16B39397005DE0E7 /* round.c */,
-				58AE58DE16B39397005DE0E7 /* scipy_iv.c */,
 				58AE58DF16B39397005DE0E7 /* setprec.c */,
 				58AE58E016B39397005DE0E7 /* shichi.c */,
-				58AE58E116B39397005DE0E7 /* sici.c */,
 				58AE58E216B39397005DE0E7 /* simpsn.c */,
 				58AE58E316B39397005DE0E7 /* simq.c */,
 				58AE58E416B39397005DE0E7 /* sincos.c */,
 				58AE58E516B39397005DE0E7 /* sindg.c */,
 				58AE58E616B39397005DE0E7 /* spence.c */,
 				58AE58E716B39397005DE0E7 /* stdtr.c */,
-				58AE58E816B39397005DE0E7 /* struve.c */,
 				58AE58E916B39397005DE0E7 /* tandg.c */,
 				58AE58EA16B39397005DE0E7 /* tukey.c */,
-				58AE58EB16B39397005DE0E7 /* unity.c */,
-				58AE58EC16B39397005DE0E7 /* yn.c */,
 				58AE58ED16B39397005DE0E7 /* zeta.c */,
 				58AE58EE16B39397005DE0E7 /* zetac.c */,
 			);
@@ -385,7 +334,6 @@
 				58AE58F116B39397005DE0E7 /* besselpoly.c in Sources */,
 				58AE58F216B39397005DE0E7 /* beta.c in Sources */,
 				58AE58F316B39397005DE0E7 /* btdtr.c in Sources */,
-				58AE58F416B39397005DE0E7 /* cbrt.c in Sources */,
 				58AE58F516B39397005DE0E7 /* chbevl.c in Sources */,
 				58AE58F616B39397005DE0E7 /* chdtr.c in Sources */,
 				58AE58F716B39397005DE0E7 /* const.c in Sources */,
@@ -394,11 +342,8 @@
 				58AE58FA16B39397005DE0E7 /* ellie.c in Sources */,
 				58AE58FB16B39397005DE0E7 /* ellik.c in Sources */,
 				58AE58FC16B39397005DE0E7 /* ellpe.c in Sources */,
-				58AE58FD16B39397005DE0E7 /* ellpj.c in Sources */,
 				58AE58FE16B39397005DE0E7 /* ellpk.c in Sources */,
 				58AE58FF16B39397005DE0E7 /* euclid.c in Sources */,
-				58AE590016B39397005DE0E7 /* exp2.c in Sources */,
-				58AE590116B39397005DE0E7 /* exp10.c in Sources */,
 				58AE590216B39397005DE0E7 /* expn.c in Sources */,
 				58AE590316B39397005DE0E7 /* fabs.c in Sources */,
 				58AE590416B39397005DE0E7 /* fdtr.c in Sources */,
@@ -408,27 +353,19 @@
 				58AE590816B39397005DE0E7 /* gammaincinv.c in Sources */,
 				58AE590916B39397005DE0E7 /* gdtr.c in Sources */,
 				58AE590A16B39397005DE0E7 /* gels.c in Sources */,
-				58AE590B16B39397005DE0E7 /* hyp2f1.c in Sources */,
-				58AE590C16B39397005DE0E7 /* hyperg.c in Sources */,
 				58AE590D16B39397005DE0E7 /* i0.c in Sources */,
 				58AE590E16B39397005DE0E7 /* i1.c in Sources */,
 				58AE590F16B39397005DE0E7 /* igam.c in Sources */,
 				58AE591016B39397005DE0E7 /* igami.c in Sources */,
 				58AE591116B39397005DE0E7 /* incbet.c in Sources */,
 				58AE591216B39397005DE0E7 /* incbi.c in Sources */,
-				58AE591316B39397005DE0E7 /* j0.c in Sources */,
-				58AE591416B39397005DE0E7 /* j1.c in Sources */,
 				58AE591516B39397005DE0E7 /* jv.c in Sources */,
-				58AE591616B39397005DE0E7 /* k0.c in Sources */,
-				58AE591716B39397005DE0E7 /* k1.c in Sources */,
-				58AE591816B39397005DE0E7 /* kn.c in Sources */,
 				58AE591916B39397005DE0E7 /* kolmogorov.c in Sources */,
 				58AE591A16B39397005DE0E7 /* mmmpy.c in Sources */,
 				58AE591B16B39397005DE0E7 /* mtherr.c in Sources */,
 				58AE591C16B39397005DE0E7 /* mtransp.c in Sources */,
 				58AE591D16B39397005DE0E7 /* mvmpy.c in Sources */,
 				58AE591E16B39397005DE0E7 /* nbdtr.c in Sources */,
-				58AE591F16B39397005DE0E7 /* ndtr.c in Sources */,
 				58AE592016B39397005DE0E7 /* ndtri.c in Sources */,
 				58AE592116B39397005DE0E7 /* pdtr.c in Sources */,
 				58AE592216B39397005DE0E7 /* polevl.c in Sources */,
@@ -439,21 +376,16 @@
 				58AE592716B39397005DE0E7 /* psi.c in Sources */,
 				58AE592816B39397005DE0E7 /* rgamma.c in Sources */,
 				58AE592916B39397005DE0E7 /* round.c in Sources */,
-				58AE592A16B39397005DE0E7 /* scipy_iv.c in Sources */,
 				58AE592B16B39397005DE0E7 /* setprec.c in Sources */,
 				58AE592C16B39397005DE0E7 /* shichi.c in Sources */,
-				58AE592D16B39397005DE0E7 /* sici.c in Sources */,
 				58AE592E16B39397005DE0E7 /* simpsn.c in Sources */,
 				58AE592F16B39397005DE0E7 /* simq.c in Sources */,
 				58AE593016B39397005DE0E7 /* sincos.c in Sources */,
 				58AE593116B39397005DE0E7 /* sindg.c in Sources */,
 				58AE593216B39397005DE0E7 /* spence.c in Sources */,
 				58AE593316B39397005DE0E7 /* stdtr.c in Sources */,
-				58AE593416B39397005DE0E7 /* struve.c in Sources */,
 				58AE593516B39397005DE0E7 /* tandg.c in Sources */,
 				58AE593616B39397005DE0E7 /* tukey.c in Sources */,
-				58AE593716B39397005DE0E7 /* unity.c in Sources */,
-				58AE593816B39397005DE0E7 /* yn.c in Sources */,
 				58AE593916B39397005DE0E7 /* zeta.c in Sources */,
 				58AE593A16B39397005DE0E7 /* zetac.c in Sources */,
 			);
