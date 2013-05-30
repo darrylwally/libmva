@@ -1,0 +1,5 @@
+*.o
+*.a
+Makefile
+*.pro.user
+test_app
