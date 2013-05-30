@@ -39,7 +39,7 @@ typedef enum MVModelType_enum {
 
 typedef enum MVCrossValType_enum {
     FAST,
-    FULL
+    FULL /* Not yet implemented */
 } MVCrossValType;
 
 typedef struct crossValData_s{
