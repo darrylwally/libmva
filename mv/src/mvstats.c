@@ -10,8 +10,8 @@ s
   IMMEDIATELY
   */
 
-//#include <math.h>
-#include <cephes/protos.h>
+#include <cephes/cmath/mconf.h>
+#include <cephes/cmath/protos.h>
 #include "mvstats.h"
 #include "mvmodel.h"
 
