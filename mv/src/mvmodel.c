@@ -208,7 +208,7 @@ static int __crossValidatePCA_FAST(mvModel *pca)
     {
         X = pca->X;
     }
-    else // pca->_A > 1
+    else // pca->_A > 1x
     {
         X = pca->E;
     }
@@ -368,14 +368,194 @@ static int __crossValidatePCA_FAST(mvModel *pca)
     return 0;
 }
 
+static int __crossValidatePCA_FULL(mvModel *pca)
+{
+    int round;
+    int i;
+    crossValData *cv = pca->cvd;
+    int numRounds = cv->numRounds;
+    mvMat * PRESS = mvAllocMatZ(1,1);
+    mvMat * PRESSV = mvAllocMatZ(1, pca->X->ncolumns);
+    mvMat * PRESSV_temp = mvAllocMatZ(1, pca->X->ncolumns); // acts as PRESSV temporary addition location and (PRESSV / SSV)
+    mvMat * componentSlice = mvAllocMat(1,1);
+    double Q2;
+    mvMat * Q2V = mvAllocMat(1, pca->X->ncolumns);
+    mvMat * X = NULL;
+
+    // slice the correct matrix.
+    if (pca->_A == 1)
+    {
+        X = pca->X;
+    }
+    else // pca->_A > 1x
+    {
+        X = pca->E;
+    }
+
+    // Check for "Leave one out" CV mode.
+    if (numRounds <= 0)
+    {
+        numRounds = X->nrows;
+    }
+
+    // allocate the models with the sliced rows of the residual matrix.
+    for (round = 0; round < numRounds; round++)
+    {
+        mvModel *modelRound;
+        mvMat * X_model = NULL; // the matrix that the model is built
+        mvMat * X_pred = NULL;  // the matrix of the data that is to be predicted
+        mvMat * E_pred = NULL;  // will function as the predicted values and the residuals.
+        mvMat * t_pred = NULL;
+        mvMat * slice_pred = mvRange(round, pca->E->nrows, numRounds);
+
+        mvMatSliceRowsRef(&X_pred, X, slice_pred);
+        mvMatDeleteRowsRef(&X_model, X, slice_pred);
+
+        E_pred = mvAllocMat(X_pred->nrows, X_pred->ncolumns);
+        t_pred = mvAllocMat(X_pred->nrows, 1);
+
+        // Initialize model, add one component, compute new observation scores.
+        modelRound = mvInitPCAModel(X_model);
+        __mvAddPCAComponent(modelRound, 0);
+        mvNewObsT(t_pred, E_pred, X_pred, modelRound, 1, SCP);
+
+        // Sum the columns of E_pred and then add those to PRESSV
+        mvMatColumnSS(PRESSV_temp, E_pred);
+        mvAddMat(PRESSV, PRESSV, PRESSV_temp);
+
+        mvFreeMat(&slice_pred);
+        mvFreeMat(&t_pred);
+        mvFreeMat(&E_pred);
+        mvFreeMat(&X_pred);
+        mvFreeMat(&X_model);
+        mvFreeModel(&modelRound);
+    }
+    mvMatSetElem(PRESS, 0, 0, mvMatSum(PRESSV));
+    // Compute Q2 and Q2V
+    {
+        mvMat * SSXV_ref = NULL;
+        componentSlice->data[0][0] = pca->_A - 1;
+        Q2 = 1.0 - PRESS->data[0][0] / pca->SSX->data[pca->_A-1][0];
+        mvMatSliceRowsRef(&SSXV_ref, pca->SSXV, componentSlice);
+        mvMatColumnDiv(PRESSV_temp, PRESSV, SSXV_ref);
+        mvMatMultS(PRESSV_temp, PRESSV, -1.0);
+        mvAddMatS(Q2V, PRESSV_temp, 1.0);
+        mvFreeMat(&SSXV_ref);
+    }
+
+    if (pca->_A == 1)
+    {
+        // Q2's have not yet been allocated.
+        pca->Q2 = mvAllocMat(1,1);
+        pca->Q2cum = mvAllocMat(1,1);
+        pca->Q2V = Q2V;
+        pca->Q2Vcum = mvAllocMat(1,X->ncolumns);
+
+        cv->PRESS = PRESS;
+        cv->PRESSV = PRESSV;
+
+        // for the first component, Q2[V] = Q2[V]cum
+        mvMatCopy(pca->Q2Vcum, pca->Q2V);
+        mvMatSetElem(pca->Q2, 0, 0, Q2);
+        mvMatSetElem(pca->Q2cum, 0, 0, Q2);
+    }
+    else
+    {
+        double Q2cum=1.0;
+        mvMat *newPRESS, *newPRESSV, *PRESSV_SSV;
+        mvMat *newQ2, *newQ2V, *newQ2cum, *newQ2Vcum, *newQ2Vcum_ref;
+        newPRESS = mvAllocMat(pca->_A, 1);
+        newPRESSV = mvAllocMat(pca->_A, pca->X->ncolumns);
+        mvConcatRows(newPRESS, cv->PRESS, PRESS);
+        mvConcatRows(newPRESSV, cv->PRESSV, PRESSV);
+        mvFreeMat(&cv->PRESS);
+        mvFreeMat(&cv->PRESSV);
+        mvFreeMat(&PRESS);
+        mvFreeMat(&PRESSV);
+        cv->PRESS = newPRESS;
+        cv->PRESSV = newPRESSV;
+
+        // new Q2
+        newQ2 = mvAllocMat(pca->_A, 1);
+        for (i=0; i<pca->_A-1; i++)
+        {
+            newQ2->data[i][0] = pca->Q2->data[i][0];
+        }
+        newQ2->data[pca->_A-1][0] = Q2;
+        mvFreeMat(&pca->Q2);
+        pca->Q2 = newQ2;
+
+        // new Q2V
+        newQ2V = mvAllocMat(pca->_A, X->ncolumns);
+        mvConcatRows(newQ2V, pca->Q2V, Q2V);
+        mvFreeMat(&pca->Q2V);
+        mvFreeMat(&Q2V);
+        pca->Q2V = newQ2V;
+
+        // new Q2cum
+        newQ2cum = mvAllocMat(pca->_A, 1);
+        for(i=0; i<pca->_A-1; i++)
+        {
+            newQ2cum->data[i][0] = pca->Q2cum->data[i][0];
+            Q2cum *= cv->PRESS->data[i][0] / pca->SSX->data[i][0];
+        }
+        Q2cum *= cv->PRESS->data[pca->_A-1][0] / pca->SSX->data[pca->_A-1][0];
+        newQ2cum->data[pca->_A-1][0] = 1.0 - Q2cum;
+        mvFreeMat(&pca->Q2cum);
+        pca->Q2cum = newQ2cum;
+
+        // new Q2Vcum
+        newQ2Vcum = mvAllocMat(pca->_A, X->ncolumns);
+        // first copy existing data into newQVcum
+        for (i=0; i < pca->_A-1; i++)
+        {
+            int j;
+            for (j=0; j<newQ2Vcum->ncolumns; j++)
+            {
+                newQ2Vcum->data[i][j] = pca->Q2Vcum->data[i][j];
+            }
+        }
+        // set PRESSV_temp to be full of 1's
+        mvMatSet(PRESSV_temp, 1.0);
+        PRESSV_SSV = mvAllocMat(1, X->ncolumns);
+        for (i=0; i < pca->_A; i++)
+        {
+            mvMat *PRESSV_ref, *SSXV_ref;
+            PRESSV_ref = NULL;
+            SSXV_ref = NULL;
+            componentSlice->data[0][0] = i;
+            mvMatSliceRowsRef(&PRESSV_ref, cv->PRESSV, componentSlice);
+            mvMatSliceRowsRef(&SSXV_ref, pca->SSXV, componentSlice);
+            mvMatColumnDiv(PRESSV_SSV, PRESSV_ref, SSXV_ref);
+            mvMatElemMult(PRESSV_temp, PRESSV_temp, PRESSV_SSV);
+
+            mvFreeMat(&PRESSV_ref);
+            mvFreeMat(&SSXV_ref);
+        }
+        componentSlice->data[0][0] = pca->_A - 1;
+        newQ2Vcum_ref = NULL;
+        mvMatSliceRowsRef(&newQ2Vcum_ref, newQ2Vcum, componentSlice);
+        mvMatMultS(PRESSV_temp, PRESSV_SSV, -1.0);
+        mvAddMatS(newQ2Vcum_ref, PRESSV_temp, 1.0);
+        mvFreeMat(&PRESSV_SSV);
+        mvFreeMat(&newQ2Vcum_ref);
+        mvFreeMat(&pca->Q2Vcum);
+        pca->Q2Vcum = newQ2Vcum;
+    }
+    mvFreeMat(&componentSlice);
+    mvFreeMat(&PRESSV_temp);
+    return 0;
+}
+
+
 static int __crossValidatePCA(mvModel *pca)
 {
     switch (pca->crossValType)
     {
     case FAST:
         return __crossValidatePCA_FAST(pca);
-//    case FULL:
-//        return __crossValidatePCA_FULL(pca);
+    case FULL:
+        return __crossValidatePCA_FULL(pca);
     default:
         return UNKNOWN_MODEL_TYPE;
     }
