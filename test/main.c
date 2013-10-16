@@ -134,6 +134,7 @@ int main(int argc, char *argv[])
                 assert(value == 1.000000);
             }
         }
+        mvFreeMat(&matrix1);
     }
 
     printf("\n**Testing concat rows with unmatching columns**\n");
@@ -188,7 +189,7 @@ int main(int argc, char *argv[])
         mvFreeMat(&matrix3);
     }
 
-    printf("\n**Testing concat rows**\n");
+    printf("\n**Testing concat columns**\n");
     {
         matrix1 = mvAllocMatVal(2,3, M_PI);
         matrix2 = mvAllocMatVal(2,4, M_E);
