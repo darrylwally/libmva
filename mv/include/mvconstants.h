@@ -20,7 +20,7 @@ extern "C"{
 #define DATA_MISSING 0
 #define DATA_PRESENT 1
 
-typedef enum MVErrorCode_enum {
+typedef enum MVReturnCode_enum {
     INCORRECT_DIMENSIONS = -1,
     INDEX_OUT_OF_BOUNDS = -2,
     ATTEMPT_TO_FREE_NULL_MATRIX = -2,
@@ -29,7 +29,7 @@ typedef enum MVErrorCode_enum {
     UNKNOWN_MODEL_TYPE = -5,
     UNKOWN_CROSSVALIDATION_TYPE = -6,
     SUCCESS = 0
-} MVErrorCode;
+} MVReturnCode;
 
 // EPS
 #define MV_DBL_EPS 2.2204460492503131e-016
