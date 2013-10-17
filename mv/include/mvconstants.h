@@ -28,7 +28,11 @@ typedef enum MVReturnCode_enum {
     WRONG_MODEL_TYPE = -4,
     UNKNOWN_MODEL_TYPE = -5,
     UNKOWN_CROSSVALIDATION_TYPE = -6,
-    SUCCESS = 0
+    SUCCESS = 0,
+    CROSSVAL_RULE1 = 1,
+    CROSSVAL_RULE2 = 2,
+    CROSSVAL_RULE3 = 3,
+    CROSSVAL_RULE4 = 4
 } MVReturnCode;
 
 // EPS

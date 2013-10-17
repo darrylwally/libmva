@@ -1400,3 +1400,8 @@ int mvNewObsT(mvMat *t, mvMat * E, const mvMat *newX, const mvModel *model,
     }
     return UNKNOWN_MODEL_TYPE;
 }
+
+int mvAutoFit(mvModel *model)
+{
+    return SUCCESS;
+}

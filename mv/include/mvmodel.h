@@ -133,6 +133,29 @@ int mvFreeModel(mvModel **model);
   */
 int mvModelAddComponent(mvModel *model);
 
+/*! Performs auto-fit on PCA or PLS model
+
+  Cross validation rules:
+   - RULE 1: New components are added if Q2 > threshold
+   - RULE 2: New components are added if any variable in Q2V > threshold (PLS)
+     or at least sqrt(K) variables have Q2V > threshold.
+   - RULE 3: New components stop if A > min(X.rows, X.cols)
+   - RULE 4: Cross validation will stop of the NIPALS iteration threshold has
+     been reached implying convergence cannot be reached which means the model
+     may have no more data to extract.  The max number of NIPALS iterations is
+     500.
+
+   References:
+    - Cross validation rules as in: Eriksson, L., Johansson, E.,
+     Kettaneh-Wold, N., Trigg, J., C., W., & Wold.S. (2006). Multi- and
+     Megavariate Data Analysis: Part 1 - Basic Principles and Applications. Umea,
+     Sweden: Umetrics AB.
+
+   \arg model mvModel to auto-fit
+   \return MVModelErrorCode;
+  */
+int mvAutoFit(mvModel *model);
+
 /*! Computes T-scores for new observations of X of a mvModel
 
   \arg t output preallocated vector of scores.  Must be size N' x A' where
