@@ -78,6 +78,7 @@ typedef struct mvModel_s{
     mvMat * SSYV;        /*! Sum of squares of columns of Y-matrix for each component size (_A+1xY)*/
     int A;      /*! Number of active components */
     int _A;     /*! Total number of computed components */
+    mvMat * iter;        /*! Column vector mvMat (_Ax1) Number of iterations on NIPALS algorithm */
 
 } mvModel;
 

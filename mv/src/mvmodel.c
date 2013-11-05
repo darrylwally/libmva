@@ -754,7 +754,7 @@ int mvFreeModel(mvModel **model)
 
 static int __mvAddPCAComponent(mvModel *model, int performCrossValidation)
 {
-    int iter = 0;
+    int num_iter = 0;
     int N = model->X->nrows;
     int K = model->X->ncolumns;
     mvMat *p = mvAllocMatVal(K, 1, 1.0);
@@ -762,6 +762,7 @@ static int __mvAddPCAComponent(mvModel *model, int performCrossValidation)
     mvMat *pDiff = mvAllocMat(K, 1);
     mvMat *t = mvAllocMat(N, 1);
     mvMat *R2 = mvAllocMat(1,1);
+    mvMat *iter = mvAllocMatZ(1,1);
     mvMat *X;   // reference -> no clean up req'd.
     mvMat *pT, *tpT;
     double vectorNorm;
@@ -781,7 +782,7 @@ static int __mvAddPCAComponent(mvModel *model, int performCrossValidation)
     }
     // PCA NIPALS Algorithm
     do{
-        iter++;
+        num_iter++;
         __mvRegressCol(t, X, p);    // t= Xp / (p'p);
 
         mvMatCopy(pOld, p);         // store contents of p into pOld
@@ -795,7 +796,7 @@ static int __mvAddPCAComponent(mvModel *model, int performCrossValidation)
         mvSubtractMat(pDiff, p, pOld);          // get the difference of P
 
         vectorNorm = mvVectorNorm(pDiff);
-    } while (vectorNorm > MV_DBL_SQRT_EPS && iter < MAX_NIPALS_ITER);
+    } while (vectorNorm > MV_DBL_SQRT_EPS && num_iter < MAX_NIPALS_ITER);
 
     // no longer need, pOld or pDiff
     mvFreeMat(&pOld);
@@ -803,6 +804,9 @@ static int __mvAddPCAComponent(mvModel *model, int performCrossValidation)
 
     // Increment number of internal components
     model->_A++;
+
+    // Set iter
+    mvMatSetElem(iter, 0, 0 , num_iter);
 
     // XXX: Cross validation must be performed before the new residual E is
     // computed and depends on _A == 1 for the first component (NOT ZERO!)
@@ -832,9 +836,11 @@ static int __mvAddPCAComponent(mvModel *model, int performCrossValidation)
     // store new components.
     if (model->_A > 1)
     {
+        mvMat *newIter = mvAllocMat(model->_A, 1);
         mvMat *newR2 = mvAllocMat(model->_A, 1);
         mvMat *newT = mvAllocMat(model->X->nrows, model->_A);
         mvMat *newP = mvAllocMat(model->X->ncolumns, model->_A);
+
         // T and P
         mvConcatColumns(newT, model->t, t);
         mvFreeMat(&model->t);
@@ -850,12 +856,20 @@ static int __mvAddPCAComponent(mvModel *model, int performCrossValidation)
         mvFreeMat(&model->R2X);
         model->R2X=newR2;
         mvFreeMat(&R2);
+
+        // Iter
+        mvConcatRows(newIter, model->iter, iter);
+        mvFreeMat(&model->iter);
+        model->iter = newIter;
+        mvFreeMat(&iter);
+
     }
     else
     {
         model->t = t;
         model->p = p;
         model->R2X = R2;
+        model->iter = iter;
     }
 
     // Store new sum of squares values.
@@ -889,7 +903,7 @@ static int __mvAddPCAComponent(mvModel *model, int performCrossValidation)
 
 static int __mvAddPLSComponent(mvModel *model, int performCrossValidation)
 {
-    int iter = 0;
+    int num_iter = 0;
     int N = model->X->nrows;
     int K = model->X->ncolumns;
     int M = model->Y->ncolumns;
@@ -902,6 +916,7 @@ static int __mvAddPLSComponent(mvModel *model, int performCrossValidation)
     mvMat *u = mvAllocMat(N, 1);
     mvMat *R2X = mvAllocMat(1, 1);
     mvMat *R2Y = mvAllocMat(1, 1);
+    mvMat *iter = mvAllocMatZ(1, 1);
     mvMat *X, *Y;   // reference -> no clean up req'd.
     mvMat *pT, *tpT, *cT, *tcT;
     double SSE, SSF;
@@ -923,7 +938,7 @@ static int __mvAddPLSComponent(mvModel *model, int performCrossValidation)
     }
     // PCA NIPALS Algorithm
     do{
-        iter++;
+        num_iter++;
 
         __mvRegressCol(t, X, w);    // t = X w / w'w
 
@@ -939,7 +954,7 @@ static int __mvAddPLSComponent(mvModel *model, int performCrossValidation)
 
         mvSubtractMat(wDiff, w, wOld);          // get the difference of w
 
-    } while (mvVectorNorm(wDiff)>MV_DBL_SQRT_EPS && iter < MAX_NIPALS_ITER);
+    } while (mvVectorNorm(wDiff)>MV_DBL_SQRT_EPS && num_iter < MAX_NIPALS_ITER);
 
     // compute loading p after loop
     __mvRegressRow(p, X, t);
@@ -950,6 +965,9 @@ static int __mvAddPLSComponent(mvModel *model, int performCrossValidation)
 
     // Increment number of internal components
     model->_A++;
+
+    // Set iter
+    mvMatSetElem(iter, 0, 0 , num_iter);
 
     // XXX: Cross validation must be performed before the new residual E is
     // computed and depends on _A == 1 for the first component (NOT ZERO!)
@@ -992,7 +1010,7 @@ static int __mvAddPLSComponent(mvModel *model, int performCrossValidation)
     if (model->_A > 1)
     {
         mvMat *newT, *newP, *newW, *newU, *newC, *wStar, *newWStar;
-        mvMat *newR2X, *newR2Y;
+        mvMat *newR2X, *newR2Y, *newIter;
         //t
         newT = mvAllocMat(model->X->nrows, model->A+1);
         mvConcatColumns(newT, model->t, t);
@@ -1051,6 +1069,13 @@ static int __mvAddPLSComponent(mvModel *model, int performCrossValidation)
         model->R2Y = newR2Y;
         mvFreeMat(&R2Y);
 
+        // Iter
+        newIter = mvAllocMat(model->A+1, 1);
+        mvConcatRows(newIter, model->iter, iter);
+        mvFreeMat(&model->iter);
+        model->iter = newIter;
+        mvFreeMat(&iter);
+
     }
     else
     {
@@ -1062,6 +1087,7 @@ static int __mvAddPLSComponent(mvModel *model, int performCrossValidation)
         model->wStar = mvAllocMatCopy(w); // W* = W for the first component
         model->R2X = R2X;
         model->R2Y = R2Y;
+        model->iter = iter;
     }
 
     // Store new sum of squares values.
