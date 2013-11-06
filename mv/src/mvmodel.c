@@ -21,6 +21,10 @@
 #include <assert.h>
 
 #define MAX_NIPALS_ITER 500
+#define AUTOFIT_THRESHOLD 0.05
+
+#define MIN(a,b) (((a) < (b)) ? (a) : (b))
+#define MAX(a,b) (((a) > (b)) ? (a) : (b))
 
 // Function prototypes
 static int __mvAddPCAComponent(mvModel *model, int performCrossValidation);
@@ -1429,5 +1433,69 @@ int mvNewObsT(mvMat *t, mvMat * E, const mvMat *newX, const mvModel *model,
 
 int mvAutoFit(mvModel *model)
 {
+    int return_val = SUCCESS;
+    int component_is_valid = 1;
+    model->A = 0;
+    while (component_is_valid)
+    {
+        component_is_valid = 0;
+        mvModelAddComponent(model);
+        double iter = 0.0;
+        mvMatGetElem(model->iter, &iter, model->A-1, 0);
+        double Q2 = 0.0;
+        mvMatGetElem(model->Q2, &Q2, model->A-1, 0);
+        /* Rule 3 */
+        if (model->A > MIN(model->X->nrows, model->X->ncolumns))
+        {
+            return_val = CROSSVAL_RULE3;
+        }
+        /* RULE 4 */
+        else if (iter >= MAX_NIPALS_ITER)
+        {
+            return_val = CROSSVAL_RULE4;
+        }
+        /* Rule 1 */
+        else if (Q2 >= AUTOFIT_THRESHOLD)
+        {
+            component_is_valid = 1;
+        }
+        else
+        {
+            int i;
+            double QV;
+            if (model->modelType == PCA)
+            {
+                int n_QV_gt = 0;
+                for (i = 0; i < model->X->ncolumns; i++)
+                {
+                    mvMatGetElem(model->Q2V, &QV, i, model->A-1);
+                    if (QV >= AUTOFIT_THRESHOLD)
+                    {
+                        n_QV_gt++;
+                    }
+                }
+                if (sqrt(n_QV_gt) > model->X->ncolumns)
+                {
+                    component_is_valid = 1;
+                }
+            }
+            else if (model->modelType == PLS)
+            {
+                for (i = 0; i < model->Y->ncolumns; i++)
+                {
+                    mvMatGetElem(model->Q2V, &QV, i, model->A-1);
+                    if (QV >= AUTOFIT_THRESHOLD)
+                    {
+                        component_is_valid = 1;
+                        break;
+                    }
+                }
+            }
+        }
+
+    }
+    /* Subtract one at the end because we've left the loop because the last
+       component was invalid / insignificant */
+    model->A--;
     return SUCCESS;
 }

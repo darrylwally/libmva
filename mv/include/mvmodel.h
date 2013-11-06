@@ -146,6 +146,9 @@ int mvModelAddComponent(mvModel *model);
      may have no more data to extract.  The max number of NIPALS iterations is
      500.
 
+   Rules 3 and 4 are fail rules.  If Rules 3 and 4 do not fail, Rule 1 or 2 must
+   pass.
+
    References:
     - Cross validation rules as in: Eriksson, L., Johansson, E.,
      Kettaneh-Wold, N., Trigg, J., C., W., & Wold.S. (2006). Multi- and
@@ -153,7 +156,7 @@ int mvModelAddComponent(mvModel *model);
      Sweden: Umetrics AB.
 
    \arg model mvModel to auto-fit
-   \return MVModelErrorCode;
+   \return MVModelReturnCode - The rule that failed.
   */
 int mvAutoFit(mvModel *model);
 
