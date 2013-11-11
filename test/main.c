@@ -1025,7 +1025,6 @@ int main(int argc, char *argv[])
         mvMat *X_mean = mvAllocMat(1,FOODS_DATA_COLUMNS);
         mvMat *X_std = mvAllocMat(1,FOODS_DATA_COLUMNS);
         mvMat *new_t = NULL;
-        mvMat *t_stddev = NULL;
         mvMat *X_hat = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
         mvMat *HT2 = mvAllocMatZ(X->nrows, 1);
         mvMat *SPE = mvAllocMatZ(X->nrows, 1);
@@ -1076,7 +1075,6 @@ int main(int argc, char *argv[])
                   i+1, pca_model->R2X->data[i][0], i+1, pca_model->Q2cum->data[i][0]);
         }
         new_t = mvAllocMatZ(X->nrows, pca_model->A);
-        t_stddev = mvAllocMatZ(1, pca_model->_A);
 
         mvNewObsT(new_t, NULL, X_mcuv, pca_model, pca_model->A, SCP);
 
@@ -1086,8 +1084,7 @@ int main(int argc, char *argv[])
             printf("T%d[1] = %1.8lf\t", i+1, new_t->data[0][i]);
         }
 
-        mvColumnStdDev(t_stddev, pca_model->t, 1);
-        mvHT2(HT2, pca_model->t, t_stddev, 1, pca_model->A);
+        mvHT2(HT2, pca_model->t, pca_model->t_stddev, 1, pca_model->A);
 
         printf("\nNew foods HT2 for [1-%d].", pca_model->A);
 
@@ -1105,7 +1102,6 @@ int main(int argc, char *argv[])
         printf("\n");
         mvFreeMat(&SPE);
         mvFreeMat(&HT2);
-        mvFreeMat(&t_stddev);
         mvFreeMat(&new_t);
         mvFreeMat(&X);
         mvFreeMat(&X_hat);

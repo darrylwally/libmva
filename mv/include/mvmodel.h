@@ -58,6 +58,7 @@ typedef struct mvModel_s{
     mvMat * E;           /*! X-Residual matrix */
     mvMat * F;           /*! Y-Residual matrix */
     mvMat * t;           /*! T-scores matrix of size (NxA) */
+    mvMat * t_stddev;    /*! Standard deviation of T-scores of size (1xA); */
     mvMat * p;           /*! P-loadings matrix of size (KxA) */
     mvMat * u;           /*! U-scores matrix of size (NxA) */
     mvMat * w;           /*! W-weightings matrix of size (KxA) */

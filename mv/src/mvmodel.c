@@ -608,6 +608,7 @@ mvModel * mvInitPCAModel(mvMat *X)
     output->E = mvAllocMatZ(X->nrows, X->ncolumns);
     output->p = NULL;
     output->t = NULL;
+    output->t_stddev = NULL;
     output->R2X = NULL;
     output->cvd = NULL;
     output->crossValType = FAST;
@@ -657,6 +658,7 @@ mvModel * mvInitPLSModel(mvMat *X, mvMat *Y)
     output->wStar = NULL;
     output->p = NULL;
     output->t = NULL;
+    output->t_stddev = NULL;
     output->cvd = NULL;
     output->crossValType = FAST;
     output->numCrossValRounds = 7;
@@ -690,6 +692,7 @@ static int __mvFreePCAModel(mvModel **model)
         return -1;
     mvFreeMat(&m->E);
     mvFreeMat(&m->t);
+    mvFreeMat(&m->t_stddev);
     mvFreeMat(&m->p);
     mvFreeMat(&m->R2X);
     mvFreeMat(&m->SSX);
@@ -719,6 +722,7 @@ static int __mvFreePLSModel(mvModel **model)
     mvFreeMat(&m->w);
     mvFreeMat(&m->wStar);
     mvFreeMat(&m->t);
+    mvFreeMat(&m->t_stddev);
     mvFreeMat(&m->p);
     mvFreeMat(&m->R2X);
     mvFreeMat(&m->R2Y);
@@ -854,6 +858,9 @@ static int __mvAddPCAComponent(mvModel *model, int performCrossValidation)
         model->p=newP;
         mvFreeMat(&t);
         mvFreeMat(&p);
+        mvFreeMat(&model->t_stddev);
+        model->t_stddev = mvAllocMat(1, model->_A);
+        mvColumnStdDev(model->t_stddev, model->t, 1);
 
         // R2X
         mvConcatRows(newR2, model->R2X, R2);
@@ -871,6 +878,8 @@ static int __mvAddPCAComponent(mvModel *model, int performCrossValidation)
     else
     {
         model->t = t;
+        model->t_stddev = mvAllocMat(1,1);
+        mvColumnStdDev(model->t_stddev, model->t, 1);
         model->p = p;
         model->R2X = R2;
         model->iter = iter;
@@ -1021,6 +1030,9 @@ static int __mvAddPLSComponent(mvModel *model, int performCrossValidation)
         mvFreeMat(&model->t);
         model->t=newT;
         mvFreeMat(&t);
+        mvFreeMat(&model->t_stddev);
+        model->t_stddev = mvAllocMat(1, model->_A);
+        mvColumnStdDev(model->t_stddev, model->t, 1);
 
         //p
         newP = mvAllocMat(model->X->ncolumns, model->A+1);
@@ -1084,6 +1096,8 @@ static int __mvAddPLSComponent(mvModel *model, int performCrossValidation)
     else
     {
         model->t=t;
+        model->t_stddev = mvAllocMat(1,1);
+        mvColumnStdDev(model->t_stddev, model->t, 1);
         model->p=p;
         model->c=c;
         model->u=u;
