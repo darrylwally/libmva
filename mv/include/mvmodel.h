@@ -23,8 +23,8 @@ extern "C" {
 
 /* TODO Define error code enums */
 
-/*!
-    Arteaga and Ferrer
+/*! New score calculation methods:
+    References: Arteaga, F and Ferrer, A. Journal of Chemometrics, 16, pp408-418, 2002.
 */
 typedef enum MVNewScoreCalcType_enum {
     SCP//, /*! Single component projection */
@@ -78,6 +78,7 @@ typedef struct mvModel_s{
     mvMat * SSYV;        /*! Sum of squares of columns of Y-matrix for each component size (_A+1xY)*/
     int A;      /*! Number of active components */
     int _A;     /*! Total number of computed components */
+    mvMat * iter;        /*! Column vector mvMat (_Ax1) Number of iterations on NIPALS algorithm */
 
 } mvModel;
 
@@ -113,20 +114,78 @@ int mvFreeModel(mvModel **model);
 
 /*! Add a component to the model
 
-  Components will not be added if A >min(X->nrows, X->ncolumns)
+  Components are added via NIPALs algorithm.
+  All calculations for relevant parameters, including cross-validation, are
+  performed.
+
+  References:
+   - Summary of PCA and PLS algorithms: Westerhuis, J.A., Kourti, T., &
+     MacGregor, J.F., ANALYSIS OF MULTIBLOCK AND HIERARCHICAL PCA AND PLS MODELS,
+     J Chemometrics 12, 301–321 (1998)
+   - Calculation of W*: Dayal, B.S. & MacGregor, J.F. (1997) Improved PLS
+     algorithms. J. Chemometrics 11:73-85
+   - "Fast" cross-validation is computed as in: Eriksson, L., Johansson, E.,
+     Kettaneh-Wold, N., Trigg, J., C., W., & Wold.S. (2006). Multi- and
+     Megavariate Data Analysis: Part 1 - Basic Principles and Applications. Umea,
+     Sweden: Umetrics AB.
+
   \arg model The mvModel
   \return 0 on success or MVModelErrorCode;
   */
 int mvModelAddComponent(mvModel *model);
 
+/*! Performs auto-fit on PCA or PLS model
+
+  Cross validation rules:
+   - RULE 1: New components are added if Q2 > threshold
+   - RULE 2: New components are added if any variable in Q2V > threshold (PLS)
+     or at least sqrt(K) variables have Q2V > threshold.
+   - RULE 3: New components stop if A > min(X.rows, X.cols)
+   - RULE 4: Cross validation will stop of the NIPALS iteration threshold has
+     been reached implying convergence cannot be reached which means the model
+     may have no more data to extract.  The max number of NIPALS iterations is
+     500.
+
+   Rules 3 and 4 are fail rules.  If Rules 3 and 4 do not fail, Rule 1 or 2 must
+   pass.
+
+   References:
+    - Cross validation rules as in: Eriksson, L., Johansson, E.,
+     Kettaneh-Wold, N., Trigg, J., C., W., & Wold.S. (2006). Multi- and
+     Megavariate Data Analysis: Part 1 - Basic Principles and Applications. Umea,
+     Sweden: Umetrics AB.
+
+   \arg model mvModel to auto-fit
+   \return MVModelReturnCode - The rule that failed.
+  */
+int mvAutoFit(mvModel *model);
+
 /*! Computes T-scores for new observations of X of a mvModel
 
+  \arg t output preallocated vector of scores.  Must be size N' x A' where
+       A' is num_components
+  \arg E output preallocated vector of residuals. Must be size N'xK
+  \arg newX matrix of new observations of size N'xK.
+  \arg pca_model mvModel object containing model weights.
+  \arg num_components Number of components of the new observation to compute.
+  \arg method Method with which to compute new scores.
+
+  \sa MVNewScoreCalcType
   */
 int mvNewObsT(mvMat *t, mvMat * E, const mvMat *newX, const mvModel *pca_model,
                   int num_components, MVNewScoreCalcType method);
 
 /*! Computes U-scores for a new observation of Y of a PLS Model
 
+  \arg u output preallocated vector of scores.  Must be size N' x A' where
+       A' is num_components
+  \arg F output preallocated vector of residuals. Must be size N'xM
+  \arg newY matrix of new observations of size N'xM.
+  \arg pls_model mvModel object containing model weights.
+  \arg num_components Number of components of the new observation to compute.
+  \arg method Method with which to compute new scores.
+
+  \sa MVNewScoreCalcType
   */
 int mvNewObsU(mvMat *u, mvMat *F, const mvMat *newY, const mvMat *newT,
                   const mvModel *pls_model, int num_components,

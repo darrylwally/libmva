@@ -1024,10 +1024,11 @@ int main(int argc, char *argv[])
         mvMat * X_mcuv = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
         mvMat *X_mean = mvAllocMat(1,FOODS_DATA_COLUMNS);
         mvMat *X_std = mvAllocMat(1,FOODS_DATA_COLUMNS);
-        mvMat *new_t = mvAllocMatZ(X->nrows, 2);
-        mvMat *t_stddev = mvAllocMat(1, 2);
-        mvMat *HT2 = mvAllocMat(X->nrows, 1);
-        mvMat *SPE = mvAllocMat(X->nrows, 1);
+        mvMat *new_t = NULL;
+        mvMat *t_stddev = NULL;
+        mvMat *X_hat = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        mvMat *HT2 = mvAllocMatZ(X->nrows, 1);
+        mvMat *SPE = mvAllocMatZ(X->nrows, 1);
         mvModel *pca_model;
         int i, j;
         for (i=0; i<FOODS_DATA_ROWS; i++)
@@ -1050,10 +1051,10 @@ int main(int argc, char *argv[])
         mvMatColumnDiv(X_mcuv, X_mcuv, X_std);
 
         pca_model = mvInitPCAModel(X_mcuv);
-        mvModelAddComponent(pca_model);
-        mvModelAddComponent(pca_model);
+        mvAutoFit(pca_model);
 
-        printf("\n");
+        printf("\nNumber of components computed: %d\nNumber of signification components: %d\n",
+               pca_model->_A, pca_model->A);
         for(i=0; i< (int) pca_model->A; i++)
         {
             printf("PRESS[%2d] = %lf\n", i+1, pca_model->cvd->PRESS->data[i][0]);
@@ -1061,33 +1062,41 @@ int main(int argc, char *argv[])
 
         for (i=0; i<FOODS_DATA_ROWS; i++)
         {
-            printf("T1[%2d]=%1.8lf\tT2[%2d]=%1.8lf\n", i+1, pca_model->t->data[i][0],
-                   i+1, pca_model->t->data[i][1]);
+            for (j=0; j < pca_model->A; j++)
+            {
+                printf("T%d[%2d]=%1.8lf\t", j+1, i+1, pca_model->t->data[i][j]);
+            }
+            printf("\n");
         }
 
-        printf("\nFoods R2X values:\nR2X[%d]=%1.8lf\nR2X[%d]=%1.8lf\n",
-               1, pca_model->R2X->data[0][0],
-               2, pca_model->R2X->data[1][0]);
-        printf("\nFoods Q2cum values:\nQ2cum[%d]=%1.8lf\nQ2cum[%d]=%1.8lf\n",
-               1, pca_model->Q2cum->data[0][0],
-               2, pca_model->Q2cum->data[1][0]);
+        printf("\nFoods R2X and Q2Cum values:\n");
+        for (i = 0; i < pca_model->A; i++)
+        {
+            printf("R2X[%d]=%1.8lf\tQ2Cum[%d]=%1.8lf\n",
+                  i+1, pca_model->R2X->data[i][0], i+1, pca_model->Q2cum->data[i][0]);
+        }
+        new_t = mvAllocMatZ(X->nrows, pca_model->A);
+        t_stddev = mvAllocMatZ(1, pca_model->_A);
 
-        mvNewObsT(new_t, NULL, X_mcuv, pca_model, 2, SCP);
+        mvNewObsT(new_t, NULL, X_mcuv, pca_model, pca_model->A, SCP);
 
-        printf("\nNew foods score T1[1] = %1.8lf, T2[1] = %1.8lf", new_t->data[0][0], new_t->data[0][1]);
+        printf("\nNew foods score:\n");
+        for (i = 0; i < pca_model->A; i++)
+        {
+            printf("T%d[1] = %1.8lf\t", i+1, new_t->data[0][i]);
+        }
 
         mvColumnStdDev(t_stddev, pca_model->t, 1);
-        mvHT2(HT2, pca_model->t, t_stddev, 1,2);
+        mvHT2(HT2, pca_model->t, t_stddev, 1, pca_model->A);
 
-        printf("\nNew foods HT2 for [1-2].");
+        printf("\nNew foods HT2 for [1-%d].", pca_model->A);
 
         for (i=0; i<FOODS_DATA_ROWS; i++)
         {
             printf("\nHT2[%d] = %1.8lf", i+1, HT2->data[i][0]);
         }
-
         mvSPE(SPE, pca_model->E);
-        printf("\nSPE Limits for Foods at A=2. 0.95 = %1.8lf, 0.99 = %1.8lf",
+        printf("\nSPE Limits for Foods at A=. 0.95 = %1.8lf, 0.99 = %1.8lf",
                mvSPELimit(0.95, SPE), mvSPELimit(0.99, SPE));
         for(i=0; i <FOODS_DATA_ROWS; i++)
         {
@@ -1099,6 +1108,7 @@ int main(int argc, char *argv[])
         mvFreeMat(&t_stddev);
         mvFreeMat(&new_t);
         mvFreeMat(&X);
+        mvFreeMat(&X_hat);
         mvFreeMat(&X_mcuv);
         mvFreeMat(&X_mean);
         mvFreeMat(&X_std);

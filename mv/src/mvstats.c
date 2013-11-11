@@ -52,8 +52,8 @@ int mvHT2(mvMat *output, const mvMat *t, const mvMat *t_stddev,
     int i,j;
     first_component--;
     if (!(output->nrows == t->nrows && output->ncolumns == 1 &&
-          first_component > -1 && last_component <= t->nrows &&
-          t_stddev->nrows == 1 && t_stddev->ncolumns == t->ncolumns))
+          first_component > -1 && last_component <= t->ncolumns &&
+          t_stddev->nrows == 1 && t_stddev->ncolumns <= t->ncolumns))
     {
         return INCORRECT_DIMENSIONS;
     }
