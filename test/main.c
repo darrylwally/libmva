@@ -1026,6 +1026,7 @@ int main(int argc, char *argv[])
         mvMat *X_std = mvAllocMat(1,FOODS_DATA_COLUMNS);
         mvMat *new_t = NULL;
         mvMat *t_stddev = NULL;
+        mvMat *X_hat = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
         mvMat *HT2 = mvAllocMatZ(X->nrows, 1);
         mvMat *SPE = mvAllocMatZ(X->nrows, 1);
         mvModel *pca_model;
@@ -1074,8 +1075,8 @@ int main(int argc, char *argv[])
             printf("R2X[%d]=%1.8lf\tQ2Cum[%d]=%1.8lf\n",
                   i+1, pca_model->R2X->data[i][0], i+1, pca_model->Q2cum->data[i][0]);
         }
-        new_t = mvAllocMatZ(X->nrows, pca_model->A);
-        t_stddev = mvAllocMatZ(X->nrows, pca_model->A);
+        new_t = mvAllocMatZ(X->nrows, pca_model->_A);
+        t_stddev = mvAllocMatZ(1, pca_model->_A);
 
         mvNewObsT(new_t, NULL, X_mcuv, pca_model, pca_model->A, SCP);
 
@@ -1094,9 +1095,8 @@ int main(int argc, char *argv[])
         {
             printf("\nHT2[%d] = %1.8lf", i+1, HT2->data[i][0]);
         }
-
         mvSPE(SPE, pca_model->E);
-        printf("\nSPE Limits for Foods at A=2. 0.95 = %1.8lf, 0.99 = %1.8lf",
+        printf("\nSPE Limits for Foods at A=. 0.95 = %1.8lf, 0.99 = %1.8lf",
                mvSPELimit(0.95, SPE), mvSPELimit(0.99, SPE));
         for(i=0; i <FOODS_DATA_ROWS; i++)
         {
@@ -1108,6 +1108,7 @@ int main(int argc, char *argv[])
         mvFreeMat(&t_stddev);
         mvFreeMat(&new_t);
         mvFreeMat(&X);
+        mvFreeMat(&X_hat);
         mvFreeMat(&X_mcuv);
         mvFreeMat(&X_mean);
         mvFreeMat(&X_std);
