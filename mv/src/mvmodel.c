@@ -1167,7 +1167,7 @@ static int __mvNewObsPCA_T(mvMat *t, mvMat *E, const mvMat *newX, const mvModel 
     mvMat *p, *EHat;
     mvMat *_t, *_p, *_p_T, *_slice; // slices for calculation of E-hat
     if ( !(t->nrows == newX->nrows && newX->ncolumns == model->p->nrows &&
-           model->p->ncolumns >= num_components && t->ncolumns == num_components))
+           model->p->ncolumns >= num_components && t->ncolumns >= num_components))
     {
         return INCORRECT_DIMENSIONS;
     }

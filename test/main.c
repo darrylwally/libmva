@@ -1075,7 +1075,7 @@ int main(int argc, char *argv[])
             printf("R2X[%d]=%1.8lf\tQ2Cum[%d]=%1.8lf\n",
                   i+1, pca_model->R2X->data[i][0], i+1, pca_model->Q2cum->data[i][0]);
         }
-        new_t = mvAllocMatZ(X->nrows, pca_model->_A);
+        new_t = mvAllocMatZ(X->nrows, pca_model->A);
         t_stddev = mvAllocMatZ(1, pca_model->_A);
 
         mvNewObsT(new_t, NULL, X_mcuv, pca_model, pca_model->A, SCP);
