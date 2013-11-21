@@ -85,6 +85,89 @@ int mvSPE(mvMat *output, const mvMat *residuals)
     return mvMatRowSS(output, residuals);
 }
 
+
+int mvSPEXFromObs(mvMat *output, const mvModel *model, const mvMat *Xobs, const mvMat *tobs, int num_components)
+{
+    // todo: error checking
+    mvMat *E = mvAllocMat(Xobs->nrows, Xobs->ncolumns);
+    if (tobs == NULL)
+    {
+        mvMat *t = mvAllocMat(Xobs->nrows, num_components);
+        mvNewObsT(t, E, Xobs, model, num_components, SCP);
+        mvSPE(output, E);
+        mvFreeMat(&t);
+    }
+    else
+    {
+        mvMat *Xhat = E;
+        mvMat *weightT = mvAllocMat(model->p->ncolumns, model->p->nrows);
+        if (model->modelType == PCA)
+        {
+            mvTransposeMat(weightT, model->p);
+        }
+        else // (model->modelType == PLS)
+        {
+            mvTransposeMat(weightT, model->wStar);
+        }
+        mvMat _t, _weightT;
+        _t.nrows = tobs->nrows;
+        _t.ncolumns = num_components;
+        _t.data = tobs->data;
+        _t.mask = tobs->mask;
+        _t.isReference = 1;
+        _weightT.nrows = num_components;
+        _weightT.ncolumns = weightT->ncolumns;
+        _weightT.data = weightT->data;
+        _weightT.mask = weightT->mask;
+        _weightT.isReference = 1;
+        mvMatMult(Xhat, &_t, &_weightT);
+        mvSubtractMat(E, Xobs, Xhat);
+        mvFreeMat(&weightT);
+        mvSPE(output, E);
+    }
+
+    mvFreeMat(&E);
+
+    return SUCCESS;
+}
+
+int mvSPEYFromObs(mvMat *output, const mvModel *model, const mvMat *Yobs, const mvMat *tobs, int num_components)
+{
+    // todo: error checking
+    mvMat *F = mvAllocMat(Yobs->nrows, Yobs->ncolumns);
+    if (tobs == NULL)
+    {
+        mvMat *t = mvAllocMat(Yobs->nrows, num_components);
+        mvNewObsT(t, F, Yobs, model, num_components, SCP);
+        mvFreeMat(&t);
+    }
+    else
+    {
+        mvMat *Yhat = F;
+        mvMat *weightT = mvAllocMat(model->c->ncolumns, model->c->nrows);
+        mvTransposeMat(weightT, model->c);
+        mvMat _t, _weightT;
+        _t.nrows = tobs->nrows;
+        _t.ncolumns = num_components;
+        _t.data = tobs->data;
+        _t.mask = tobs->mask;
+        _t.isReference = 1;
+        _weightT.nrows = num_components;
+        _weightT.ncolumns = weightT->ncolumns;
+        _weightT.data = weightT->data;
+        _weightT.mask = weightT->mask;
+        _weightT.isReference = 1;
+        mvMatMult(Yhat, &_t, &_weightT);
+        mvSubtractMat(F, Yobs, Yhat);
+        mvFreeMat(&weightT);
+        mvSPE(output, F);
+    }
+
+    mvFreeMat(&F);
+
+    return SUCCESS;
+}
+
 double mvSPELimit(double alpha, const mvMat *modelSPE_values)
 {
     double m,v,g,h;

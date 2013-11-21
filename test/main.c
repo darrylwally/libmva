@@ -1092,9 +1092,18 @@ int main(int argc, char *argv[])
         {
             printf("\nHT2[%d] = %1.8lf", i+1, HT2->data[i][0]);
         }
+        // TODO: Compute SPEXLimits, SPEYLimits per component.  Add this to the model.
+        mvSPEXFromObs(SPE, pca_model, X_mcuv, pca_model->t, 4);
+        printf("\nSPE Limits for Foods at A=%d. 0.95 = %1.8lf, 0.99 = %1.8lf",
+               pca_model->_A, mvSPELimit(0.95, SPE), mvSPELimit(0.99, SPE));
+        for(i=0; i <FOODS_DATA_ROWS; i++)
+        {
+            printf("\nSPE[%d] = %1.8lf", i+1, SPE->data[i][0]);
+        }
+
         mvSPE(SPE, pca_model->E);
-        printf("\nSPE Limits for Foods at A=. 0.95 = %1.8lf, 0.99 = %1.8lf",
-               mvSPELimit(0.95, SPE), mvSPELimit(0.99, SPE));
+        printf("\nSPE Limits for Foods at A=%d. 0.95 = %1.8lf, 0.99 = %1.8lf",
+               pca_model->_A, mvSPELimit(0.95, SPE), mvSPELimit(0.99, SPE));
         for(i=0; i <FOODS_DATA_ROWS; i++)
         {
             printf("\nSPE[%d] = %1.8lf", i+1, SPE->data[i][0]);

@@ -14,6 +14,7 @@ s
 #define MVSTATS_H
 
 #include "mvmatrix.h"
+#include "mvmodel.h"
 
 double t_ppf(double alpha, double df, double loc, double scale);
 
@@ -29,6 +30,8 @@ int mvHT2(mvMat *output, const mvMat *scores, const mvMat *t_stddev,
 double mvHT2Limit(double alpha, int A, int N);
 
 int mvSPE(mvMat *output, const mvMat *residuals);
+int mvSPEXFromObs(mvMat *output, const mvModel *model, const mvMat *Xobs, const mvMat *tobs, int num_components);
+int mvSPEYFromObs(mvMat *output, const mvModel *model, const mvMat *Yobs, const mvMat *tobs, int num_components);
 
 double mvSPELimit(double alpha, const mvMat *modelSPE_values);
 
