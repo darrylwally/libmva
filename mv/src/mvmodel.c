@@ -1513,3 +1513,41 @@ int mvAutoFit(mvModel *model)
     model->A--;
     return SUCCESS;
 }
+
+
+static int __mvComputePred(mvMat *pred, const mvMat *scores, const mvMat *weights, int num_components)
+{
+    // todo: error checking
+    mvMat *weightsT = mvAllocMat(weights->ncolumns, weights->nrows);
+    mvTransposeMat(weightsT, weights);
+    mvMat _weightsT, _scores;
+    _weightsT.nrows = num_components;
+    _weightsT.ncolumns = weightsT->ncolumns;
+    _weightsT.data = weightsT->data;
+    _weightsT.mask = weightsT->mask;
+    _weightsT.isReference = 1;
+
+    _scores.nrows = scores->nrows;
+    _scores.ncolumns = num_components;
+    _scores.data = scores->data;
+    _scores.mask = scores->mask;
+    _scores.isReference = 1;
+
+    MVReturnCode ret = mvMatMult(pred, &_scores, &_weightsT);
+
+    mvFreeMat(&weightsT);
+    return ret;
+}
+
+
+int mvComputeXpred(mvMat *Xhat, const mvModel *model, const mvMat *t, int num_components)
+{
+    return __mvComputePred(Xhat, t, model->p, num_components);
+}
+
+
+int mvComputeYpred(mvMat *Yhat, const mvModel *model, const mvMat *t, int num_components)
+{
+    // todo: error checking
+    return __mvComputePred(Yhat, t, model->c, num_components);
+}

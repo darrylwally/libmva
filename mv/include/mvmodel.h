@@ -192,6 +192,29 @@ int mvNewObsU(mvMat *u, mvMat *F, const mvMat *newY, const mvMat *newT,
                   const mvModel *pls_model, int num_components,
                   MVNewScoreCalcType method);
 
+/*! Compute the predicted X values based on scores and loadings provided.
+
+    Predictions for X: Xhat = TP'
+
+    \arg pred preallocated mvMat, must be size NxK
+    \arg model mvModel.
+    \arg t scores with which to compute Xhat.
+    \arg num_components number of components to compute Xhat
+*/
+int mvComputeXpred(mvMat *Xhat, const mvModel *model, const mvMat *t, int num_components);
+
+/*! Compute the predicted X values based on scores and loadings provided.
+
+    Predictions for Y: Yhat = TC'
+
+    \arg pred preallocated mvMat, must be size NxK
+    \arg model mvModel must be PLS model.
+    \arg t scores with which to compute Yhat
+    \arg num_components number of components to compute Xhat
+*/
+int mvComputeYpred(mvMat *Yhat, const mvModel *model, const mvMat *t, int num_components);
+
+
 
 #ifdef __cplusplus
 }
