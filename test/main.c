@@ -1093,7 +1093,7 @@ int main(int argc, char *argv[])
             printf("\nHT2[%d] = %1.8lf", i+1, HT2->data[i][0]);
         }
 
-        int comp = pca_model->A;
+        int comp = 2;
         mvSPEXFromObs(SPE, pca_model, X_mcuv, pca_model->t, comp);
         printf("\nSPE Limits for Foods at A=%d. 0.95 = %1.8lf, 0.99 = %1.8lf",
                comp, mvSPELimit(0.95, pca_model->SPEX, comp), mvSPELimit(0.99, pca_model->SPEX, comp));

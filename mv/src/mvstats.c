@@ -100,29 +100,8 @@ int mvSPEXFromObs(mvMat *output, const mvModel *model, const mvMat *Xobs, const 
     else
     {
         mvMat *Xhat = E;
-        mvMat *weightT = mvAllocMat(model->p->ncolumns, model->p->nrows);
-        if (model->modelType == PCA)
-        {
-            mvTransposeMat(weightT, model->p);
-        }
-        else // (model->modelType == PLS)
-        {
-            mvTransposeMat(weightT, model->wStar);
-        }
-        mvMat _t, _weightT;
-        _t.nrows = tobs->nrows;
-        _t.ncolumns = num_components;
-        _t.data = tobs->data;
-        _t.mask = tobs->mask;
-        _t.isReference = 1;
-        _weightT.nrows = num_components;
-        _weightT.ncolumns = weightT->ncolumns;
-        _weightT.data = weightT->data;
-        _weightT.mask = weightT->mask;
-        _weightT.isReference = 1;
-        mvMatMult(Xhat, &_t, &_weightT);
+        mvComputeXpred(Xhat, model, tobs, num_components);
         mvSubtractMat(E, Xobs, Xhat);
-        mvFreeMat(&weightT);
         mvSPE(output, E);
     }
 
@@ -139,27 +118,14 @@ int mvSPEYFromObs(mvMat *output, const mvModel *model, const mvMat *Yobs, const 
     {
         mvMat *t = mvAllocMat(Yobs->nrows, num_components);
         mvNewObsT(t, F, Yobs, model, num_components, SCP);
+        mvSPE(output, F);
         mvFreeMat(&t);
     }
     else
     {
         mvMat *Yhat = F;
-        mvMat *weightT = mvAllocMat(model->c->ncolumns, model->c->nrows);
-        mvTransposeMat(weightT, model->c);
-        mvMat _t, _weightT;
-        _t.nrows = tobs->nrows;
-        _t.ncolumns = num_components;
-        _t.data = tobs->data;
-        _t.mask = tobs->mask;
-        _t.isReference = 1;
-        _weightT.nrows = num_components;
-        _weightT.ncolumns = weightT->ncolumns;
-        _weightT.data = weightT->data;
-        _weightT.mask = weightT->mask;
-        _weightT.isReference = 1;
-        mvMatMult(Yhat, &_t, &_weightT);
+        mvComputeYpred(Yhat, model, tobs, num_components);
         mvSubtractMat(F, Yobs, Yhat);
-        mvFreeMat(&weightT);
         mvSPE(output, F);
     }
 

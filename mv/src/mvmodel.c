@@ -1581,7 +1581,16 @@ static int __mvComputePred(mvMat *pred, const mvMat *scores, const mvMat *weight
 
 int mvComputeXpred(mvMat *Xhat, const mvModel *model, const mvMat *t, int num_components)
 {
-    return __mvComputePred(Xhat, t, model->p, num_components);
+    mvMat *weights = NULL;
+    if (model->modelType == PCA)
+    {
+        weights = model->p;
+    }
+    else if(model->modelType == PLS)
+    {
+        weights = model->wStar;
+    }
+    return __mvComputePred(Xhat, t, weights, num_components);
 }
 
 
