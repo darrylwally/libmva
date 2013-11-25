@@ -70,6 +70,8 @@ typedef struct mvModel_s{
     mvMat * Q2Vcum;      /*! Column vector mvMat (_Ax1)*/
     mvMat * Q2;          /*! Column vector mvMat (_Ax1)*/
     mvMat * Q2V;         /*! Q2 per Variable matrix of size KxA (PCA) or MxA (PLS) */
+    mvMat * SPEX;        /*! Squared Prediction Error of X (size NxA) */
+    mvMat * SPEY;        /*! Squared Prediction Error of Y - PLS only (size NxA) */
     crossValData * cvd;  /*! Data required for crossValidation */
     MVCrossValType crossValType; /*! Type of cross validation */
     int numCrossValRounds; /*! Number of rounds to for cross validation (default = 7) */

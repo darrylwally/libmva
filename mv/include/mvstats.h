@@ -33,7 +33,7 @@ int mvSPE(mvMat *output, const mvMat *residuals);
 int mvSPEXFromObs(mvMat *output, const mvModel *model, const mvMat *Xobs, const mvMat *tobs, int num_components);
 int mvSPEYFromObs(mvMat *output, const mvModel *model, const mvMat *Yobs, const mvMat *tobs, int num_components);
 
-double mvSPELimit(double alpha, const mvMat *modelSPE_values);
+double mvSPELimit(double alpha, const mvMat *modelSPE_values, int component);
 
 
 #endif // MVSTATS_H

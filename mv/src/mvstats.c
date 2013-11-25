@@ -168,17 +168,17 @@ int mvSPEYFromObs(mvMat *output, const mvModel *model, const mvMat *Yobs, const 
     return SUCCESS;
 }
 
-double mvSPELimit(double alpha, const mvMat *modelSPE_values)
+double mvSPELimit(double alpha, const mvMat *modelSPE_values, int component)
 {
     double m,v,g,h;
-    mvMat *mean = mvAllocMat(1,1);
-    mvMat *var = mvAllocMat(1,1);
+    mvMat *mean = mvAllocMat(1, modelSPE_values->ncolumns);
+    mvMat *var = mvAllocMat(1, modelSPE_values->ncolumns);
 
     mvColumnMean(mean, modelSPE_values);
     // sample variance.
     mvColumnVar(var, modelSPE_values, 1);
-    m = mean->data[0][0];
-    v = var->data[0][0];
+    m = mean->data[0][component-1];
+    v = var->data[0][component-1];
     mvFreeMat(&var);
     mvFreeMat(&mean);
 

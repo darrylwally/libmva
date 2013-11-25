@@ -13,6 +13,7 @@
 
 #include "mvmodel.h"
 #include "mvconstants.h"
+#include "mvstats.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -622,6 +623,8 @@ mvModel * mvInitPCAModel(mvMat *X)
     output->Q2V = NULL;
     output->Q2cum = NULL;
     output->Q2Vcum = NULL;
+    output->SPEX = NULL;
+    output->SPEY = NULL;
     /* Set PLS options to NULL just because */
     output->SSY = NULL;
     output->SSYV = NULL;
@@ -670,6 +673,8 @@ mvModel * mvInitPLSModel(mvMat *X, mvMat *Y)
     output->SSYV = mvAllocMat(1, Y->ncolumns);
     mvMatColumnSS(output->SSYV, Y);
     output->SSY->data[0][0] = mvMatSum(output->SSYV);
+    output->SPEX = NULL;
+    output->SPEY = NULL;
     output->R2X = NULL;
     output->R2Y = NULL;
     output->Q2 = NULL;
@@ -702,6 +707,7 @@ static int __mvFreePCAModel(mvModel **model)
     mvFreeMat(&m->Q2V);
     mvFreeMat(&m->Q2cum);
     mvFreeMat(&m->Q2Vcum);
+    mvFreeMat(&m->SPEX);
     __freeCrossValData((crossValData**) &m->cvd);
     free(m);
     *model = NULL;
@@ -734,6 +740,8 @@ static int __mvFreePLSModel(mvModel **model)
     mvFreeMat(&m->Q2V);
     mvFreeMat(&m->Q2cum);
     mvFreeMat(&m->Q2Vcum);
+    mvFreeMat(&m->SPEX);
+    mvFreeMat(&m->SPEY);
     __freeCrossValData((crossValData **) &m->cvd);
     free(m);
     *model = NULL;
@@ -848,6 +856,8 @@ static int __mvAddPCAComponent(mvModel *model, int performCrossValidation)
         mvMat *newR2 = mvAllocMat(model->_A, 1);
         mvMat *newT = mvAllocMat(model->X->nrows, model->_A);
         mvMat *newP = mvAllocMat(model->X->ncolumns, model->_A);
+        mvMat *newSPE = mvAllocMat(model->X->nrows, model->_A);
+        mvMat *SPE = mvAllocMat(model->X->nrows, 1);
 
         // T and P
         mvConcatColumns(newT, model->t, t);
@@ -868,6 +878,13 @@ static int __mvAddPCAComponent(mvModel *model, int performCrossValidation)
         model->R2X=newR2;
         mvFreeMat(&R2);
 
+        // SPE
+        mvSPE(SPE, model->E);
+        mvConcatColumns(newSPE, model->SPEX, SPE);
+        mvFreeMat(&model->SPEX);
+        mvFreeMat(&SPE);
+        model->SPEX = newSPE;
+
         // Iter
         mvConcatRows(newIter, model->iter, iter);
         mvFreeMat(&model->iter);
@@ -883,6 +900,8 @@ static int __mvAddPCAComponent(mvModel *model, int performCrossValidation)
         model->p = p;
         model->R2X = R2;
         model->iter = iter;
+        model->SPEX = mvAllocMat(model->E->nrows, 1);
+        mvSPE(model->SPEX, model->E);
     }
 
     // Store new sum of squares values.
@@ -1023,7 +1042,7 @@ static int __mvAddPLSComponent(mvModel *model, int performCrossValidation)
     if (model->_A > 1)
     {
         mvMat *newT, *newP, *newW, *newU, *newC, *wStar, *newWStar;
-        mvMat *newR2X, *newR2Y, *newIter;
+        mvMat *newR2X, *newR2Y, *newIter, *newSPE, *SPE;
         //t
         newT = mvAllocMat(model->X->nrows, model->A+1);
         mvConcatColumns(newT, model->t, t);
@@ -1085,6 +1104,22 @@ static int __mvAddPLSComponent(mvModel *model, int performCrossValidation)
         model->R2Y = newR2Y;
         mvFreeMat(&R2Y);
 
+        // SPE X and Y
+        SPE = mvAllocMat(model->X->nrows, 1);
+        newSPE = mvAllocMat(model->X->nrows, model->_A);
+        mvSPE(SPE, model->E);
+        mvConcatColumns(newSPE, model->SPEX, SPE);
+        mvFreeMat(&model->SPEX);
+        model->SPEX = newSPE;
+
+        newSPE = mvAllocMat(model->Y->nrows, model->_A);
+        mvSPE(SPE, model->F);
+        mvConcatColumns(newSPE, model->SPEY, SPE);
+        mvFreeMat(&model->SPEY);
+        model->SPEY = newSPE;
+        mvFreeMat(&SPE);
+
+
         // Iter
         newIter = mvAllocMat(model->A+1, 1);
         mvConcatRows(newIter, model->iter, iter);
@@ -1106,6 +1141,10 @@ static int __mvAddPLSComponent(mvModel *model, int performCrossValidation)
         model->R2X = R2X;
         model->R2Y = R2Y;
         model->iter = iter;
+        model->SPEX = mvAllocMat(model->E->nrows, 1);
+        mvSPE(model->SPEX, model->E);
+        model->SPEY = mvAllocMat(model->F->nrows, 1);
+        mvSPE(model->SPEY, model->F);
     }
 
     // Store new sum of squares values.
