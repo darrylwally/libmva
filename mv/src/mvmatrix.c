@@ -138,7 +138,7 @@ mvMat * mvRange(int start, int stop, int step)
     mvMat *output;
     double *data;
     if ( (start < stop && step<0) || (start > stop && step > 0) ||
-         step==0.0 || fabs(step) <= MV_DBL_SQRT_EPS)
+         step==0.0 || fabs(step) <= MV_SQRT_EPS)
     {
         return NULL;
     }

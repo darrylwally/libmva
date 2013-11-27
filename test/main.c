@@ -1207,8 +1207,8 @@ int main(int argc, char *argv[])
         ioi=207;
         printf("\nNew kamyr score T1[%2d] = %1.8lf, T2[%2d] = %1.8lf",
                ioi, new_t->data[ioi][0], ioi, new_t->data[ioi][1]);
-        assert(fabs(new_t->data[ioi][0]-pls_model->t->data[ioi][0]) < MV_DBL_SQRT_EPS);
-        assert(fabs(new_t->data[ioi][1]-pls_model->t->data[ioi][1]) < MV_DBL_SQRT_EPS);
+        assert(fabs(new_t->data[ioi][0]-pls_model->t->data[ioi][0]) < MV_SQRT_EPS);
+        assert(fabs(new_t->data[ioi][1]-pls_model->t->data[ioi][1]) < MV_SQRT_EPS);
 
         printf("\n\nR2X test %1.8lf, SSX = %lf, SSE0 = %lf, SSE1 = %lf, SSE2 = %lf, SSE_pred2 = %lf",
                1.0 - mvMatSS(E_pred) / mvMatSS(X_mcuv), mvMatSS(X_mcuv),

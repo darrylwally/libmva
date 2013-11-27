@@ -12,38 +12,46 @@
 
 #include "mvconstants.h"
 
+const double MV_EPS = 2.2204460492503131e-016;
+const double MV_SQRT_EPS = 1.4901161193847656e-08;
+const float MV_EPS_F = 1.192092896e-07;
+const float MV_SQRT_EPS_F = 3.452669831e-04;
+
+static const long long __mv_nan = 0x7ff8000000000000;
+static const int __mv_nanf = 0x7fc00000;
+static const unsigned long long __mv_inf = 0x7ff0000000000000;
+static const unsigned long long __mv_neg_inf = 0xfff0000000000000;
+static const unsigned int __mv_inff = 0x7f800000;
+static const unsigned int __mv_neg_inff = 0xff800000;
+
 double mvNaN()
 {
-    unsigned long long __nand = 0x7ff8000000000000;
-    return *(double *) &__nand;
+    return *(double *) &__mv_nan;
 }
 
 float mvNaNf()
 {
-    unsigned int __nanf = 0x7fc00000;
-    return *(float *)&__nanf;
+    return *(float *)&__mv_nanf;
 }
 
 double mvInf()
 {
-    unsigned long long __infd = 0x7ff0000000000000;
-    return *(double *)&__infd;
+
+    return *(double *)&__mv_inf;
 }
 
 double mvNegInf()
 {
-    unsigned long long __infd = 0xfff0000000000000;
-    return *(double *)&__infd;
+
+    return *(double *)&__mv_neg_inf;
 }
 
 float mvInff()
 {
-    unsigned int __inff = 0x7f800000;
-    return *(float *)&__inff;
+    return *(float *)&__mv_inff;
 }
 
 float mvNegInff()
 {
-    unsigned int __inff = 0xff800000;
-    return *(float *)&__inff;
+    return *(float *)&__mv_neg_inff;
 }

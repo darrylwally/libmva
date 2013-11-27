@@ -36,10 +36,11 @@ typedef enum MVReturnCode_enum {
 } MVReturnCode;
 
 // EPS
-#define MV_DBL_EPS 2.2204460492503131e-016
-#define MV_DBL_SQRT_EPS 1.4901161193847656e-08
-#define MV_FLOAT_EPS 1.192092896e-07
-#define MV_FLOAT_SQRT_EPS 3.452669831e-04
+extern const double MV_EPS;
+extern const double MV_SQRT_EPS;
+extern const float MV_EPS_F;
+extern const float MV_SQRT_EPS_F;
+
 
 // NANS
 double mvNaN();

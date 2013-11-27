@@ -812,7 +812,7 @@ static int __mvAddPCAComponent(mvModel *model, int performCrossValidation)
         mvSubtractMat(pDiff, p, pOld);          // get the difference of P
 
         vectorNorm = mvVectorNorm(pDiff);
-    } while (vectorNorm > MV_DBL_SQRT_EPS && num_iter < MAX_NIPALS_ITER);
+    } while (vectorNorm > MV_SQRT_EPS && num_iter < MAX_NIPALS_ITER);
 
     // no longer need, pOld or pDiff
     mvFreeMat(&pOld);
@@ -986,7 +986,7 @@ static int __mvAddPLSComponent(mvModel *model, int performCrossValidation)
 
         mvSubtractMat(wDiff, w, wOld);          // get the difference of w
 
-    } while (mvVectorNorm(wDiff)>MV_DBL_SQRT_EPS && num_iter < MAX_NIPALS_ITER);
+    } while (mvVectorNorm(wDiff)>MV_SQRT_EPS && num_iter < MAX_NIPALS_ITER);
 
     // compute loading p after loop
     __mvRegressRow(p, X, t);
