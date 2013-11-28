@@ -93,14 +93,14 @@ int mvSPEXFromObs(MVMat *output, const MVModel *model, const MVMat *Xobs, const 
     if (tobs == NULL)
     {
         MVMat *t = mvmat_alloc(Xobs->nrows, num_components);
-        mvNewObsT(t, E, Xobs, model, num_components, MV_NEW_SCORE_SCP);
+        mvmodel_new_obs_scores_t(t, E, Xobs, model, num_components, MV_NEW_SCORE_SCP);
         mvSPE(output, E);
         mvmat_free(&t);
     }
     else
     {
         MVMat *Xhat = E;
-        mvComputeXpred(Xhat, model, tobs, num_components);
+        mvmodel_compute_xpred(Xhat, model, tobs, num_components);
         mvmat_subtract(E, Xobs, Xhat);
         mvSPE(output, E);
     }
@@ -117,14 +117,14 @@ int mvSPEYFromObs(MVMat *output, const MVModel *model, const MVMat *Yobs, const 
     if (tobs == NULL)
     {
         MVMat *t = mvmat_alloc(Yobs->nrows, num_components);
-        mvNewObsT(t, F, Yobs, model, num_components, MV_NEW_SCORE_SCP);
+        mvmodel_new_obs_scores_t(t, F, Yobs, model, num_components, MV_NEW_SCORE_SCP);
         mvSPE(output, F);
         mvmat_free(&t);
     }
     else
     {
         MVMat *Yhat = F;
-        mvComputeYpred(Yhat, model, tobs, num_components);
+        mvmodel_compute_ypred(Yhat, model, tobs, num_components);
         mvmat_subtract(F, Yobs, Yhat);
         mvSPE(output, F);
     }

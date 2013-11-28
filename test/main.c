@@ -1049,8 +1049,8 @@ int main(int argc, char *argv[])
         // scale to unit variance.
         mvmat_column_div(X_mcuv, X_mcuv, X_std);
 
-        pca_model = mvInitPCAModel(X_mcuv);
-        mvAutoFit(pca_model);
+        pca_model = mvmodel_alloc_init_pca(X_mcuv);
+        mvmodel_autofit(pca_model);
 
         printf("\nNumber of components computed: %d\nNumber of signification components: %d\n",
                pca_model->_A, pca_model->A);
@@ -1076,7 +1076,7 @@ int main(int argc, char *argv[])
         }
         new_t = mvmat_allocz(X->nrows, pca_model->A);
 
-        mvNewObsT(new_t, NULL, X_mcuv, pca_model, pca_model->A, MV_NEW_SCORE_SCP);
+        mvmodel_new_obs_scores_t(new_t, NULL, X_mcuv, pca_model, pca_model->A, MV_NEW_SCORE_SCP);
 
         printf("\nNew foods score:\n");
         for (i = 0; i < pca_model->A; i++)
@@ -1115,7 +1115,7 @@ int main(int argc, char *argv[])
         mvmat_free(&X_mcuv);
         mvmat_free(&X_mean);
         mvmat_free(&X_std);
-        mvFreeModel(&pca_model);
+        mvmodel_free(&pca_model);
     }
     printf("\n**Testing PLS**\n");
     {
@@ -1166,11 +1166,11 @@ int main(int argc, char *argv[])
         mvmat_column_div(X_mcuv, X_mcuv, X_std);
         mvmat_column_div(Y_mcuv, Y_mcuv, Y_std);
 
-        pls_model = mvInitPLSModel(X_mcuv, Y_mcuv);
-        mvModelAddComponent(pls_model);
-        mvModelAddComponent(pls_model);
-        mvModelAddComponent(pls_model);
-        mvModelAddComponent(pls_model);
+        pls_model = mvmodel_alloc_init_pls(X_mcuv, Y_mcuv);
+        mvmodel_add_component(pls_model);
+        mvmodel_add_component(pls_model);
+        mvmodel_add_component(pls_model);
+        mvmodel_add_component(pls_model);
 
         printf("Kamyr Score for Obs. 1207: T1[%2d]=%1.8lf\tT2[%2d]=%1.8lf\n", ioi, pls_model->t->data[ioi][0],
                 ioi, pls_model->t->data[ioi][1]);
@@ -1201,7 +1201,7 @@ int main(int argc, char *argv[])
                3, pls_model->Q2cum->data[2][0],
                4, pls_model->Q2cum->data[3][0]);
 
-        mvNewObsT(new_t, E_pred, X_mcuv, pls_model, 2, MV_NEW_SCORE_SCP);
+        mvmodel_new_obs_scores_t(new_t, E_pred, X_mcuv, pls_model, 2, MV_NEW_SCORE_SCP);
 
 
         ioi=207;
@@ -1215,7 +1215,7 @@ int main(int argc, char *argv[])
                pls_model->SSX->data[0][0], pls_model->SSX->data[1][0], pls_model->SSX->data[2][0], mvmat_ss(E_pred));
 
 
-        mvNewObsU(new_u, F_pred, Y_mcuv, new_t, pls_model, 2, MV_NEW_SCORE_SCP);
+        mvmodel_new_obs_scores_u(new_u, F_pred, Y_mcuv, new_t, pls_model, 2, MV_NEW_SCORE_SCP);
         printf("\nNew kamyr score U1[%2d] = %1.8lf, U2[%2d] = %1.8lf",
                ioi, new_u->data[ioi][0], ioi, new_u->data[ioi][1]);
         printf("\n\nR2Y test %1.8lf, SSY = %lf, SSF0 = %lf, SSF1 = %lf, SSF2 = %lf, SSF_pred2 = %lf",
@@ -1234,7 +1234,7 @@ int main(int argc, char *argv[])
         mvmat_free(&Y_mcuv);
         mvmat_free(&Y_mean);
         mvmat_free(&Y_std);
-        mvFreeModel(&pls_model);
+        mvmodel_free(&pls_model);
     }
 
     printf("\n**Testing F_ppf**\n");

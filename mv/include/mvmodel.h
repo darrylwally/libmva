@@ -95,7 +95,7 @@ typedef struct MVModel_s{
 
   \sa mvFreeModel, MVModelType, MVCrossValType
   */
-MVModel * mvInitPCAModel(MVMat *X);
+MVModel * mvmodel_alloc_init_pca(MVMat *X);
 
 /*! Initializes a PLS model
 
@@ -107,13 +107,13 @@ MVModel * mvInitPCAModel(MVMat *X);
   \return mvModel of type PLS
   \sa mvFreeModel, MVModelType
   */
-MVModel * mvInitPLSModel(MVMat *X, MVMat *Y);
+MVModel * mvmodel_alloc_init_pls(MVMat *X, MVMat *Y);
 
 /*! Frees the mvModel
   \arg model pointer to the mvModel pointer.
   \return 0 on success or MVModelErrorCode
   */
-int mvFreeModel(MVModel **model);
+int mvmodel_free(MVModel **model);
 
 /*! Add a component to the model
 
@@ -135,7 +135,7 @@ int mvFreeModel(MVModel **model);
   \arg model The mvModel
   \return 0 on success or MVModelErrorCode;
   */
-int mvModelAddComponent(MVModel *model);
+int mvmodel_add_component(MVModel *model);
 
 /*! Performs auto-fit on PCA or PLS model
 
@@ -161,7 +161,7 @@ int mvModelAddComponent(MVModel *model);
    \arg model mvModel to auto-fit
    \return MVModelReturnCode - The rule that failed.
   */
-int mvAutoFit(MVModel *model);
+int mvmodel_autofit(MVModel *model);
 
 /*! Computes T-scores for new observations of X of a mvModel
 
@@ -175,7 +175,7 @@ int mvAutoFit(MVModel *model);
 
   \sa MVNewScoreCalcType
   */
-int mvNewObsT(MVMat *t, MVMat * E, const MVMat *newX, const MVModel *pca_model,
+int mvmodel_new_obs_scores_t(MVMat *t, MVMat * E, const MVMat *newX, const MVModel *pca_model,
                   int num_components, MVNewScoreCalcType method);
 
 /*! Computes U-scores for a new observation of Y of a PLS Model
@@ -190,7 +190,7 @@ int mvNewObsT(MVMat *t, MVMat * E, const MVMat *newX, const MVModel *pca_model,
 
   \sa MVNewScoreCalcType
   */
-int mvNewObsU(MVMat *u, MVMat *F, const MVMat *newY, const MVMat *newT,
+int mvmodel_new_obs_scores_u(MVMat *u, MVMat *F, const MVMat *newY, const MVMat *newT,
                   const MVModel *pls_model, int num_components,
                   MVNewScoreCalcType method);
 
@@ -203,7 +203,7 @@ int mvNewObsU(MVMat *u, MVMat *F, const MVMat *newY, const MVMat *newT,
     \arg t scores with which to compute Xhat.
     \arg num_components number of components to compute Xhat
 */
-int mvComputeXpred(MVMat *Xhat, const MVModel *model, const MVMat *t, int num_components);
+int mvmodel_compute_xpred(MVMat *Xhat, const MVModel *model, const MVMat *t, int num_components);
 
 /*! Compute the predicted X values based on scores and loadings provided.
 
@@ -214,7 +214,7 @@ int mvComputeXpred(MVMat *Xhat, const MVModel *model, const MVMat *t, int num_co
     \arg t scores with which to compute Yhat
     \arg num_components number of components to compute Xhat
 */
-int mvComputeYpred(MVMat *Yhat, const MVModel *model, const MVMat *t, int num_components);
+int mvmodel_compute_ypred(MVMat *Yhat, const MVModel *model, const MVMat *t, int num_components);
 
 
 
