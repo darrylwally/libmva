@@ -879,7 +879,7 @@ static int __mvAddPCAComponent(MVModel *model, int performCrossValidation)
         mvmat_free(&R2);
 
         // SPE
-        mvSPE(SPE, model->E);
+        mvstats_spe(SPE, model->E);
         mvmat_concat_columns(newSPE, model->SPEX, SPE);
         mvmat_free(&model->SPEX);
         mvmat_free(&SPE);
@@ -901,7 +901,7 @@ static int __mvAddPCAComponent(MVModel *model, int performCrossValidation)
         model->R2X = R2;
         model->iter = iter;
         model->SPEX = mvmat_alloc(model->E->nrows, 1);
-        mvSPE(model->SPEX, model->E);
+        mvstats_spe(model->SPEX, model->E);
     }
 
     // Store new sum of squares values.
@@ -1107,13 +1107,13 @@ static int __mvAddPLSComponent(MVModel *model, int performCrossValidation)
         // SPE X and Y
         SPE = mvmat_alloc(model->X->nrows, 1);
         newSPE = mvmat_alloc(model->X->nrows, model->_A);
-        mvSPE(SPE, model->E);
+        mvstats_spe(SPE, model->E);
         mvmat_concat_columns(newSPE, model->SPEX, SPE);
         mvmat_free(&model->SPEX);
         model->SPEX = newSPE;
 
         newSPE = mvmat_alloc(model->Y->nrows, model->_A);
-        mvSPE(SPE, model->F);
+        mvstats_spe(SPE, model->F);
         mvmat_concat_columns(newSPE, model->SPEY, SPE);
         mvmat_free(&model->SPEY);
         model->SPEY = newSPE;
@@ -1142,9 +1142,9 @@ static int __mvAddPLSComponent(MVModel *model, int performCrossValidation)
         model->R2Y = R2Y;
         model->iter = iter;
         model->SPEX = mvmat_alloc(model->E->nrows, 1);
-        mvSPE(model->SPEX, model->E);
+        mvstats_spe(model->SPEX, model->E);
         model->SPEY = mvmat_alloc(model->F->nrows, 1);
-        mvSPE(model->SPEY, model->F);
+        mvstats_spe(model->SPEY, model->F);
     }
 
     // Store new sum of squares values.

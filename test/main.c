@@ -1084,7 +1084,7 @@ int main(int argc, char *argv[])
             printf("T%d[1] = %1.8lf\t", i+1, new_t->data[0][i]);
         }
 
-        mvHT2(HT2, pca_model->t, pca_model->t_stddev, 1, pca_model->A);
+        mvstats_ht2(HT2, pca_model->t, pca_model->t_stddev, 1, pca_model->A);
 
         printf("\nNew foods HT2 for [1-%d].", pca_model->A);
 
@@ -1094,9 +1094,9 @@ int main(int argc, char *argv[])
         }
 
         int comp = 2;
-        mvSPEXFromObs(SPE, pca_model, X_mcuv, pca_model->t, comp);
+        mvstats_spex_from_obs(SPE, pca_model, X_mcuv, pca_model->t, comp);
         printf("\nSPE Limits for Foods at A=%d. 0.95 = %1.8lf, 0.99 = %1.8lf",
-               comp, mvSPELimit(0.95, pca_model->SPEX, comp), mvSPELimit(0.99, pca_model->SPEX, comp));
+               comp, mvstats_spe_limit(0.95, pca_model->SPEX, comp), mvstats_spe_limit(0.99, pca_model->SPEX, comp));
         for(i=0; i <FOODS_DATA_ROWS; i++)
         {
             printf("\nSPEFromObs[%d] = %1.8lf", i+1, SPE->data[i][0]);
@@ -1243,32 +1243,32 @@ int main(int argc, char *argv[])
         double A = 2.0;
         double alpha = 0.95;
         //float(numComponents*(model.N-1)*(model.N+1) )/float((model.N*(model.N-numComponents)))
-        printf("\nF_ppf(N1=2, N2=14, alpha=0.95) = %2.16lf", F_ppf(0.95, 2, 14,0,0));
+        printf("\nF_ppf(N1=2, N2=14, alpha=0.95) = %2.16lf", mvstats_F_ppf(0.95, 2, 14,0,0));
         printf("\nHT2(N=%d, A=%d, alpha=%lf) = %2.16lf", (int)N, (int)A, alpha,
-               (A*(N-1)*(N+1) / (N*(N-A)))*F_ppf(alpha, A, (N-A), 0, 0));
+               (A*(N-1)*(N+1) / (N*(N-A)))*mvstats_F_ppf(alpha, A, (N-A), 0, 0));
         printf("\nHT2(N=%d, A=%d, alpha=%lf) = %2.16lf", (int)N, (int)A, alpha,
-               mvHT2Limit(alpha, (int)A, (int)N));
+               mvstats_ht2_limit(alpha, (int)A, (int)N));
     }
 
     printf("\n**Testing Chi2_ppf**\n");
     {
         double df = 10.0;
         double alpha = 0.95;
-        printf("\nChi2_ppf(df = %lf, alpha=%lf) = %2.16lf", df, alpha, chi2_ppf(alpha, df, 0, 0));
+        printf("\nChi2_ppf(df = %lf, alpha=%lf) = %2.16lf", df, alpha, mvstats_chi2_ppf(alpha, df, 0, 0));
     }
 
     printf("\n**Testing Student's T ppf**\n");
     {
         double df = 10.2;
         double alpha =0.95;
-        printf("\nStudent's T_ppf (df=%lf, alpha = %lf) = %2.16lf", df, alpha, t_ppf(alpha,df,0,0));
+        printf("\nStudent's T_ppf (df=%lf, alpha = %lf) = %2.16lf", df, alpha, mvstats_t_ppf(alpha,df,0,0));
     }
 
     printf("\n**Testing Gamma distribution**\n");
     {
         double df = 10.2;
         double alpha =0.95;
-        printf("\nGamma (df=%lf, alpha = %lf) = %2.16lf", df, alpha, gamma_ppf(alpha,df,0,0));
+        printf("\nGamma (df=%lf, alpha = %lf) = %2.16lf", df, alpha, mvstats_gamma_ppf(alpha,df,0,0));
     }
 
 

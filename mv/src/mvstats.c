@@ -18,35 +18,35 @@ s
 // this is in gammaincinv.c
 extern double gammaincinv(double alpha, double df);
 
-double t_ppf(double alpha, double df, double loc, double scale)
+double mvstats_t_ppf(double alpha, double df, double loc, double scale)
 {
     // unused variables:
     (void)loc; (void) scale;
     return stdtri(df, alpha);
 }
 
-double F_ppf(double alpha, double N1, double N2, double loc, double scale)
+double mvstats_F_ppf(double alpha, double N1, double N2, double loc, double scale)
 {
     // unused variables:
     (void)loc; (void) scale;
     return fdtri(N1, N2, alpha);
 }
 
-double chi2_ppf(double alpha, double df, double loc, double scale)
+double mvstats_chi2_ppf(double alpha, double df, double loc, double scale)
 {
     // unused variables:
     (void)loc; (void) scale;
     return chdtri(df, 1-alpha);
 }
 
-double gamma_ppf(double alpha, double df, double loc, double scale)
+double mvstats_gamma_ppf(double alpha, double df, double loc, double scale)
 {
     // unused variables:
     (void)loc; (void) scale;
     return gammaincinv(df, alpha);
 }
 
-int mvHT2(MVMat *output, const MVMat *t, const MVMat *t_stddev,
+int mvstats_ht2(MVMat *output, const MVMat *t, const MVMat *t_stddev,
           int first_component, int last_component)
 {
     int i,j;
@@ -73,20 +73,20 @@ int mvHT2(MVMat *output, const MVMat *t, const MVMat *t_stddev,
     return SUCCESS;
 }
 
-double mvHT2Limit(double alpha, int A, int N)
+double mvstats_ht2_limit(double alpha, int A, int N)
 {
     double _A = A;
     double _N = N;
-    return _A*(_N*_N-1.0)/ (_N*(_N-_A)) * F_ppf(alpha, _A, _N-_A, 0, 0);
+    return _A*(_N*_N-1.0)/ (_N*(_N-_A)) * mvstats_F_ppf(alpha, _A, _N-_A, 0, 0);
 }
 
-int mvSPE(MVMat *output, const MVMat *residuals)
+int mvstats_spe(MVMat *output, const MVMat *residuals)
 {
     return mvmat_row_ss(output, residuals);
 }
 
 
-int mvSPEXFromObs(MVMat *output, const MVModel *model, const MVMat *Xobs, const MVMat *tobs, int num_components)
+int mvstats_spex_from_obs(MVMat *output, const MVModel *model, const MVMat *Xobs, const MVMat *tobs, int num_components)
 {
     // todo: error checking
     MVMat *E = mvmat_alloc(Xobs->nrows, Xobs->ncolumns);
@@ -94,7 +94,7 @@ int mvSPEXFromObs(MVMat *output, const MVModel *model, const MVMat *Xobs, const 
     {
         MVMat *t = mvmat_alloc(Xobs->nrows, num_components);
         mvmodel_new_obs_scores_t(t, E, Xobs, model, num_components, MV_NEW_SCORE_SCP);
-        mvSPE(output, E);
+        mvstats_spe(output, E);
         mvmat_free(&t);
     }
     else
@@ -102,7 +102,7 @@ int mvSPEXFromObs(MVMat *output, const MVModel *model, const MVMat *Xobs, const 
         MVMat *Xhat = E;
         mvmodel_compute_xpred(Xhat, model, tobs, num_components);
         mvmat_subtract(E, Xobs, Xhat);
-        mvSPE(output, E);
+        mvstats_spe(output, E);
     }
 
     mvmat_free(&E);
@@ -110,7 +110,7 @@ int mvSPEXFromObs(MVMat *output, const MVModel *model, const MVMat *Xobs, const 
     return SUCCESS;
 }
 
-int mvSPEYFromObs(MVMat *output, const MVModel *model, const MVMat *Yobs, const MVMat *tobs, int num_components)
+int mvstats_spey_from_obs(MVMat *output, const MVModel *model, const MVMat *Yobs, const MVMat *tobs, int num_components)
 {
     // todo: error checking
     MVMat *F = mvmat_alloc(Yobs->nrows, Yobs->ncolumns);
@@ -118,7 +118,7 @@ int mvSPEYFromObs(MVMat *output, const MVModel *model, const MVMat *Yobs, const 
     {
         MVMat *t = mvmat_alloc(Yobs->nrows, num_components);
         mvmodel_new_obs_scores_t(t, F, Yobs, model, num_components, MV_NEW_SCORE_SCP);
-        mvSPE(output, F);
+        mvstats_spe(output, F);
         mvmat_free(&t);
     }
     else
@@ -126,7 +126,7 @@ int mvSPEYFromObs(MVMat *output, const MVModel *model, const MVMat *Yobs, const 
         MVMat *Yhat = F;
         mvmodel_compute_ypred(Yhat, model, tobs, num_components);
         mvmat_subtract(F, Yobs, Yhat);
-        mvSPE(output, F);
+        mvstats_spe(output, F);
     }
 
     mvmat_free(&F);
@@ -134,7 +134,7 @@ int mvSPEYFromObs(MVMat *output, const MVModel *model, const MVMat *Yobs, const 
     return SUCCESS;
 }
 
-double mvSPELimit(double alpha, const MVMat *modelSPE_values, int component)
+double mvstats_spe_limit(double alpha, const MVMat *modelSPE_values, int component)
 {
     double m,v,g,h;
     MVMat *mean = mvmat_alloc(1, modelSPE_values->ncolumns);
@@ -151,5 +151,5 @@ double mvSPELimit(double alpha, const MVMat *modelSPE_values, int component)
     g = v / (2.0 * m);
     h = (2.0 * m * m) / v;
 
-    return g * chi2_ppf(alpha, h, 0, 1);
+    return g * mvstats_chi2_ppf(alpha, h, 0, 1);
 }

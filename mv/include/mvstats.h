@@ -16,24 +16,24 @@ s
 #include "mvmatrix.h"
 #include "mvmodel.h"
 
-double t_ppf(double alpha, double df, double loc, double scale);
+double mvstats_t_ppf(double alpha, double df, double loc, double scale);
 
-double F_ppf(double alpha, double N1, double N2, double loc, double scale);
+double mvstats_F_ppf(double alpha, double N1, double N2, double loc, double scale);
 
-double gamma_ppf(double alpha, double a, double loc, double scale);
+double mvstats_gamma_ppf(double alpha, double a, double loc, double scale);
 
-double chi2_ppf(double alpha, double a, double loc, double scale);
+double mvstats_chi2_ppf(double alpha, double a, double loc, double scale);
 
-int mvHT2(MVMat *output, const MVMat *scores, const MVMat *t_stddev,
+int mvstats_ht2(MVMat *output, const MVMat *scores, const MVMat *t_stddev,
           int first_component, int last_component);
 
-double mvHT2Limit(double alpha, int A, int N);
+double mvstats_ht2_limit(double alpha, int A, int N);
 
-int mvSPE(MVMat *output, const MVMat *residuals);
-int mvSPEXFromObs(MVMat *output, const MVModel *model, const MVMat *Xobs, const MVMat *tobs, int num_components);
-int mvSPEYFromObs(MVMat *output, const MVModel *model, const MVMat *Yobs, const MVMat *tobs, int num_components);
+int mvstats_spe(MVMat *output, const MVMat *residuals);
+int mvstats_spex_from_obs(MVMat *output, const MVModel *model, const MVMat *Xobs, const MVMat *tobs, int num_components);
+int mvstats_spey_from_obs(MVMat *output, const MVModel *model, const MVMat *Yobs, const MVMat *tobs, int num_components);
 
-double mvSPELimit(double alpha, const MVMat *modelSPE_values, int component);
+double mvstats_spe_limit(double alpha, const MVMat *modelSPE_values, int component);
 
 
 #endif // MVSTATS_H
