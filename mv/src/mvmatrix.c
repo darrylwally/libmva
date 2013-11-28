@@ -23,15 +23,15 @@
 #define MVISNAN_FUNC isnan
 #endif
 
-mvMat * mvAllocMat(int rows, int columns)
+MVMat * mvAllocMat(int rows, int columns)
 {
     int i;
     double *data;
     size_t *mask, *mask_end;
-    mvMat *output;
+    MVMat *output;
     data = NULL;
     mask = NULL;
-    output = (mvMat *) malloc(sizeof(mvMat));
+    output = (MVMat *) malloc(sizeof(MVMat));
 
     if (!output)
     {
@@ -90,31 +90,31 @@ mvMat * mvAllocMat(int rows, int columns)
     return output;
 }
 
-mvMat * mvAllocMatZ(int rows, int columns)
+MVMat * mvAllocMatZ(int rows, int columns)
 {
-    mvMat *output = mvAllocMat(rows, columns);
+    MVMat *output = mvAllocMat(rows, columns);
     memset(output->data[0], 0, rows * columns * sizeof(double));
     return output;
 }
 
-mvMat *mvAllocMatVal(int rows, int columns, double val)
+MVMat *mvAllocMatVal(int rows, int columns, double val)
 {
-    mvMat *output = mvAllocMat(rows, columns);
+    MVMat *output = mvAllocMat(rows, columns);
     mvMatSet(output, val);
     return output;
 }
 
-mvMat *mvAllocMatCopy(const mvMat *other)
+MVMat *mvAllocMatCopy(const MVMat *other)
 {
-    mvMat *output = mvAllocMat(other->nrows, other->ncolumns);
+    MVMat *output = mvAllocMat(other->nrows, other->ncolumns);
     mvMatCopy(output, other);
     return output;
 }
 
-mvMat * mvAllocIdentity(int dim)
+MVMat * mvAllocIdentity(int dim)
 {
     int i;
-    mvMat *output;
+    MVMat *output;
     if (dim == 0)
     {
         return NULL;
@@ -130,12 +130,12 @@ mvMat * mvAllocIdentity(int dim)
     return output;
 }
 
-mvMat * mvRange(int start, int stop, int step)
+MVMat * mvRange(int start, int stop, int step)
 {
     int range;
     int num_elements;
     int i;
-    mvMat *output;
+    MVMat *output;
     double *data;
     if ( (start < stop && step<0) || (start > stop && step > 0) ||
          step==0.0 || fabs(step) <= MV_SQRT_EPS)
@@ -158,10 +158,10 @@ mvMat * mvRange(int start, int stop, int step)
     return output;
 }
 
-mvMat * mvLinspace(double start, double stop, int num_values, int end_point)
+MVMat * mvLinspace(double start, double stop, int num_values, int end_point)
 {
     double range, step, *data;
-    mvMat *output;
+    MVMat *output;
     int i;
     if (num_values<=0)
     {
@@ -190,9 +190,9 @@ mvMat * mvLinspace(double start, double stop, int num_values, int end_point)
 
 }
 
-mvMat * mvAllocMatRef(int rows)
+MVMat * mvAllocMatRef(int rows)
 {
-    mvMat * output = (mvMat *)malloc(sizeof(mvMat));
+    MVMat * output = (MVMat *)malloc(sizeof(MVMat));
     if (!output)
     {
         return NULL;
@@ -206,9 +206,9 @@ mvMat * mvAllocMatRef(int rows)
     return output;
 }
 
-int mvFreeMat(mvMat **matrix)
+int mvFreeMat(MVMat **matrix)
 {
-    mvMat *mat = *matrix;
+    MVMat *mat = *matrix;
     if (!mat)
         return ATTEMPT_TO_FREE_NULL_MATRIX;
     if (!mat->isReference)
@@ -223,7 +223,7 @@ int mvFreeMat(mvMat **matrix)
     return SUCCESS;
 }
 
-int mvMatCopy(mvMat *output, const mvMat *other)
+int mvMatCopy(MVMat *output, const MVMat *other)
 {
     if (!(other->nrows==output->nrows && other->ncolumns==other->ncolumns))
     {
@@ -259,7 +259,7 @@ int mvMatCopy(mvMat *output, const mvMat *other)
     return SUCCESS;
 }
 
-int mvConcatColumns(mvMat *output, const mvMat *A, const mvMat *B)
+int mvConcatColumns(MVMat *output, const MVMat *A, const MVMat *B)
 {
     int i,j;
     if (!(output->ncolumns==(A->ncolumns+B->ncolumns) &&
@@ -284,7 +284,7 @@ int mvConcatColumns(mvMat *output, const mvMat *A, const mvMat *B)
     return 0;
 }
 
-int mvConcatRows(mvMat *output, const mvMat *A, const mvMat *B)
+int mvConcatRows(MVMat *output, const MVMat *A, const MVMat *B)
 {
     int i,j;
     if (!(output->nrows==(A->nrows+B->nrows) &&
@@ -313,7 +313,7 @@ int mvConcatRows(mvMat *output, const mvMat *A, const mvMat *B)
     return SUCCESS;
 }
 
-int mvMatSliceRows(mvMat *output, const mvMat *A, const mvMat *rows)
+int mvMatSliceRows(MVMat *output, const MVMat *A, const MVMat *rows)
 {
     int i,j;
     if ( !(output->nrows == rows->nrows && output->ncolumns == A->ncolumns))
@@ -338,7 +338,7 @@ int mvMatSliceRows(mvMat *output, const mvMat *A, const mvMat *rows)
     return SUCCESS;
 }
 
-int mvMatDeleteRows(mvMat *output, const mvMat *A, const mvMat *rows)
+int mvMatDeleteRows(MVMat *output, const MVMat *A, const MVMat *rows)
 {
     int i;
     int num_rows = A->nrows - rows->nrows;
@@ -373,10 +373,10 @@ int mvMatDeleteRows(mvMat *output, const mvMat *A, const mvMat *rows)
     return SUCCESS;
 }
 
-int mvMatSliceRowsRef(mvMat **output, const mvMat *A, const mvMat *rows)
+int mvMatSliceRowsRef(MVMat **output, const MVMat *A, const MVMat *rows)
 {
     int i;
-    mvMat *o = *output;
+    MVMat *o = *output;
     if (o && !o->isReference)
     {
         return REFERENCE_MAT_REQUIRED;
@@ -405,10 +405,10 @@ int mvMatSliceRowsRef(mvMat **output, const mvMat *A, const mvMat *rows)
     return SUCCESS;
 }
 
-int mvMatDeleteRowsRef(mvMat **output, const mvMat *A, const mvMat *rows)
+int mvMatDeleteRowsRef(MVMat **output, const MVMat *A, const MVMat *rows)
 {
     int i;
-    mvMat *o = *output;
+    MVMat *o = *output;
     int num_rows = A->nrows - rows->nrows;
     int slice_index = 0;
     int out_index = 0;
@@ -454,7 +454,7 @@ int mvMatDeleteRowsRef(mvMat **output, const mvMat *A, const mvMat *rows)
 }
 
 
-int mvMatSliceColumns(mvMat *output, const mvMat *A, const mvMat *columns)
+int mvMatSliceColumns(MVMat *output, const MVMat *A, const MVMat *columns)
 {
     int i,j;
     if ( !(output->ncolumns == columns->nrows && output->nrows == A->nrows))
@@ -479,7 +479,7 @@ int mvMatSliceColumns(mvMat *output, const mvMat *A, const mvMat *columns)
     return SUCCESS;
 }
 
-int mvTransposeMat(mvMat *output, const mvMat *mat)
+int mvTransposeMat(MVMat *output, const MVMat *mat)
 {
     int i,j;
     if (! (mat->ncolumns==output->nrows &&
@@ -499,7 +499,7 @@ int mvTransposeMat(mvMat *output, const mvMat *mat)
     return SUCCESS;
 }
 
-int mvMatSet(mvMat *mat, double val)
+int mvMatSet(MVMat *mat, double val)
 {
     if(!mat->isReference)
     {
@@ -535,7 +535,7 @@ int mvMatSet(mvMat *mat, double val)
     return SUCCESS;
 }
 
-int mvMatSetElem(mvMat *mat, int row, int column, double value)
+int mvMatSetElem(MVMat *mat, int row, int column, double value)
 {
     if ( row> (mat->nrows-1)  || column>(mat->ncolumns-1) )
     {
@@ -554,7 +554,7 @@ int mvMatSetElem(mvMat *mat, int row, int column, double value)
     return SUCCESS;
 }
 
-int mvMatGetElem(const mvMat *mat, double *value, int row, int column)
+int mvMatGetElem(const MVMat *mat, double *value, int row, int column)
 {
     if ( row> (mat->nrows-1)  || column>(mat->ncolumns-1) )
     {
@@ -571,7 +571,7 @@ int mvMatGetElem(const mvMat *mat, double *value, int row, int column)
     return SUCCESS;
 }
 
-int mvAddMat(mvMat *output, const mvMat *A, const mvMat *B)
+int mvAddMat(MVMat *output, const MVMat *A, const MVMat *B)
 {
     int i,j;
     if ( !(A->nrows == B->nrows && A->nrows == output->nrows &&
@@ -592,7 +592,7 @@ int mvAddMat(mvMat *output, const mvMat *A, const mvMat *B)
     return SUCCESS;
 }
 
-int mvAddMatS(mvMat *output, const mvMat *A, double value)
+int mvAddMatS(MVMat *output, const MVMat *A, double value)
 {
     int i,j;
     if ( !(A->nrows == output->nrows && A->ncolumns == output->ncolumns))
@@ -612,7 +612,7 @@ int mvAddMatS(mvMat *output, const mvMat *A, double value)
     return SUCCESS;
 }
 
-int mvSubtractMat(mvMat *output, const mvMat *A, const mvMat *B)
+int mvSubtractMat(MVMat *output, const MVMat *A, const MVMat *B)
 {
     int i,j;
     if ( !(A->nrows == B->nrows && A->nrows == output->nrows &&
@@ -641,7 +641,7 @@ int mvSubtractMat(mvMat *output, const mvMat *A, const mvMat *B)
 }
 
 
-int mvMatMult(mvMat *output, const mvMat *A, const mvMat *B)
+int mvMatMult(MVMat *output, const MVMat *A, const MVMat *B)
 {
     int i,j,k;
     if ( !(A->ncolumns == B->nrows && A->nrows == output->nrows &&
@@ -665,7 +665,7 @@ int mvMatMult(mvMat *output, const mvMat *A, const mvMat *B)
     return SUCCESS;
 }
 
-int mvMatMultS(mvMat *output, const mvMat *A, double scalar)
+int mvMatMultS(MVMat *output, const MVMat *A, double scalar)
 {
     int i,j;
     if (!(A->nrows == output->nrows && A->ncolumns == output->ncolumns))
@@ -684,7 +684,7 @@ int mvMatMultS(mvMat *output, const mvMat *A, double scalar)
     return SUCCESS;
 }
 
-int mvMatElemMult(mvMat *output, const mvMat *A, const mvMat *B)
+int mvMatElemMult(MVMat *output, const MVMat *A, const MVMat *B)
 {
     int i,j;
     if ( !(A->nrows == B->nrows && A->nrows == output->nrows &&
@@ -704,7 +704,7 @@ int mvMatElemMult(mvMat *output, const mvMat *A, const mvMat *B)
     return SUCCESS;
 }
 
-int mvMatElemDiv(mvMat *output, const mvMat *A, const mvMat *B)
+int mvMatElemDiv(MVMat *output, const MVMat *A, const MVMat *B)
 {
     int i,j;
     if ( !(A->nrows == B->nrows && A->nrows == output->nrows &&
@@ -732,7 +732,7 @@ int mvMatElemDiv(mvMat *output, const mvMat *A, const mvMat *B)
     return SUCCESS;
 }
 
-double mvVectorNorm(const mvMat *A)
+double mvVectorNorm(const MVMat *A)
 {
     int i;
     double norm = 0.0;
@@ -761,7 +761,7 @@ double mvVectorNorm(const mvMat *A)
     return sqrt(norm);
 }
 
-int mvMatColumnSum(mvMat *output, const mvMat *A)
+int mvMatColumnSum(MVMat *output, const MVMat *A)
 {
     int i,j, num_missing;
     if (output->ncolumns!=A->ncolumns)
@@ -784,7 +784,7 @@ int mvMatColumnSum(mvMat *output, const mvMat *A)
     return SUCCESS;
 }
 
-int mvMatColumnSS(mvMat *output, const mvMat *A)
+int mvMatColumnSS(MVMat *output, const MVMat *A)
 {
     int i,j;
     if (!(output->ncolumns == A->ncolumns && output->nrows == 1))
@@ -806,7 +806,7 @@ int mvMatColumnSS(mvMat *output, const mvMat *A)
     return SUCCESS;
 }
 
-int mvColumnMean(mvMat *output, const mvMat *A)
+int mvColumnMean(MVMat *output, const MVMat *A)
 {
     int i,j, num_missing;
     if (output->ncolumns!=A->ncolumns)
@@ -842,12 +842,12 @@ int mvColumnMean(mvMat *output, const mvMat *A)
     return SUCCESS;
 }
 
-int mvColumnVar(mvMat *output, const mvMat *A, int ddof)
+int mvColumnVar(MVMat *output, const MVMat *A, int ddof)
 {
     int i,j;
     int N, num_missing;
     double temp;
-    mvMat *colmean;
+    MVMat *colmean;
     if (output->ncolumns!=A->ncolumns)
     {
         return INCORRECT_DIMENSIONS;
@@ -897,7 +897,7 @@ int mvColumnVar(mvMat *output, const mvMat *A, int ddof)
     return SUCCESS;
 }
 
-int mvColumnStdDev(mvMat *output, const mvMat *A, int ddof)
+int mvColumnStdDev(MVMat *output, const MVMat *A, int ddof)
 {
     int j;
     int ret_val = mvColumnVar(output, A, ddof);
@@ -916,7 +916,7 @@ int mvColumnStdDev(mvMat *output, const mvMat *A, int ddof)
     return SUCCESS;
 }
 
-int mvMatRowSS(mvMat *output, const mvMat *A)
+int mvMatRowSS(MVMat *output, const MVMat *A)
 {
     int i,j;
     if (!(output->nrows == A->nrows && output->ncolumns == 1))
@@ -938,7 +938,7 @@ int mvMatRowSS(mvMat *output, const mvMat *A)
     return SUCCESS;
 }
 
-int mvMatColumnAdd(mvMat *output, const mvMat *A, const mvMat *columnValues)
+int mvMatColumnAdd(MVMat *output, const MVMat *A, const MVMat *columnValues)
 {
     int i,j;
     if (!(output->nrows == A->nrows && output->ncolumns && A->ncolumns
@@ -966,7 +966,7 @@ int mvMatColumnAdd(mvMat *output, const mvMat *A, const mvMat *columnValues)
     return SUCCESS;
 }
 
-int mvMatColumnSubtract(mvMat *output, const mvMat *A, const mvMat *columnValues)
+int mvMatColumnSubtract(MVMat *output, const MVMat *A, const MVMat *columnValues)
 {
     int i,j;
     if (!(output->nrows == A->nrows && output->ncolumns && A->ncolumns
@@ -994,7 +994,7 @@ int mvMatColumnSubtract(mvMat *output, const mvMat *A, const mvMat *columnValues
     return SUCCESS;
 }
 
-int mvMatColumnMult(mvMat *output, const mvMat *A, const mvMat *columnValues)
+int mvMatColumnMult(MVMat *output, const MVMat *A, const MVMat *columnValues)
 {
     int i,j;
     if (!(output->nrows == A->nrows && output->ncolumns && A->ncolumns
@@ -1022,7 +1022,7 @@ int mvMatColumnMult(mvMat *output, const mvMat *A, const mvMat *columnValues)
     return SUCCESS;
 }
 
-int mvMatColumnDiv(mvMat *output, const mvMat *A, const mvMat *columnValues)
+int mvMatColumnDiv(MVMat *output, const MVMat *A, const MVMat *columnValues)
 {
     int i,j;
     if (!(output->nrows == A->nrows && output->ncolumns == A->ncolumns
@@ -1051,7 +1051,7 @@ int mvMatColumnDiv(mvMat *output, const mvMat *A, const mvMat *columnValues)
     return SUCCESS;
 }
 
-int mvNumMissing(const mvMat *mat)
+int mvNumMissing(const MVMat *mat)
 {
     int num_missing;
     int i,j;
@@ -1067,7 +1067,7 @@ int mvNumMissing(const mvMat *mat)
     return num_missing;
 }
 
-double mvPctMissing(const mvMat *mat)
+double mvPctMissing(const MVMat *mat)
 {
     double num_vals = (double) (mat->ncolumns * mat->nrows);
     double num_missing = mvNumMissing(mat);
@@ -1075,7 +1075,7 @@ double mvPctMissing(const mvMat *mat)
 
 }
 
-double mvDotProduct(const mvMat *a, const mvMat *b)
+double mvDotProduct(const MVMat *a, const MVMat *b)
 {
     int i, N;
     double result = 0.0;
@@ -1103,7 +1103,7 @@ double mvDotProduct(const mvMat *a, const mvMat *b)
     return result;
 }
 
-double mvMatSS(const mvMat *A)
+double mvMatSS(const MVMat *A)
 {
     double result = 0.0;
     if (!A->isReference)
@@ -1143,7 +1143,7 @@ double mvMatSS(const mvMat *A)
 
 }
 
-double mvMatSum(const mvMat *A)
+double mvMatSum(const MVMat *A)
 {
     double result = 0.0;
     if (!A->isReference)

@@ -24,16 +24,16 @@ double gamma_ppf(double alpha, double a, double loc, double scale);
 
 double chi2_ppf(double alpha, double a, double loc, double scale);
 
-int mvHT2(mvMat *output, const mvMat *scores, const mvMat *t_stddev,
+int mvHT2(MVMat *output, const MVMat *scores, const MVMat *t_stddev,
           int first_component, int last_component);
 
 double mvHT2Limit(double alpha, int A, int N);
 
-int mvSPE(mvMat *output, const mvMat *residuals);
-int mvSPEXFromObs(mvMat *output, const mvModel *model, const mvMat *Xobs, const mvMat *tobs, int num_components);
-int mvSPEYFromObs(mvMat *output, const mvModel *model, const mvMat *Yobs, const mvMat *tobs, int num_components);
+int mvSPE(MVMat *output, const MVMat *residuals);
+int mvSPEXFromObs(MVMat *output, const MVModel *model, const MVMat *Xobs, const MVMat *tobs, int num_components);
+int mvSPEYFromObs(MVMat *output, const MVModel *model, const MVMat *Yobs, const MVMat *tobs, int num_components);
 
-double mvSPELimit(double alpha, const mvMat *modelSPE_values, int component);
+double mvSPELimit(double alpha, const MVMat *modelSPE_values, int component);
 
 
 #endif // MVSTATS_H

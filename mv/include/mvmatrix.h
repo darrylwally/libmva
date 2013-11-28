@@ -31,7 +31,7 @@ extern "C" {
 
   rows and columns parameters determine the size of the matrix
   */
-typedef struct mvMat_s {
+typedef struct MVMat_s {
     ///Array of data.  Will be allocated as 2d-array (matrix)
     double **data;
 
@@ -49,58 +49,58 @@ typedef struct mvMat_s {
       */
     int isReference;
 
-} mvMat;
+} MVMat;
 
-/*! Allocate an mvMat matrix structure.
+/*! Allocate an MVMat matrix structure.
 
   This structure can be freed with mvFreeMat;
 
   \arg rows the rows of the matrix.
   \arg columns the columns of the matrix.
-  \return mvMat on success, NULL on failure
+  \return MVMat on success, NULL on failure
 
-  \sa mvMat, mvFreeMat
+  \sa MVMat, mvFreeMat
   */
-mvMat * mvAllocMat(int rows, int columns);
+MVMat * mvAllocMat(int rows, int columns);
 
-/*! Allocate an mvMat matrix structure and initialize all values to zero.
+/*! Allocate an MVMat matrix structure and initialize all values to zero.
 
   \arg rows the rows of the matrix.
   \arg columns the columns of the matrix.
-  \return mvMat on success, NULL on failure
+  \return MVMat on success, NULL on failure
 
-  \sa mvMat, mvFreeMat
+  \sa MVMat, mvFreeMat
   */
-mvMat * mvAllocMatZ(int rows, int columns);
+MVMat * mvAllocMatZ(int rows, int columns);
 
-/*! Allocate an mvMat matrix sturcture and initalize all values to val.
+/*! Allocate an MVMat matrix sturcture and initalize all values to val.
 
   \arg rows the rows of the matrix.
   \arg columns the columns of the matrix.
   \arg val the value of every element in the matrix.
-  \return mvMat on success, NULL on failure
+  \return MVMat on success, NULL on failure
 
-  \sa mvMat, mvFreeMat;
+  \sa MVMat, mvFreeMat;
   */
-mvMat *mvAllocMatVal(int rows, int columns, double val);
+MVMat *mvAllocMatVal(int rows, int columns, double val);
 
-/*! Allocate an mvMat structure with the dimensions and contents of another
+/*! Allocate an MVMat structure with the dimensions and contents of another
     effectively creating a copy.
 
   \arg other
-  \return mvMat on success, NULL on failure
+  \return MVMat on success, NULL on failure
 
-  \sa mvMat, mvFreeMat
+  \sa MVMat, mvFreeMat
   */
-mvMat *mvAllocMatCopy(const mvMat *other);
+MVMat *mvAllocMatCopy(const MVMat *other);
 
 /*! Generates a identity matrix of dimension NxN
 
   \arg dim The size of the matrix NxN where N > 0.
-  \return mvMat * on success or NULL on fail
+  \return MVMat * on success or NULL on fail
   \sa mvFreeMat
   */
-mvMat *mvAllocIdentity(int dim);
+MVMat *mvAllocIdentity(int dim);
 
 /*! Generates a column vector with the range and step
 
@@ -124,16 +124,16 @@ mvMat *mvAllocIdentity(int dim);
   \note This function will return NULL with ill-conditioned arguments.  For example,
   if start > stop and step > 0.  Will return NULL if step==0;
 
-  \note Because mvMat data type is double, the contents will be double and if
+  \note Because MVMat data type is double, the contents will be double and if
   used for indexing they will need casting to integer types.
 
   \arg start starting value of the range.
   \arg stop ending value of the range.
   \arg step step size of the range.
-  \return mvMat with Nx1 or NULL if error.  N is computed based on the step size and the range.
+  \return MVMat with Nx1 or NULL if error.  N is computed based on the step size and the range.
   \sa mvFreeMat
   */
-mvMat *mvRange(int start, int stop, int step);
+MVMat *mvRange(int start, int stop, int step);
 
 /*! Generates a column vector with evenly spaced values between the start and stop
 
@@ -167,23 +167,23 @@ mvMat *mvRange(int start, int stop, int step);
   \arg stop ending value
   \arg num_values number of values within the range.
   \arg end_point Include end point in the linear space (1=include, 0=don't include)
-  \return mvMat with size (num_values x 1) or NULL if error.
+  \return MVMat with size (num_values x 1) or NULL if error.
   \sa mvFreeMat
  */
-mvMat *mvLinspace(double start, double stop, int num_values, int end_point);
+MVMat *mvLinspace(double start, double stop, int num_values, int end_point);
 
-/*! Free an mvMat matrix structure.
+/*! Free an MVMat matrix structure.
   \arg mat pointer to the MvMat data structure.
   \return 0 on success, -1 on failure.
   */
-int mvFreeMat(mvMat **mat);
+int mvFreeMat(MVMat **mat);
 
 /*! Copy the contents of other into output.
 
   \arg output The preallocated output matrix
   \arg other The matrix that will be copied into output.
   */
-int mvMatCopy(mvMat *output, const mvMat *other);
+int mvMatCopy(MVMat *output, const MVMat *other);
 
 /*! Concatenates, row-wise, two matrices together and put them in output.
 
@@ -192,7 +192,7 @@ int mvMatCopy(mvMat *output, const mvMat *other);
   \arg B The second matrix of size MxK
   \return 0 on success or MVErrorCode
   */
-int mvConcatRows(mvMat *output, const mvMat *A, const mvMat *B);
+int mvConcatRows(MVMat *output, const MVMat *A, const MVMat *B);
 
 /*! Concatenates, column-wise, two matrices together and put them in output.
 
@@ -201,7 +201,7 @@ int mvConcatRows(mvMat *output, const mvMat *A, const mvMat *B);
   \arg B The second matrix of size NxP
   \return 0 on success or MVErrorCode
   */
-int mvConcatColumns(mvMat *output, const mvMat *A, const mvMat *B);
+int mvConcatColumns(MVMat *output, const MVMat *A, const MVMat *B);
 
 /*! Performs row-wise slicing of A and stores the result in output.
   The "rows" vector which contains the rows from A that will be put into output.
@@ -210,13 +210,13 @@ int mvConcatColumns(mvMat *output, const mvMat *A, const mvMat *B);
 
   See mvRange for conveniently creating a slice vector.
 
-  \arg output The mvMat matrix of size(rows->nrows, A->ncolumns)
+  \arg output The MVMat matrix of size(rows->nrows, A->ncolumns)
   \arg A The matrix that is being sliced.
-  \arg rows mvMat that should be a column vector (Nx1) of row indexes.
+  \arg rows MVMat that should be a column vector (Nx1) of row indexes.
   \return 0 on success or MVErrorCode
   \sa mvRange
   */
-int mvMatSliceRows(mvMat *output, const mvMat *A, const mvMat *rows);
+int mvMatSliceRows(MVMat *output, const MVMat *A, const MVMat *rows);
 
 /*! Performs row-wise delete of A and stores the result in output.
   The "rows" vector which contains the rows that will be "deleted" from A.  The
@@ -226,13 +226,13 @@ int mvMatSliceRows(mvMat *output, const mvMat *A, const mvMat *rows);
 
   See mvRange for conveniently creating a slice vector.
 
-  \arg output The mvMat matrix of size(rows->nrows, A->ncolumns)
+  \arg output The MVMat matrix of size(rows->nrows, A->ncolumns)
   \arg A The matrix that is being sliced.
-  \arg rows mvMat that should be a column vector (Nx1) of row indexes.
+  \arg rows MVMat that should be a column vector (Nx1) of row indexes.
   \return 0 on SUCCESS or MVErrorCode
   \sa mvRange
   */
-int mvMatDeleteRows(mvMat *output, const mvMat *A, const mvMat *rows);
+int mvMatDeleteRows(MVMat *output, const MVMat *A, const MVMat *rows);
 
 /*! Performs row-wise slicing of A and stores the result in output.
   The "rows" vector which contains the rows from A that will be put into output.
@@ -241,14 +241,14 @@ int mvMatDeleteRows(mvMat *output, const mvMat *A, const mvMat *rows);
 
   See mvRange for conveniently creating a slice vector.
 
-  \arg output The double pointer mvMat matrix that will become an mvMat with
+  \arg output The double pointer MVMat matrix that will become an MVMat with
        is_reference = 1.  Can be NULL;
   \arg A The matrix that is being sliced.
-  \arg rows mvMat that should be a column vector (Nx1) of row indexes.
+  \arg rows MVMat that should be a column vector (Nx1) of row indexes.
   \return 0 on SUCCESS or MVErrorCode
   \sa mvRange
   */
-int mvMatSliceRowsRef(mvMat **output, const mvMat *A, const mvMat *rows);
+int mvMatSliceRowsRef(MVMat **output, const MVMat *A, const MVMat *rows);
 
 /*! Performs row-wise delete of A and stores the result in output.
   The "rows" vector which contains the rows that will be "deleted" from A.  The
@@ -258,14 +258,14 @@ int mvMatSliceRowsRef(mvMat **output, const mvMat *A, const mvMat *rows);
 
   See mvRange for conveniently creating a slice vector.
 
-  \arg output The double pointer mvMat matrix that will become an mvMat with
+  \arg output The double pointer MVMat matrix that will become an MVMat with
        is_reference = 1.  Can be NULL
   \arg A The matrix that is being sliced.
-  \arg rows mvMat that should be a column vector (Nx1) of row indexes.
+  \arg rows MVMat that should be a column vector (Nx1) of row indexes.
   \return 0 on SUCCESS or MVErrorCode
   \sa mvRange
   */
-int mvMatDeleteRowsRef(mvMat **output, const mvMat *A, const mvMat *rows);
+int mvMatDeleteRowsRef(MVMat **output, const MVMat *A, const MVMat *rows);
 
 
 /*! Performs column-wise slicing of A and stores the result in output.
@@ -275,13 +275,13 @@ int mvMatDeleteRowsRef(mvMat **output, const mvMat *A, const mvMat *rows);
 
   See mvRange for conveniently creating a slice vector.
 
-  \arg output The mvMat matrix of size(rows->nrows, A->ncolumns)
+  \arg output The MVMat matrix of size(rows->nrows, A->ncolumns)
   \arg A The matrix that is being sliced.
-  \arg columns mvMat that should be a column vector (Nx1) of column indexes.
+  \arg columns MVMat that should be a column vector (Nx1) of column indexes.
   \return 0 on success or MVErrorCode
   \sa mvRange
   */
-int mvMatSliceColumns(mvMat *output, const mvMat *A, const mvMat *columns);
+int mvMatSliceColumns(MVMat *output, const MVMat *A, const MVMat *columns);
 
 /*! Convenience setter function
   Sets the value to every element in the matrix.
@@ -294,31 +294,31 @@ int mvMatSliceColumns(mvMat *output, const mvMat *A, const mvMat *columns);
   \return 0 on success or MVErrorCode
   \sa mvNaN
   */
-int mvMatSet(mvMat *mat, double value);
+int mvMatSet(MVMat *mat, double value);
 
 /*! Convenience element setter function
   Sets the element in (row, column) of mat to value.  If the location of
   (row,column) is currently "missing" then it will be set to "present"; i.e.,
   its mask value will be set to TRUE if FALSE, unless value is NaN.
 
-  \arg mat The mvMat structure.
+  \arg mat The MVMat structure.
   \arg row The row of the value we wish to set.
   \arg column The column of the value we wish to set.
   \arg value The value that will be set.
   \return 0 on success or a MVErrorCode.
   */
-int mvMatSetElem(mvMat *mat, int row, int column, double value);
+int mvMatSetElem(MVMat *mat, int row, int column, double value);
 
 /*! Convenience element getter function
   Gets the element in (row, column) of mat to value.
-  \arg mat The mvMat structure.
+  \arg mat The MVMat structure.
   \arg value Pointer to the where the value should be stored.  Will be NaN if
        value is missing or if index is out of bounds.
   \arg row The row of the value we wish to set.
   \arg column The column of the value we wish to set.
   \return 0 on success or MVErrorCode.
   */
-int mvMatGetElem(const mvMat *mat, double *value, int row, int column);
+int mvMatGetElem(const MVMat *mat, double *value, int row, int column);
 
 /*! Performs the transponse of a matrix.
   This function takes the input matrix, mat, and transposes it into the output.
@@ -328,7 +328,7 @@ int mvMatGetElem(const mvMat *mat, double *value, int row, int column);
   \return 0 on success or a MVErrorCode.
   */
 
-int mvTransposeMat(mvMat *output, const mvMat *mat);
+int mvTransposeMat(MVMat *output, const MVMat *mat);
 
 /*! Performs addition of two matrices.
   This function will add two matrices, A and B, and store the result in output.
@@ -342,7 +342,7 @@ int mvTransposeMat(mvMat *output, const mvMat *mat);
   \arg B the second matrix
   \return 0 on success or a MVErrorCode.
   */
-int mvAddMat(mvMat *output, const mvMat *A, const mvMat *B);
+int mvAddMat(MVMat *output, const MVMat *A, const MVMat *B);
 
 /*! Performs subtraction of two matrices.
   This function will subtract two matrices, A and B, and store the result in
@@ -357,7 +357,7 @@ int mvAddMat(mvMat *output, const mvMat *A, const mvMat *B);
   \arg B the second matrix
   \return 0 on success or a MVErrorCode.
   */
-int mvSubtractMat(mvMat *output, const mvMat *A, const mvMat *B);
+int mvSubtractMat(MVMat *output, const MVMat *A, const MVMat *B);
 
 /*! Performs addition a matrix with a scalar.
   This function will add matrix A with scalar and store the result in output.
@@ -373,7 +373,7 @@ int mvSubtractMat(mvMat *output, const mvMat *A, const mvMat *B);
   \arg scalar the scalar value that will be subtracted from A
   \return 0 on success or a MVErrorCode.
   */
-int mvAddMatS(mvMat *output, const mvMat *A, double scalar);
+int mvAddMatS(MVMat *output, const MVMat *A, double scalar);
 
 /*! Performs matrix multiplication
   This function performs matrix multiplication on A and B and stores the
@@ -391,7 +391,7 @@ int mvAddMatS(mvMat *output, const mvMat *A, double scalar);
   \arg B the second matrix
   \return 0 on success or a MVErrorCode.
   */
-int mvMatMult(mvMat *output, const mvMat *A, const mvMat *B);
+int mvMatMult(MVMat *output, const MVMat *A, const MVMat *B);
 
 /*! Performs multiplication of a matrix with a scalar
     This function multiplies each element in matrix A by a scalar
@@ -410,7 +410,7 @@ int mvMatMult(mvMat *output, const mvMat *A, const mvMat *B);
   \arg scalar the scalar
   \return 0 on success or a MVErrorCode.
   */
-int mvMatMultS(mvMat *output, const mvMat *A, double scalar);
+int mvMatMultS(MVMat *output, const MVMat *A, double scalar);
 
 /*! Performs element-wise matrix multiplication on matrices of similar dimension
 
@@ -421,7 +421,7 @@ int mvMatMultS(mvMat *output, const mvMat *A, double scalar);
   \arg B the second matrix
   \return 0 on success or a MVErrorCode.
   */
-int mvMatElemMult(mvMat *output, const mvMat *A, const mvMat *B);
+int mvMatElemMult(MVMat *output, const MVMat *A, const MVMat *B);
 
 /*! Performs element-wise matrix division on matrices of similar dimension
 
@@ -436,79 +436,79 @@ int mvMatElemMult(mvMat *output, const mvMat *A, const mvMat *B);
   \arg B the second matrix
   \return 0 on success or a MVErrorCode.
   */
-int mvMatElemDiv(mvMat *output, const mvMat *A, const mvMat *B);
+int mvMatElemDiv(MVMat *output, const MVMat *A, const MVMat *B);
 
 /*! Computes the norm of a vector
-  A vector is supplied as an mvMat.  The vector must be Nx1 or 1xN in dimension.
+  A vector is supplied as an MVMat.  The vector must be Nx1 or 1xN in dimension.
 
   \note This function asserts that one of the dimensions is 1.
 
-  \arg A mvMat that is Nx1 or 1xN in dimension.
+  \arg A MVMat that is Nx1 or 1xN in dimension.
   \return The vector's Euclidiean norm. An entirely missing vector will return 0.
   */
-double mvVectorNorm(const mvMat * A);
+double mvVectorNorm(const MVMat * A);
 
 /*! Computes the sum of each column in a matrix.
   The sum of each column is computed and stored in output.
 
   \note If A is NxM in size, then output must be 1xM in size.
-  \arg output The output mvMat that is 1xM in dimension.
+  \arg output The output MVMat that is 1xM in dimension.
   \arg A the input matrix.
   \return 0 on success or a MVErrorCode.
   */
-int mvMatColumnSum(mvMat *output, const mvMat * A);
+int mvMatColumnSum(MVMat *output, const MVMat * A);
 
 /*! Computes the sum of squares for each column in a matrix.
   The sum of squares for each column is computed and stored in output.
 
   \note If A is NxM in size, then output must be 1xM in size.
-  \arg output The output mvMat that is 1xM in dimension.
+  \arg output The output MVMat that is 1xM in dimension.
   \arg A the input matrix.
   \return 0 on success or a MVErrorCode.
   */
-int mvMatColumnSS(mvMat *output, const mvMat *A);
+int mvMatColumnSS(MVMat *output, const MVMat *A);
 
 /*! Computes the mean of each column in a matrix.
   The mean of each column is computed and stored in output.
 
   \note If A is NxM in size, then output must be 1xM in size.
-  \arg output The output mvMat that is 1xM in dimension.
+  \arg output The output MVMat that is 1xM in dimension.
   \arg A the input matrix.
   \return 0 on success or a MVErrorCode.
   */
-int mvColumnMean(mvMat * output, const mvMat * A);
+int mvColumnMean(MVMat * output, const MVMat * A);
 
 /*! Computes the variance of each column in a matrix.
   The variance of each column is computed and stored in output.
 
   \note If A is NxM in size, then output must be 1xM in size.
-  \arg output The output mvMat that is 1xM in dimension.
+  \arg output The output MVMat that is 1xM in dimension.
   \arg A the input matrix.
   \arg ddof N-ddof in the denominator.  Default should be zero or one.
   \return 0 on success or a MVErrorCode.
   */
-int mvColumnVar(mvMat * output, const mvMat * A, int ddof);
+int mvColumnVar(MVMat * output, const MVMat * A, int ddof);
 
 /*! Computes the standard deviation of each column in a matrix.
   The standard deviation of each column is computed and stored in output.
 
   \note If A is NxM in size, then output must be 1xM in size.
-  \arg output The output mvMat that is 1xM in dimension.
+  \arg output The output MVMat that is 1xM in dimension.
   \arg A the input matrix.
   \arg ddof N-ddof in the denominator.  Default should be zero or one.
   \return 0 on success or a MVErrorCode.
   */
-int mvColumnStdDev(mvMat *output, const mvMat *A, int ddof);
+int mvColumnStdDev(MVMat *output, const MVMat *A, int ddof);
 
 /*! Computes the sum of squares for each row in a matrix.
   The sum of squares for each row is computed and stored in output.
 
   \note If A is NxM in size, then output must be Nx1 in size.
-  \arg output The output mvMat that is Nx1 in dimension.
+  \arg output The output MVMat that is Nx1 in dimension.
   \arg A the input matrix.
   \return 0 on success or a MVErrorCode.
   */
-int mvMatRowSS(mvMat *output, const mvMat *A);
+int mvMatRowSS(MVMat *output, const MVMat *A);
 
 /*! Performs a column-wise addition of elements in column with elements of A.
 
@@ -519,7 +519,7 @@ int mvMatRowSS(mvMat *output, const mvMat *A);
   \arg columnValues The values that will be added to each column of A.
   \return 0 on success or a MVErrorCode.
   */
-int mvMatColumnAdd(mvMat *output, const mvMat *A, const mvMat *columnValues);
+int mvMatColumnAdd(MVMat *output, const MVMat *A, const MVMat *columnValues);
 
 /*! Performs a column-wise subtraction of elements in column from elements of A.
 
@@ -530,7 +530,7 @@ int mvMatColumnAdd(mvMat *output, const mvMat *A, const mvMat *columnValues);
   \arg columnValues The values that will be subtracted from each column of A.
   \return 0 on success or a MVErrorCode.
   */
-int mvMatColumnSubtract(mvMat *output, const mvMat *A, const mvMat *columnValues);
+int mvMatColumnSubtract(MVMat *output, const MVMat *A, const MVMat *columnValues);
 
 /*! Performs a column-wise multiplication of elements in column with elements of A.
 
@@ -541,7 +541,7 @@ int mvMatColumnSubtract(mvMat *output, const mvMat *A, const mvMat *columnValues
   \arg columnValues The values that will be multiplied with each column of A.
   \return 0 on success or a MVErrorCode.
   */
-int mvMatColumnMult(mvMat *output, const mvMat *A, const mvMat *columnValues);
+int mvMatColumnMult(MVMat *output, const MVMat *A, const MVMat *columnValues);
 
 
 /*! Performs a column-wise division of elements in column with elements of A.
@@ -553,19 +553,19 @@ int mvMatColumnMult(mvMat *output, const mvMat *A, const mvMat *columnValues);
   \arg columnValues The values that will be divided with each column of A.
   \return 0 on success or a MVErrorCode.
   */
-int mvMatColumnDiv(mvMat *output, const mvMat *A, const mvMat *columnValues);
+int mvMatColumnDiv(MVMat *output, const MVMat *A, const MVMat *columnValues);
 
 /*! Returns the number of missing values in the matrix
-  \arg mat The mvMat matrix.
+  \arg mat The MVMat matrix.
   \return number of missing values
   */
-int mvNumMissing(const mvMat *mat);
+int mvNumMissing(const MVMat *mat);
 
 /*! Returns the percentage of missing values in the matrix
-  \arg mat The mvMat matrix.
+  \arg mat The MVMat matrix.
   \return percentage of missing values (between 0 -> 1.0)
   */
-double mvPctMissing(const mvMat *mat);
+double mvPctMissing(const MVMat *mat);
 
 /*! Returns the dot product of vector's A and B
   Vectors must be 1 dimensional.  As long as 1 dimension is size(1) and the
@@ -576,17 +576,17 @@ double mvPctMissing(const mvMat *mat);
   \arg b the second vector of size Nx1.
   \arg the dot product or NaN if error.
   */
-double mvDotProduct(const mvMat *a, const mvMat *b);
+double mvDotProduct(const MVMat *a, const MVMat *b);
 
-/*! Returns the SUM of SQUARES of an mvMat
+/*! Returns the SUM of SQUARES of an MVMat
 
   \note if all values are missing then the result will be zero.
   \arg A the matrix
   \return sum of squares;
   */
-double mvMatSS(const mvMat *A);
+double mvMatSS(const MVMat *A);
 
-/*! Returns the sum of all of the elements of an mvMat
+/*! Returns the sum of all of the elements of an MVMat
 
   This function properly accounts for missing data.
 
@@ -594,7 +594,7 @@ double mvMatSS(const mvMat *A);
   \arg A the matrix.
   \return sum
   */
-double mvMatSum(const mvMat *A);
+double mvMatSum(const MVMat *A);
 
 #ifdef __cplusplus
 }

@@ -14,7 +14,7 @@
 #endif
 
 #include <mvconstants.h>
-#include <mvmatrix.h>
+#include <mvMatrix.h>
 #include <mvmodel.h>
 #include <mvstats.h>
 
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
     size_t memusage_before;
     size_t memusage_during;
     size_t memusage_after;
-    mvMat *matrix1, *matrix2, *matrix3, *matrix4;
+    MVMat *matrix1, *matrix2, *matrix3, *matrix4;
     char *data;
     (void)data;
     (void)matrix1;
@@ -861,7 +861,7 @@ int main(int argc, char *argv[])
     printf("\n**Testing mvRange **\n");
     {
         int i;
-        mvMat * range;
+        MVMat * range;
 
         printf("\n\nmvRange(1, 5, -1);");
         range = mvRange(1, 5, -1);
@@ -899,7 +899,7 @@ int main(int argc, char *argv[])
     printf("\n\n**Testing LinSpace**\n");
     {
         int i;
-        mvMat *linspace;
+        MVMat *linspace;
 
         printf("\nmvLinspace(1.0, 5.0, 0, 1);");
         linspace = mvLinspace(1.0, 5.0, 0, 1);
@@ -939,10 +939,10 @@ int main(int argc, char *argv[])
         int i, j;
         const double x_data [FOODS_DATA_ROWS][FOODS_DATA_COLUMNS]=FOODS_DATA;
 
-        mvMat *slice = mvRange(0, FOODS_DATA_ROWS, 7);
-        mvMat *XSliceRef = NULL;
-        mvMat *XSlice = mvAllocMat(slice->nrows, FOODS_DATA_COLUMNS);
-        mvMat *X = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVMat *slice = mvRange(0, FOODS_DATA_ROWS, 7);
+        MVMat *XSliceRef = NULL;
+        MVMat *XSlice = mvAllocMat(slice->nrows, FOODS_DATA_COLUMNS);
+        MVMat *X = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
 
         for (i=0; i<FOODS_DATA_ROWS; i++)
         {
@@ -978,7 +978,7 @@ int main(int argc, char *argv[])
         int i, j, round, num_rounds;
         const double x_data [FOODS_DATA_ROWS][FOODS_DATA_COLUMNS]=FOODS_DATA;
 
-        mvMat *X = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVMat *X = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
 
 
 
@@ -993,8 +993,8 @@ int main(int argc, char *argv[])
         {
             for (round = 0; round<num_rounds; round++)
             {
-                mvMat *slice = mvRange(round, FOODS_DATA_ROWS, num_rounds);
-                mvMat *XSliceRef = NULL;
+                MVMat *slice = mvRange(round, FOODS_DATA_ROWS, num_rounds);
+                MVMat *XSliceRef = NULL;
 
 
                 mvMatDeleteRowsRef(&XSliceRef, X, slice);
@@ -1020,15 +1020,15 @@ int main(int argc, char *argv[])
     printf("\n**Testing PCA**\n");
     {
         const double data [FOODS_DATA_ROWS][FOODS_DATA_COLUMNS]=FOODS_DATA;
-        mvMat * X = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
-        mvMat * X_mcuv = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
-        mvMat *X_mean = mvAllocMat(1,FOODS_DATA_COLUMNS);
-        mvMat *X_std = mvAllocMat(1,FOODS_DATA_COLUMNS);
-        mvMat *new_t = NULL;
-        mvMat *X_hat = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
-        mvMat *HT2 = mvAllocMatZ(X->nrows, 1);
-        mvMat *SPE = mvAllocMatZ(X->nrows, 1);
-        mvModel *pca_model;
+        MVMat * X = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVMat * X_mcuv = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVMat *X_mean = mvAllocMat(1,FOODS_DATA_COLUMNS);
+        MVMat *X_std = mvAllocMat(1,FOODS_DATA_COLUMNS);
+        MVMat *new_t = NULL;
+        MVMat *X_hat = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVMat *HT2 = mvAllocMatZ(X->nrows, 1);
+        MVMat *SPE = mvAllocMatZ(X->nrows, 1);
+        MVModel *pca_model;
         int i, j;
         for (i=0; i<FOODS_DATA_ROWS; i++)
         {
@@ -1076,7 +1076,7 @@ int main(int argc, char *argv[])
         }
         new_t = mvAllocMatZ(X->nrows, pca_model->A);
 
-        mvNewObsT(new_t, NULL, X_mcuv, pca_model, pca_model->A, SCP);
+        mvNewObsT(new_t, NULL, X_mcuv, pca_model, pca_model->A, MV_NEW_SCORE_SCP);
 
         printf("\nNew foods score:\n");
         for (i = 0; i < pca_model->A; i++)
@@ -1122,19 +1122,19 @@ int main(int argc, char *argv[])
         int ioi = 207; // index of interest
         const double x_data [KAMYR_ROWS][KAMYR_X_COLUMNS]=KAMYR_X;
         const double y_data [KAMYR_ROWS][KAMYR_Y_COLUMNS]=KAMYR_Y;
-        mvMat * X = mvAllocMat(KAMYR_ROWS, KAMYR_X_COLUMNS);
-        mvMat * X_mcuv = mvAllocMat(KAMYR_ROWS, KAMYR_X_COLUMNS);
-        mvMat *X_mean = mvAllocMat(1,KAMYR_X_COLUMNS);
-        mvMat *X_std = mvAllocMat(1,KAMYR_X_COLUMNS);
-        mvMat * Y = mvAllocMat(KAMYR_ROWS, KAMYR_Y_COLUMNS);
-        mvMat * Y_mcuv = mvAllocMat(KAMYR_ROWS, KAMYR_Y_COLUMNS);
-        mvMat *Y_mean = mvAllocMat(1,KAMYR_Y_COLUMNS);
-        mvMat *Y_std = mvAllocMat(1,KAMYR_Y_COLUMNS);
-        mvMat *E_pred = mvAllocMatZ(KAMYR_ROWS, KAMYR_X_COLUMNS);
-        mvMat *F_pred = mvAllocMatZ(KAMYR_ROWS, KAMYR_Y_COLUMNS);
-        mvMat *new_t = mvAllocMatZ(X->nrows, 2);
-        mvMat *new_u = mvAllocMatZ(X->nrows, 2);
-        mvModel *pls_model;
+        MVMat * X = mvAllocMat(KAMYR_ROWS, KAMYR_X_COLUMNS);
+        MVMat * X_mcuv = mvAllocMat(KAMYR_ROWS, KAMYR_X_COLUMNS);
+        MVMat *X_mean = mvAllocMat(1,KAMYR_X_COLUMNS);
+        MVMat *X_std = mvAllocMat(1,KAMYR_X_COLUMNS);
+        MVMat * Y = mvAllocMat(KAMYR_ROWS, KAMYR_Y_COLUMNS);
+        MVMat * Y_mcuv = mvAllocMat(KAMYR_ROWS, KAMYR_Y_COLUMNS);
+        MVMat *Y_mean = mvAllocMat(1,KAMYR_Y_COLUMNS);
+        MVMat *Y_std = mvAllocMat(1,KAMYR_Y_COLUMNS);
+        MVMat *E_pred = mvAllocMatZ(KAMYR_ROWS, KAMYR_X_COLUMNS);
+        MVMat *F_pred = mvAllocMatZ(KAMYR_ROWS, KAMYR_Y_COLUMNS);
+        MVMat *new_t = mvAllocMatZ(X->nrows, 2);
+        MVMat *new_u = mvAllocMatZ(X->nrows, 2);
+        MVModel *pls_model;
         int i, j;
         for (i=0; i<KAMYR_ROWS; i++)
         {
@@ -1201,7 +1201,7 @@ int main(int argc, char *argv[])
                3, pls_model->Q2cum->data[2][0],
                4, pls_model->Q2cum->data[3][0]);
 
-        mvNewObsT(new_t, E_pred, X_mcuv, pls_model, 2, SCP);
+        mvNewObsT(new_t, E_pred, X_mcuv, pls_model, 2, MV_NEW_SCORE_SCP);
 
 
         ioi=207;
@@ -1215,7 +1215,7 @@ int main(int argc, char *argv[])
                pls_model->SSX->data[0][0], pls_model->SSX->data[1][0], pls_model->SSX->data[2][0], mvMatSS(E_pred));
 
 
-        mvNewObsU(new_u, F_pred, Y_mcuv, new_t, pls_model, 2, SCP);
+        mvNewObsU(new_u, F_pred, Y_mcuv, new_t, pls_model, 2, MV_NEW_SCORE_SCP);
         printf("\nNew kamyr score U1[%2d] = %1.8lf, U2[%2d] = %1.8lf",
                ioi, new_u->data[ioi][0], ioi, new_u->data[ioi][1]);
         printf("\n\nR2Y test %1.8lf, SSY = %lf, SSF0 = %lf, SSF1 = %lf, SSF2 = %lf, SSF_pred2 = %lf",

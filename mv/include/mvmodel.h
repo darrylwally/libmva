@@ -27,63 +27,63 @@ extern "C" {
     References: Arteaga, F and Ferrer, A. Journal of Chemometrics, 16, pp408-418, 2002.
 */
 typedef enum MVNewScoreCalcType_enum {
-    SCP//, /*! Single component projection */
+    MV_NEW_SCORE_SCP//, /*! Single component projection */
     //PMP, /*! Projection to model plane */
     //TSR  /*! Trimmed score regression */
 } MVNewScoreCalcType;
 
 typedef enum MVModelType_enum {
-    PCA,
-    PLS
+    MV_MODEL_TYPE_PCA,
+    MV_MODEL_TYPE_PLS
 } MVModelType;
 
 typedef enum MVCrossValType_enum {
-    FAST,
-    FULL /* Not yet implemented */
+    MV_CROSSVAL_TYPE_FAST,
+    MV_CROSSVAL_TYPE_FULL /* Not yet implemented */
 } MVCrossValType;
 
-typedef struct crossValData_s{
-    mvMat * PRESS;      /*! _Ax1 */
-    mvMat * PRESSV;     /*! _AxK for PCA or _AxM for PLS */
+typedef struct MVCrossValData_s{
+    MVMat * PRESS;      /*! _Ax1 */
+    MVMat * PRESSV;     /*! _AxK for PCA or _AxM for PLS */
     void ** models;     /*! array of models of size NUM_ROUNDS */
     int numRounds;      /*! Number of rounds in this cross val data */
-} crossValData;
+} MVCrossValData;
 
 /*! Structure for both PCA and PLS models
   */
-typedef struct mvModel_s{
+typedef struct MVModel_s{
     MVModelType modelType;
-    mvMat * X;           /*! Reference to X-matrix of size(NxK)*/
-    mvMat * Y;           /*! Reference to Y-matrix of size(NxM) - PLS only */
-    mvMat * E;           /*! X-Residual matrix */
-    mvMat * F;           /*! Y-Residual matrix */
-    mvMat * t;           /*! T-scores matrix of size (NxA) */
-    mvMat * t_stddev;    /*! Standard deviation of T-scores of size (1xA); */
-    mvMat * p;           /*! P-loadings matrix of size (KxA) */
-    mvMat * u;           /*! U-scores matrix of size (NxA) */
-    mvMat * w;           /*! W-weightings matrix of size (KxA) */
-    mvMat * wStar;       /*! W*-weightings matrix of size (KxA) */
-    mvMat * c;           /*! C-loadings matrix of size (MxA) */
-    mvMat * R2X;         /*! Column vector mvMat (_Ax1)*/
-    mvMat * R2Y;         /*! Column vector mvMat (_Ax1)*/
-    mvMat * Q2cum;       /*! Column vector mvMat (_Ax1)*/
-    mvMat * Q2Vcum;      /*! Column vector mvMat (_Ax1)*/
-    mvMat * Q2;          /*! Column vector mvMat (_Ax1)*/
-    mvMat * Q2V;         /*! Q2 per Variable matrix of size KxA (PCA) or MxA (PLS) */
-    mvMat * SPEX;        /*! Squared Prediction Error of X (size NxA) */
-    mvMat * SPEY;        /*! Squared Prediction Error of Y - PLS only (size NxA) */
-    crossValData * cvd;  /*! Data required for crossValidation */
+    MVMat * X;           /*! Reference to X-matrix of size(NxK)*/
+    MVMat * Y;           /*! Reference to Y-matrix of size(NxM) - PLS only */
+    MVMat * E;           /*! X-Residual matrix */
+    MVMat * F;           /*! Y-Residual matrix */
+    MVMat * t;           /*! T-scores matrix of size (NxA) */
+    MVMat * t_stddev;    /*! Standard deviation of T-scores of size (1xA); */
+    MVMat * p;           /*! P-loadings matrix of size (KxA) */
+    MVMat * u;           /*! U-scores matrix of size (NxA) */
+    MVMat * w;           /*! W-weightings matrix of size (KxA) */
+    MVMat * wStar;       /*! W*-weightings matrix of size (KxA) */
+    MVMat * c;           /*! C-loadings matrix of size (MxA) */
+    MVMat * R2X;         /*! Column vector MVMat (_Ax1)*/
+    MVMat * R2Y;         /*! Column vector MVMat (_Ax1)*/
+    MVMat * Q2cum;       /*! Column vector MVMat (_Ax1)*/
+    MVMat * Q2Vcum;      /*! Column vector MVMat (_Ax1)*/
+    MVMat * Q2;          /*! Column vector MVMat (_Ax1)*/
+    MVMat * Q2V;         /*! Q2 per Variable matrix of size KxA (PCA) or MxA (PLS) */
+    MVMat * SPEX;        /*! Squared Prediction Error of X (size NxA) */
+    MVMat * SPEY;        /*! Squared Prediction Error of Y - PLS only (size NxA) */
+    MVCrossValData * cvd;  /*! Data required for crossValidation */
     MVCrossValType crossValType; /*! Type of cross validation */
     int numCrossValRounds; /*! Number of rounds to for cross validation (default = 7) */
-    mvMat * SSX;         /*! Sum of squares of X-matrix for each component size (_A+1x1)*/
-    mvMat * SSY;         /*! Sum of squares of Y-matrix for each component size (_A+1x1)*/
-    mvMat * SSXV;        /*! Sum of squares of columns of X-matrix for each component size (_A+1xK)*/
-    mvMat * SSYV;        /*! Sum of squares of columns of Y-matrix for each component size (_A+1xY)*/
+    MVMat * SSX;         /*! Sum of squares of X-matrix for each component size (_A+1x1)*/
+    MVMat * SSY;         /*! Sum of squares of Y-matrix for each component size (_A+1x1)*/
+    MVMat * SSXV;        /*! Sum of squares of columns of X-matrix for each component size (_A+1xK)*/
+    MVMat * SSYV;        /*! Sum of squares of columns of Y-matrix for each component size (_A+1xY)*/
     int A;      /*! Number of active components */
     int _A;     /*! Total number of computed components */
-    mvMat * iter;        /*! Column vector mvMat (_Ax1) Number of iterations on NIPALS algorithm */
+    MVMat * iter;        /*! Column vector MVMat (_Ax1) Number of iterations on NIPALS algorithm */
 
-} mvModel;
+} MVModel;
 
 /*! Initializes a PCA model
 
@@ -95,7 +95,7 @@ typedef struct mvModel_s{
 
   \sa mvFreeModel, MVModelType, MVCrossValType
   */
-mvModel * mvInitPCAModel(mvMat *X);
+MVModel * mvInitPCAModel(MVMat *X);
 
 /*! Initializes a PLS model
 
@@ -107,13 +107,13 @@ mvModel * mvInitPCAModel(mvMat *X);
   \return mvModel of type PLS
   \sa mvFreeModel, MVModelType
   */
-mvModel * mvInitPLSModel(mvMat *X, mvMat *Y);
+MVModel * mvInitPLSModel(MVMat *X, MVMat *Y);
 
 /*! Frees the mvModel
   \arg model pointer to the mvModel pointer.
   \return 0 on success or MVModelErrorCode
   */
-int mvFreeModel(mvModel **model);
+int mvFreeModel(MVModel **model);
 
 /*! Add a component to the model
 
@@ -135,7 +135,7 @@ int mvFreeModel(mvModel **model);
   \arg model The mvModel
   \return 0 on success or MVModelErrorCode;
   */
-int mvModelAddComponent(mvModel *model);
+int mvModelAddComponent(MVModel *model);
 
 /*! Performs auto-fit on PCA or PLS model
 
@@ -161,7 +161,7 @@ int mvModelAddComponent(mvModel *model);
    \arg model mvModel to auto-fit
    \return MVModelReturnCode - The rule that failed.
   */
-int mvAutoFit(mvModel *model);
+int mvAutoFit(MVModel *model);
 
 /*! Computes T-scores for new observations of X of a mvModel
 
@@ -175,7 +175,7 @@ int mvAutoFit(mvModel *model);
 
   \sa MVNewScoreCalcType
   */
-int mvNewObsT(mvMat *t, mvMat * E, const mvMat *newX, const mvModel *pca_model,
+int mvNewObsT(MVMat *t, MVMat * E, const MVMat *newX, const MVModel *pca_model,
                   int num_components, MVNewScoreCalcType method);
 
 /*! Computes U-scores for a new observation of Y of a PLS Model
@@ -190,31 +190,31 @@ int mvNewObsT(mvMat *t, mvMat * E, const mvMat *newX, const mvModel *pca_model,
 
   \sa MVNewScoreCalcType
   */
-int mvNewObsU(mvMat *u, mvMat *F, const mvMat *newY, const mvMat *newT,
-                  const mvModel *pls_model, int num_components,
+int mvNewObsU(MVMat *u, MVMat *F, const MVMat *newY, const MVMat *newT,
+                  const MVModel *pls_model, int num_components,
                   MVNewScoreCalcType method);
 
 /*! Compute the predicted X values based on scores and loadings provided.
 
     Predictions for X: Xhat = TP'
 
-    \arg pred preallocated mvMat, must be size NxK
+    \arg pred preallocated MVMat, must be size NxK
     \arg model mvModel.
     \arg t scores with which to compute Xhat.
     \arg num_components number of components to compute Xhat
 */
-int mvComputeXpred(mvMat *Xhat, const mvModel *model, const mvMat *t, int num_components);
+int mvComputeXpred(MVMat *Xhat, const MVModel *model, const MVMat *t, int num_components);
 
 /*! Compute the predicted X values based on scores and loadings provided.
 
     Predictions for Y: Yhat = TC'
 
-    \arg pred preallocated mvMat, must be size NxK
+    \arg pred preallocated MVMat, must be size NxK
     \arg model mvModel must be PLS model.
     \arg t scores with which to compute Yhat
     \arg num_components number of components to compute Xhat
 */
-int mvComputeYpred(mvMat *Yhat, const mvModel *model, const mvMat *t, int num_components);
+int mvComputeYpred(MVMat *Yhat, const MVModel *model, const MVMat *t, int num_components);
 
 
 
