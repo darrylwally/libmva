@@ -566,7 +566,7 @@ int mvmat_get_elem(const MVMat *mat, double *value, int row, int column)
     }
     else
     {
-        *value = mvNaN();
+        *value = mv_NaN();
     }
     return SUCCESS;
 }
@@ -627,7 +627,7 @@ int mvmat_subtract(MVMat *output, const MVMat *A, const MVMat *B)
         {
             if (A->mask[i][j] == DATA_MISSING || B->mask[i][j] == DATA_MISSING)
             {
-                output->data[i][j] = mvNaN();
+                output->data[i][j] = mv_NaN();
                 output->mask[i][j] = DATA_MISSING;
             }
             else
@@ -719,7 +719,7 @@ int mvmat_elem_div(MVMat *output, const MVMat *A, const MVMat *B)
         {
             if (B->data[i][j]==0.0)
             {
-                output->data[i][j] = mvNaN();
+                output->data[i][j] = mv_NaN();
                 output->mask[i][j] = 1;
             }
             else
@@ -831,7 +831,7 @@ int mvmat_column_mean(MVMat *output, const MVMat *A)
         }
         if (num_missing==A->nrows)
         {
-            output->data[0][j] = mvNaN();
+            output->data[0][j] = mv_NaN();
             output->mask[0][j] = DATA_MISSING;
         }
         else
@@ -865,7 +865,7 @@ int mvmat_column_var(MVMat *output, const MVMat *A, int ddof)
         output->mask[0][j]=DATA_PRESENT;
         if ( MVISNAN_FUNC(colmean->data[0][j]) )
         {
-            output->data[0][j] = mvNaN();
+            output->data[0][j] = mv_NaN();
             output->mask[0][j] = DATA_MISSING;
             continue;
         }
@@ -884,7 +884,7 @@ int mvmat_column_var(MVMat *output, const MVMat *A, int ddof)
         }
         if ((N-num_missing) <= 0)
         {
-            output->data[0][j] = mvNaN();
+            output->data[0][j] = mv_NaN();
             output->mask[0][j] = DATA_MISSING;
         }
         else
@@ -954,7 +954,7 @@ int mvmat_column_add(MVMat *output, const MVMat *A, const MVMat *columnValues)
             if (columnValues->mask[0][j]==DATA_MISSING)
             {
                 output->mask[i][j]=DATA_MISSING;
-                output->data[i][j]=mvNaN();
+                output->data[i][j]=mv_NaN();
             }
             else
             {
@@ -982,7 +982,7 @@ int mvmat_column_subtract(MVMat *output, const MVMat *A, const MVMat *columnValu
             if (columnValues->mask[0][j]==DATA_MISSING)
             {
                 output->mask[i][j]=DATA_MISSING;
-                output->data[i][j]=mvNaN();
+                output->data[i][j]=mv_NaN();
             }
             else
             {
@@ -1010,7 +1010,7 @@ int mvmat_column_mult(MVMat *output, const MVMat *A, const MVMat *columnValues)
             if (columnValues->mask[0][j]==DATA_MISSING)
             {
                 output->mask[i][j]=DATA_MISSING;
-                output->data[i][j]=mvNaN();
+                output->data[i][j]=mv_NaN();
             }
             else
             {
@@ -1039,7 +1039,7 @@ int mvmat_column_div(MVMat *output, const MVMat *A, const MVMat *columnValues)
                     columnValues->data[0][j]==0.0)
             {
                 output->mask[i][j]=DATA_MISSING;
-                output->data[i][j]=mvNaN();
+                output->data[i][j]=mv_NaN();
             }
             else
             {
@@ -1084,7 +1084,7 @@ double mvmat_dot_product(const MVMat *a, const MVMat *b)
     if ( !((a->nrows*a->ncolumns == b->nrows*b->ncolumns) &&
            (a->nrows==1 || a->ncolumns==1) && (b->nrows==1 || b->ncolumns) ))
     {
-        return mvNaN();
+        return mv_NaN();
     }
     N = a->nrows * a->ncolumns;
     a_data = a->data[0];

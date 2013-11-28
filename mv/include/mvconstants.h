@@ -43,14 +43,14 @@ extern const float MV_SQRT_EPS_F;
 
 
 // NANS
-double mvNaN();
-float mvNaNf();
+double mv_NaN();
+float mv_NaNf();
 
 // Infinite
-double mvInf();
-double mvNegInf();
-float mvInff();
-float mvNegInff();
+double mv_inf();
+double mv_neg_inf();
+float mv_inff();
+float mv_neg_inff();
 
 #ifdef __cplusplus
 }

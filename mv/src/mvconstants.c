@@ -24,34 +24,34 @@ static const unsigned long long __mv_neg_inf = 0xfff0000000000000;
 static const unsigned int __mv_inff = 0x7f800000;
 static const unsigned int __mv_neg_inff = 0xff800000;
 
-double mvNaN()
+double mv_NaN()
 {
     return *(double *) &__mv_nan;
 }
 
-float mvNaNf()
+float mv_NaNf()
 {
     return *(float *)&__mv_nanf;
 }
 
-double mvInf()
+double mv_inf()
 {
 
     return *(double *)&__mv_inf;
 }
 
-double mvNegInf()
+double mv_neg_inf()
 {
 
     return *(double *)&__mv_neg_inf;
 }
 
-float mvInff()
+float mv_inff()
 {
     return *(float *)&__mv_inff;
 }
 
-float mvNegInff()
+float mv_neg_inff()
 {
     return *(float *)&__mv_neg_inff;
 }

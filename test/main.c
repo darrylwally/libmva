@@ -555,16 +555,16 @@ int main(int argc, char *argv[])
         }
         val = mvmat_vector_norm(matrix1);
         assert(val == sqrt((1.0*1.0+2.0*2.0+3.0*3.0+4.0*4.0)));
-        mvmat_set_elem(matrix1, 0,0, mvNaN());
+        mvmat_set_elem(matrix1, 0,0, mv_NaN());
         val = mvmat_vector_norm(matrix1);
         assert(val == sqrt((2.0*2.0+3.0*3.0+4.0*4.0)));
-        mvmat_set_elem(matrix1, 1,0, mvNaN());
+        mvmat_set_elem(matrix1, 1,0, mv_NaN());
         val = mvmat_vector_norm(matrix1);
         assert(val == sqrt((3.0*3.0+4.0*4.0)));
-        mvmat_set_elem(matrix1, 2,0, mvNaN());
+        mvmat_set_elem(matrix1, 2,0, mv_NaN());
         val = mvmat_vector_norm(matrix1);
         assert(val == sqrt((4.0*4.0)));
-        mvmat_set_elem(matrix1, 3,0, mvNaN());
+        mvmat_set_elem(matrix1, 3,0, mv_NaN());
         val = mvmat_vector_norm(matrix1);
         assert(val == 0.0);
         mvmat_free(&matrix1);
@@ -576,16 +576,16 @@ int main(int argc, char *argv[])
         }
         val = mvmat_vector_norm(matrix1);
         assert(val == sqrt((1.0*1.0+2.0*2.0+3.0*3.0+4.0*4.0)));
-        mvmat_set_elem(matrix1, 0,0, mvNaN());
+        mvmat_set_elem(matrix1, 0,0, mv_NaN());
         val = mvmat_vector_norm(matrix1);
         assert(val == sqrt((2.0*2.0+3.0*3.0+4.0*4.0)));
-        mvmat_set_elem(matrix1, 0,1, mvNaN());
+        mvmat_set_elem(matrix1, 0,1, mv_NaN());
         val = mvmat_vector_norm(matrix1);
         assert(val == sqrt((3.0*3.0+4.0*4.0)));
-        mvmat_set_elem(matrix1, 0,2, mvNaN());
+        mvmat_set_elem(matrix1, 0,2, mv_NaN());
         val = mvmat_vector_norm(matrix1);
         assert(val == sqrt((4.0*4.0)));
-        mvmat_set_elem(matrix1, 0,3, mvNaN());
+        mvmat_set_elem(matrix1, 0,3, mv_NaN());
         val = mvmat_vector_norm(matrix1);
         assert(val == 0.0);
         mvmat_free(&matrix1);
@@ -600,7 +600,7 @@ int main(int argc, char *argv[])
         mvmat_set_elem(matrix3, 0, 0, 2.0);
         mvmat_set_elem(matrix3, 0, 1, 1.5);
         mvmat_set_elem(matrix3, 0, 2, 1.0);
-        mvmat_set_elem(matrix3, 0, 3, mvNaN());
+        mvmat_set_elem(matrix3, 0, 3, mv_NaN());
         for(i=0;i<3; i++)
         {
             for(j=0;j<4;j++)
@@ -609,12 +609,12 @@ int main(int argc, char *argv[])
             }
         }
 
-        mvmat_set_elem(matrix1, 2, 1, mvNaN());
-        mvmat_set_elem(matrix1, 1, 2, mvNaN());
-        mvmat_set_elem(matrix1, 2, 2, mvNaN());
-        mvmat_set_elem(matrix1, 0, 3, mvNaN());
-        mvmat_set_elem(matrix1, 1, 3, mvNaN());
-        mvmat_set_elem(matrix1, 2, 3, mvNaN());
+        mvmat_set_elem(matrix1, 2, 1, mv_NaN());
+        mvmat_set_elem(matrix1, 1, 2, mv_NaN());
+        mvmat_set_elem(matrix1, 2, 2, mv_NaN());
+        mvmat_set_elem(matrix1, 0, 3, mv_NaN());
+        mvmat_set_elem(matrix1, 1, 3, mv_NaN());
+        mvmat_set_elem(matrix1, 2, 3, mv_NaN());
 
         matrix2=mvmat_alloc(1,5);
         assert(mvmat_column_mean(matrix2, matrix1)==INCORRECT_DIMENSIONS);
@@ -650,7 +650,7 @@ int main(int argc, char *argv[])
         mvmat_set_elem(matrix3, 0, 0, 0.66666666666666663);
         mvmat_set_elem(matrix3, 0, 1, 0.25);
         mvmat_set_elem(matrix3, 0, 2, 0.0);
-        mvmat_set_elem(matrix3, 0, 3, mvNaN());
+        mvmat_set_elem(matrix3, 0, 3, mv_NaN());
         for(i=0;i<3; i++)
         {
             for(j=0;j<4;j++)
@@ -659,12 +659,12 @@ int main(int argc, char *argv[])
             }
         }
 
-        mvmat_set_elem(matrix1, 2, 1, mvNaN());
-        mvmat_set_elem(matrix1, 1, 2, mvNaN());
-        mvmat_set_elem(matrix1, 2, 2, mvNaN());
-        mvmat_set_elem(matrix1, 0, 3, mvNaN());
-        mvmat_set_elem(matrix1, 1, 3, mvNaN());
-        mvmat_set_elem(matrix1, 2, 3, mvNaN());
+        mvmat_set_elem(matrix1, 2, 1, mv_NaN());
+        mvmat_set_elem(matrix1, 1, 2, mv_NaN());
+        mvmat_set_elem(matrix1, 2, 2, mv_NaN());
+        mvmat_set_elem(matrix1, 0, 3, mv_NaN());
+        mvmat_set_elem(matrix1, 1, 3, mv_NaN());
+        mvmat_set_elem(matrix1, 2, 3, mv_NaN());
 
         matrix2=mvmat_alloc(1,5);
         assert(mvmat_column_var(matrix2, matrix1, 0)==INCORRECT_DIMENSIONS);
@@ -846,12 +846,12 @@ int main(int argc, char *argv[])
             }
         }
 
-        mvmat_set_elem(matrix1, 2, 1, mvNaN());
-        mvmat_set_elem(matrix1, 1, 2, mvNaN());
-        mvmat_set_elem(matrix1, 2, 2, mvNaN());
-        mvmat_set_elem(matrix1, 0, 3, mvNaN());
-        mvmat_set_elem(matrix1, 1, 3, mvNaN());
-        mvmat_set_elem(matrix1, 2, 3, mvNaN());
+        mvmat_set_elem(matrix1, 2, 1, mv_NaN());
+        mvmat_set_elem(matrix1, 1, 2, mv_NaN());
+        mvmat_set_elem(matrix1, 2, 2, mv_NaN());
+        mvmat_set_elem(matrix1, 0, 3, mv_NaN());
+        mvmat_set_elem(matrix1, 1, 3, mv_NaN());
+        mvmat_set_elem(matrix1, 2, 3, mv_NaN());
 
         assert(mvmat_pct_missing(matrix1)==6.0);
         assert(mvPctMissing(matrix1)==0.5);
@@ -1035,7 +1035,7 @@ int main(int argc, char *argv[])
             for (j=0; j<FOODS_DATA_COLUMNS; j++)
             {
                 if (data[i][j]==FOODS_DATA_MASK)
-                    mvmat_set_elem(X, i,j, mvNaN());
+                    mvmat_set_elem(X, i,j, mv_NaN());
                 else
                     mvmat_set_elem(X, i,j, data[i][j]);
             }
@@ -1141,14 +1141,14 @@ int main(int argc, char *argv[])
             for (j=0; j<KAMYR_X_COLUMNS; j++)
             {
                 if (x_data[i][j]==KAMYR_MASK)
-                    mvmat_set_elem(X, i,j, mvNaN());
+                    mvmat_set_elem(X, i,j, mv_NaN());
                 else
                     mvmat_set_elem(X, i,j, x_data[i][j]);
             }
             for (j=0; j<KAMYR_Y_COLUMNS; j++)
             {
                 if (y_data[i][j]==KAMYR_MASK)
-                    mvmat_set_elem(Y, i,j, mvNaN());
+                    mvmat_set_elem(Y, i,j, mv_NaN());
                 else
                     mvmat_set_elem(Y, i,j, y_data[i][j]);
             }
