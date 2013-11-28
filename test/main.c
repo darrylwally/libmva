@@ -63,15 +63,15 @@ int main(int argc, char *argv[])
 
     printf("\n**Testing memory allocation and freeing**\n");
     memusage_before = get_memory_usage();
-    matrix1 = mvAllocMat(1024,1024);
-    matrix2 = mvAllocMatZ(1024,1024);
-    matrix3 = mvAllocMatVal(1024, 1024, 3.1415962);
-    matrix4 = mvAllocMatCopy(matrix3);
+    matrix1 = mvmat_alloc(1024,1024);
+    matrix2 = mvmat_allocz(1024,1024);
+    matrix3 = mvmat_alloc_setval(1024, 1024, 3.1415962);
+    matrix4 = mvmat_alloc_copy(matrix3);
     memusage_during = get_memory_usage();
-    mvFreeMat(&matrix1);
-    mvFreeMat(&matrix2);
-    mvFreeMat(&matrix3);
-    mvFreeMat(&matrix4);
+    mvmat_free(&matrix1);
+    mvmat_free(&matrix2);
+    mvmat_free(&matrix3);
+    mvmat_free(&matrix4);
     memusage_after = get_memory_usage();
 
     printf("\nMemory before allocation: %ld", memusage_before);
@@ -81,85 +81,85 @@ int main(int argc, char *argv[])
 
     printf("\n**Testing setting, copying and getting data**\n");
     {
-        matrix1 = mvAllocMat(2,3);
-        matrix2 = mvAllocMat(2,3);
+        matrix1 = mvmat_alloc(2,3);
+        matrix2 = mvmat_alloc(2,3);
         for (i=0; i<2; i++)
         {
             for (j=0; j<3; j++)
             {
-                mvMatSetElem(matrix1,i,j, (double)i*j);
+                mvmat_set_elem(matrix1,i,j, (double)i*j);
             }
         }
-        mvMatCopy(matrix2, matrix1);
+        mvmat_copy(matrix2, matrix1);
         for (i=0; i<2; i++)
         {
             for (j=0; j<3; j++)
             {
                 double output;
-                mvMatGetElem(matrix2, &output, i,j);
+                mvmat_get_elem(matrix2, &output, i,j);
                 assert(output==(double)(i*j));
             }
         }
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix2);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix2);
     }
 
     printf("\n**Testing setting out of bounds**\n");
     {
-        matrix1 = mvAllocMat(2,3);
-        assert(mvMatSetElem(matrix1,3,0, M_PI)==INDEX_OUT_OF_BOUNDS);
-        assert(mvMatSetElem(matrix1,0,4, M_E)==INDEX_OUT_OF_BOUNDS);
-        mvFreeMat(&matrix1);
+        matrix1 = mvmat_alloc(2,3);
+        assert(mvmat_set_elem(matrix1,3,0, M_PI)==INDEX_OUT_OF_BOUNDS);
+        assert(mvmat_set_elem(matrix1,0,4, M_E)==INDEX_OUT_OF_BOUNDS);
+        mvmat_free(&matrix1);
     }
 
     printf("\n**Testing getting out of bounds**\n");
     {
         double val;
-        matrix1 = mvAllocMat(4,5);
-        assert(mvMatGetElem(matrix1,&val, 0,6)==INDEX_OUT_OF_BOUNDS);
-        assert(mvMatGetElem(matrix1,&val,5,0)==INDEX_OUT_OF_BOUNDS);
-        mvFreeMat(&matrix1);
+        matrix1 = mvmat_alloc(4,5);
+        assert(mvmat_get_elem(matrix1,&val, 0,6)==INDEX_OUT_OF_BOUNDS);
+        assert(mvmat_get_elem(matrix1,&val,5,0)==INDEX_OUT_OF_BOUNDS);
+        mvmat_free(&matrix1);
 
     }
     printf("\n**Testing mvAllocMatVal (and mvMatSet)\n");
     {
         int i,j;
-        matrix1 = mvAllocMatVal(2,4, 1.00000);
+        matrix1 = mvmat_alloc_setval(2,4, 1.00000);
         for (i=0; i<2; i++)
         {
             for (j=0; j<4; j++)
             {
                 double value;
-                mvMatGetElem(matrix1, &value, i,j);
+                mvmat_get_elem(matrix1, &value, i,j);
                 assert(value == 1.000000);
             }
         }
-        mvFreeMat(&matrix1);
+        mvmat_free(&matrix1);
     }
 
     printf("\n**Testing concat rows with unmatching columns**\n");
     {
-        matrix1 = mvAllocMatVal(2,3, M_PI);
-        matrix2 = mvAllocMatVal(2,4, M_E);
-        matrix3 = mvAllocMat(4,3);
-        assert(mvConcatRows(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix3);
+        matrix1 = mvmat_alloc_setval(2,3, M_PI);
+        matrix2 = mvmat_alloc_setval(2,4, M_E);
+        matrix3 = mvmat_alloc(4,3);
+        assert(mvmat_concat_rows(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix3);
     }
 
     printf("\n**Testing concat rows**\n");
     {
-        matrix1 = mvAllocMatVal(2,3, M_PI);
-        matrix2 = mvAllocMatVal(2,3, M_E);
-        matrix3 = mvAllocMat(4,3);
-        assert(mvConcatRows(matrix3, matrix1, matrix2)==SUCCESS);
+        matrix1 = mvmat_alloc_setval(2,3, M_PI);
+        matrix2 = mvmat_alloc_setval(2,3, M_E);
+        matrix3 = mvmat_alloc(4,3);
+        assert(mvmat_concat_rows(matrix3, matrix1, matrix2)==SUCCESS);
         for (i=0; i<2; i++)
         {
             for (j=0; j<4; j++)
             {
                 double value;
-                mvMatGetElem(matrix3, &value, i,j);
+                mvmat_get_elem(matrix3, &value, i,j);
                 assert(value == M_PI);
             }
         }
@@ -168,39 +168,39 @@ int main(int argc, char *argv[])
             for (j=0; j<4; j++)
             {
                 double value;
-                mvMatGetElem(matrix3, &value, i,j);
+                mvmat_get_elem(matrix3, &value, i,j);
                 assert(value == M_E);
             }
         }
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix3);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix3);
 
     }
 
     printf("\n**Testing concat columns with unmatching rows**\n");
     {
-        matrix1 = mvAllocMatVal(2,3, M_PI);
-        matrix2 = mvAllocMatVal(3,4, M_E);
-        matrix3 = mvAllocMat(2,7);
-        assert(mvConcatColumns(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix3);
+        matrix1 = mvmat_alloc_setval(2,3, M_PI);
+        matrix2 = mvmat_alloc_setval(3,4, M_E);
+        matrix3 = mvmat_alloc(2,7);
+        assert(mvmat_concat_columns(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix3);
     }
 
     printf("\n**Testing concat columns**\n");
     {
-        matrix1 = mvAllocMatVal(2,3, M_PI);
-        matrix2 = mvAllocMatVal(2,4, M_E);
-        matrix3 = mvAllocMat(2,7);
-        assert(mvConcatColumns(matrix3, matrix1, matrix2)==SUCCESS);
+        matrix1 = mvmat_alloc_setval(2,3, M_PI);
+        matrix2 = mvmat_alloc_setval(2,4, M_E);
+        matrix3 = mvmat_alloc(2,7);
+        assert(mvmat_concat_columns(matrix3, matrix1, matrix2)==SUCCESS);
         for (i=0; i<2; i++)
         {
             for (j=0; j<3; j++)
             {
                 double value;
-                mvMatGetElem(matrix3, &value, i,j);
+                mvmat_get_elem(matrix3, &value, i,j);
                 assert(value == M_PI);
             }
         }
@@ -209,45 +209,45 @@ int main(int argc, char *argv[])
             for (j=3; j<7; j++)
             {
                 double value;
-                mvMatGetElem(matrix3, &value, i,j);
+                mvmat_get_elem(matrix3, &value, i,j);
                 assert(value == M_E);
             }
         }
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix3);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix3);
     }
 
     printf("\n**Testing mvTransposeMat with unmatching dimensions**\n");
     {
-        matrix1 = mvAllocMatVal(2, 4, M_PI);
-        matrix2 = mvAllocMat(4,3);
+        matrix1 = mvmat_alloc_setval(2, 4, M_PI);
+        matrix2 = mvmat_alloc(4,3);
 
-        assert(mvTransposeMat(matrix2, matrix1)==INCORRECT_DIMENSIONS);
+        assert(mvmat_transpose(matrix2, matrix1)==INCORRECT_DIMENSIONS);
 
-        mvFreeMat(&matrix2);
-        matrix2 = mvAllocMat(3,2);
-        assert(mvTransposeMat(matrix2, matrix1)==INCORRECT_DIMENSIONS);
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix1);
+        mvmat_free(&matrix2);
+        matrix2 = mvmat_alloc(3,2);
+        assert(mvmat_transpose(matrix2, matrix1)==INCORRECT_DIMENSIONS);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix1);
     }
 
     printf("\n**Testing mvTransposeMat**\n");
     {
         int i,j;
-        matrix1 = mvAllocMatVal(2, 4, M_PI);
+        matrix1 = mvmat_alloc_setval(2, 4, M_PI);
         for (j=0; j<4; j++)
         {
-            mvMatSetElem(matrix1, 0, j, M_E);
+            mvmat_set_elem(matrix1, 0, j, M_E);
         }
-        matrix2 = mvAllocMat(4,2);
-        assert(mvTransposeMat(matrix2, matrix1)==SUCCESS);
+        matrix2 = mvmat_alloc(4,2);
+        assert(mvmat_transpose(matrix2, matrix1)==SUCCESS);
         for (i=0; i<4; i++)
         {
             for (j=0; j<2; j++)
             {
                 double val;
-                mvMatGetElem(matrix2, &val, i, j);
+                mvmat_get_elem(matrix2, &val, i, j);
                 if (j==0)
                 {
                     assert(val==M_E);
@@ -259,46 +259,46 @@ int main(int argc, char *argv[])
             }
         }
 
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix2);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix2);
     }
 
     printf("\n**Testing mvAddMat with unmatching dimensions**\n");
     {
-        matrix1 = mvAllocMatVal(2, 4, M_PI);
-        matrix2 = mvAllocMatVal(2, 5, 1.0);
-        matrix3 = mvAllocMat(2,4);
+        matrix1 = mvmat_alloc_setval(2, 4, M_PI);
+        matrix2 = mvmat_alloc_setval(2, 5, 1.0);
+        matrix3 = mvmat_alloc(2,4);
 
-        assert(mvAddMat(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_add(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
 
-        mvFreeMat(&matrix2);
-        matrix2 = mvAllocMat(3,4);
+        mvmat_free(&matrix2);
+        matrix2 = mvmat_alloc(3,4);
 
-        assert(mvAddMat(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_add(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
 
-        mvFreeMat(&matrix3);
-        matrix3 = mvAllocMat(3,4);
-        assert(mvAddMat(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix3);
+        mvmat_free(&matrix3);
+        matrix3 = mvmat_alloc(3,4);
+        assert(mvmat_add(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix3);
     }
 
     printf("\n**Testing mvAddMat**\n");
     {
         int i,j;
-        matrix1 = mvAllocMatVal(2, 4, M_PI);
-        matrix2 = mvAllocMatVal(2, 4, 1.0);
-        matrix3 = mvAllocMat(2,4);
+        matrix1 = mvmat_alloc_setval(2, 4, M_PI);
+        matrix2 = mvmat_alloc_setval(2, 4, 1.0);
+        matrix3 = mvmat_alloc(2,4);
 
-        assert(mvAddMat(matrix3, matrix1, matrix2)==SUCCESS);
+        assert(mvmat_add(matrix3, matrix1, matrix2)==SUCCESS);
 
         for(i=0; i<2; i++)
         {
             for (j=0; j<4; j++)
             {
                 double val;
-                mvMatGetElem(matrix3,&val, i,j);
+                mvmat_get_elem(matrix3,&val, i,j);
                 assert(val == (M_PI + 1.0));
             }
         }
@@ -306,40 +306,40 @@ int main(int argc, char *argv[])
 
     printf("\n**Testing mvSubtractMat with unmatching dimensions**\n");
     {
-        matrix1 = mvAllocMatVal(2, 4, M_PI);
-        matrix2 = mvAllocMatVal(2, 5, 1.0);
-        matrix3 = mvAllocMat(2,4);
+        matrix1 = mvmat_alloc_setval(2, 4, M_PI);
+        matrix2 = mvmat_alloc_setval(2, 5, 1.0);
+        matrix3 = mvmat_alloc(2,4);
 
-        assert(mvSubtractMat(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_subtract(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
 
-        mvFreeMat(&matrix2);
-        matrix2 = mvAllocMat(3,4);
+        mvmat_free(&matrix2);
+        matrix2 = mvmat_alloc(3,4);
 
-        assert(mvSubtractMat(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_subtract(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
 
-        mvFreeMat(&matrix3);
-        matrix3 = mvAllocMat(3,4);
-        assert(mvSubtractMat(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix3);
+        mvmat_free(&matrix3);
+        matrix3 = mvmat_alloc(3,4);
+        assert(mvmat_subtract(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix3);
     }
 
     printf("\n**Testing mvSubtractMat**\n");
     {
         int i,j;
-        matrix1 = mvAllocMatVal(2, 4, M_PI);
-        matrix2 = mvAllocMatVal(2, 4, 1.0);
-        matrix3 = mvAllocMat(2,4);
+        matrix1 = mvmat_alloc_setval(2, 4, M_PI);
+        matrix2 = mvmat_alloc_setval(2, 4, 1.0);
+        matrix3 = mvmat_alloc(2,4);
 
-        assert(mvSubtractMat(matrix3, matrix1, matrix2)==SUCCESS);
+        assert(mvmat_subtract(matrix3, matrix1, matrix2)==SUCCESS);
 
         for(i=0; i<2; i++)
         {
             for (j=0; j<4; j++)
             {
                 double val;
-                mvMatGetElem(matrix3,&val, i,j);
+                mvmat_get_elem(matrix3,&val, i,j);
                 assert(val == (M_PI - 1.0));
             }
         }
@@ -347,143 +347,143 @@ int main(int argc, char *argv[])
 
     printf("\n**Testing mvAddMatS with unmatching dimensions**\n");
     {
-        matrix1 = mvAllocMatVal(2, 4, M_PI);
-        matrix2 = mvAllocMat(2,3);
+        matrix1 = mvmat_alloc_setval(2, 4, M_PI);
+        matrix2 = mvmat_alloc(2,3);
 
-        assert(mvAddMatS(matrix2, matrix1, 1.0)==INCORRECT_DIMENSIONS);
-        mvFreeMat(&matrix2);
-        matrix2 = mvAllocMat(3,4);
-        assert(mvAddMatS(matrix2, matrix1, 1.0)==INCORRECT_DIMENSIONS);
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix1);
+        assert(mvmat_add_scalar(matrix2, matrix1, 1.0)==INCORRECT_DIMENSIONS);
+        mvmat_free(&matrix2);
+        matrix2 = mvmat_alloc(3,4);
+        assert(mvmat_add_scalar(matrix2, matrix1, 1.0)==INCORRECT_DIMENSIONS);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix1);
     }
 
     printf("\n**Testing mvAddMatS**\n");
     {
         int i,j;
-        matrix1 = mvAllocMatVal(2, 4, M_PI);
-        matrix2 = mvAllocMat(2,4);
+        matrix1 = mvmat_alloc_setval(2, 4, M_PI);
+        matrix2 = mvmat_alloc(2,4);
 
-        assert(mvAddMatS(matrix2, matrix1, -1.0)==SUCCESS);
+        assert(mvmat_add_scalar(matrix2, matrix1, -1.0)==SUCCESS);
 
         for(i=0; i<2; i++)
         {
             for (j=0; j<4; j++)
             {
                 double val;
-                mvMatGetElem(matrix2,&val, i,j);
+                mvmat_get_elem(matrix2,&val, i,j);
                 assert(val == (M_PI - 1.0));
             }
         }
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix1);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix1);
     }
 
     printf("\n**Testing mvMatMult with incorrect dimensions.**\n");
     {
-        matrix1 = mvAllocMatVal(2, 4, M_PI);
-        matrix2 = mvAllocMatVal(3, 3, 2.0);
-        matrix3 = mvAllocMat(2,3);
+        matrix1 = mvmat_alloc_setval(2, 4, M_PI);
+        matrix2 = mvmat_alloc_setval(3, 3, 2.0);
+        matrix3 = mvmat_alloc(2,3);
 
-        assert(mvMatMult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_mult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
 
-        mvFreeMat(&matrix2);
-        matrix2 = mvAllocMatVal(4,3, 2.0);
-        mvFreeMat(&matrix3);
-        matrix3 = mvAllocMat(2,4);
+        mvmat_free(&matrix2);
+        matrix2 = mvmat_alloc_setval(4,3, 2.0);
+        mvmat_free(&matrix3);
+        matrix3 = mvmat_alloc(2,4);
 
-        assert(mvMatMult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_mult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
 
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix3);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix3);
     }
     printf("\n**Testing mvMatMult**\n");
     {
         int i;
-        matrix1 = mvAllocMatVal(3, 3, 1.0);
-        matrix2 = mvAllocMatVal(3, 1, 2.0);
-        matrix3 = mvAllocMat(3,1);
+        matrix1 = mvmat_alloc_setval(3, 3, 1.0);
+        matrix2 = mvmat_alloc_setval(3, 1, 2.0);
+        matrix3 = mvmat_alloc(3,1);
 
-        assert(mvMatMult(matrix3, matrix1, matrix2)==SUCCESS);
+        assert(mvmat_mult(matrix3, matrix1, matrix2)==SUCCESS);
 
         for (i=0; i<3; i++)
         {
             double val;
-            mvMatGetElem(matrix3, &val, i, 0);
+            mvmat_get_elem(matrix3, &val, i, 0);
             assert(val == 6.0);
         }
     }
     printf("\n**Testing mvMultMatS with unmatching dimensions**\n");
     {
-        matrix1 = mvAllocMatVal(2, 4, M_PI);
-        matrix2 = mvAllocMat(2,3);
+        matrix1 = mvmat_alloc_setval(2, 4, M_PI);
+        matrix2 = mvmat_alloc(2,3);
 
-        assert(mvMatMultS(matrix2, matrix1, 2.0)==INCORRECT_DIMENSIONS);
-        mvFreeMat(&matrix2);
-        matrix2 = mvAllocMat(3,4);
-        assert(mvMatMultS(matrix2, matrix1, 2.0)==INCORRECT_DIMENSIONS);
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix1);
+        assert(mvmat_mult_scalar(matrix2, matrix1, 2.0)==INCORRECT_DIMENSIONS);
+        mvmat_free(&matrix2);
+        matrix2 = mvmat_alloc(3,4);
+        assert(mvmat_mult_scalar(matrix2, matrix1, 2.0)==INCORRECT_DIMENSIONS);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix1);
     }
 
     printf("\n**Testing mvMultMatS**\n");
     {
         int i,j;
-        matrix1 = mvAllocMatVal(2, 4, M_PI);
-        matrix2 = mvAllocMat(2,4);
+        matrix1 = mvmat_alloc_setval(2, 4, M_PI);
+        matrix2 = mvmat_alloc(2,4);
 
-        assert(mvMatMultS(matrix2, matrix1, 2.0)==SUCCESS);
+        assert(mvmat_mult_scalar(matrix2, matrix1, 2.0)==SUCCESS);
 
         for(i=0; i<2; i++)
         {
             for (j=0; j<4; j++)
             {
                 double val;
-                mvMatGetElem(matrix2,&val, i,j);
+                mvmat_get_elem(matrix2,&val, i,j);
                 assert(val == (M_PI * 2.0));
             }
         }
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix1);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix1);
     }
 
     printf("\n**Testing mvMatElemMult with unmatching dimensions**\n");
     {
-        matrix1 = mvAllocMatVal(2, 4, M_PI);
-        matrix2 = mvAllocMatVal(2, 5, 1.0);
-        matrix3 = mvAllocMat(2,4);
+        matrix1 = mvmat_alloc_setval(2, 4, M_PI);
+        matrix2 = mvmat_alloc_setval(2, 5, 1.0);
+        matrix3 = mvmat_alloc(2,4);
 
-        assert(mvMatElemMult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_elem_mult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
 
-        mvFreeMat(&matrix2);
-        matrix2 = mvAllocMat(3,4);
+        mvmat_free(&matrix2);
+        matrix2 = mvmat_alloc(3,4);
 
-        assert(mvMatElemMult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_elem_mult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
 
-        mvFreeMat(&matrix3);
-        matrix3 = mvAllocMat(3,4);
-        assert(mvMatElemMult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix3);
+        mvmat_free(&matrix3);
+        matrix3 = mvmat_alloc(3,4);
+        assert(mvmat_elem_mult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix3);
     }
 
     printf("\n**Testing mvMatElemMult**\n");
     {
         int i,j;
-        matrix1 = mvAllocMatVal(2, 4, M_PI);
-        matrix2 = mvAllocMatVal(2, 4, 2.0);
-        matrix3 = mvAllocMat(2,4);
+        matrix1 = mvmat_alloc_setval(2, 4, M_PI);
+        matrix2 = mvmat_alloc_setval(2, 4, 2.0);
+        matrix3 = mvmat_alloc(2,4);
 
-        assert(mvMatElemMult(matrix3, matrix1, matrix2)==SUCCESS);
+        assert(mvmat_elem_mult(matrix3, matrix1, matrix2)==SUCCESS);
 
         for(i=0; i<2; i++)
         {
             for (j=0; j<4; j++)
             {
                 double val;
-                mvMatGetElem(matrix3,&val, i,j);
+                mvmat_get_elem(matrix3,&val, i,j);
                 assert(val == (M_PI * 2.0));
             }
         }
@@ -491,142 +491,142 @@ int main(int argc, char *argv[])
 
     printf("\n**Testing mvMatElemDiv with unmatching dimensions**\n");
     {
-        matrix1 = mvAllocMatVal(2, 4, M_PI);
-        matrix2 = mvAllocMatVal(2, 5, 1.0);
-        matrix3 = mvAllocMat(2,4);
+        matrix1 = mvmat_alloc_setval(2, 4, M_PI);
+        matrix2 = mvmat_alloc_setval(2, 5, 1.0);
+        matrix3 = mvmat_alloc(2,4);
 
-        assert(mvMatElemDiv(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_elem_div(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
 
-        mvFreeMat(&matrix2);
-        matrix2 = mvAllocMat(3,4);
+        mvmat_free(&matrix2);
+        matrix2 = mvmat_alloc(3,4);
 
-        assert(mvMatElemDiv(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_elem_div(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
 
-        mvFreeMat(&matrix3);
-        matrix3 = mvAllocMat(3,4);
-        assert(mvMatElemDiv(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix3);
+        mvmat_free(&matrix3);
+        matrix3 = mvmat_alloc(3,4);
+        assert(mvmat_elem_div(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix3);
     }
 
     printf("\n**Testing mvMatElemDiv**\n");
     {
         int i,j;
-        matrix1 = mvAllocMatVal(2, 4, M_PI);
-        matrix2 = mvAllocMatVal(2, 4, 2.0);
-        matrix3 = mvAllocMat(2,4);
+        matrix1 = mvmat_alloc_setval(2, 4, M_PI);
+        matrix2 = mvmat_alloc_setval(2, 4, 2.0);
+        matrix3 = mvmat_alloc(2,4);
 
-        assert(mvMatElemDiv(matrix3, matrix1, matrix2)==SUCCESS);
+        assert(mvmat_elem_div(matrix3, matrix1, matrix2)==SUCCESS);
 
         for(i=0; i<2; i++)
         {
             for (j=0; j<4; j++)
             {
                 double val;
-                mvMatGetElem(matrix3,&val, i,j);
+                mvmat_get_elem(matrix3,&val, i,j);
                 assert(val == (M_PI / 2.0));
             }
         }
-        mvMatSet(matrix2, 0.0);
-        assert(mvMatElemDiv(matrix3,matrix1, matrix2)==SUCCESS);
+        mvmat_set(matrix2, 0.0);
+        assert(mvmat_elem_div(matrix3,matrix1, matrix2)==SUCCESS);
         for(i=0; i<2; i++)
         {
             for (j=0; j<4; j++)
             {
                 double val;
-                mvMatGetElem(matrix3,&val, i,j);
+                mvmat_get_elem(matrix3,&val, i,j);
                 assert(MVISNAN_FUNC(val));
             }
         }
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix3);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix3);
     }
 
     printf("\n**Testing vector norm**\n");
     {
         int i=0;
         double val;
-        matrix1 = mvAllocMat(4,1);
+        matrix1 = mvmat_alloc(4,1);
         for (i=0; i< 4; i++)
         {
-            mvMatSetElem(matrix1, i, 0, 1.0 + i);
+            mvmat_set_elem(matrix1, i, 0, 1.0 + i);
         }
-        val = mvVectorNorm(matrix1);
+        val = mvmat_vector_norm(matrix1);
         assert(val == sqrt((1.0*1.0+2.0*2.0+3.0*3.0+4.0*4.0)));
-        mvMatSetElem(matrix1, 0,0, mvNaN());
-        val = mvVectorNorm(matrix1);
+        mvmat_set_elem(matrix1, 0,0, mvNaN());
+        val = mvmat_vector_norm(matrix1);
         assert(val == sqrt((2.0*2.0+3.0*3.0+4.0*4.0)));
-        mvMatSetElem(matrix1, 1,0, mvNaN());
-        val = mvVectorNorm(matrix1);
+        mvmat_set_elem(matrix1, 1,0, mvNaN());
+        val = mvmat_vector_norm(matrix1);
         assert(val == sqrt((3.0*3.0+4.0*4.0)));
-        mvMatSetElem(matrix1, 2,0, mvNaN());
-        val = mvVectorNorm(matrix1);
+        mvmat_set_elem(matrix1, 2,0, mvNaN());
+        val = mvmat_vector_norm(matrix1);
         assert(val == sqrt((4.0*4.0)));
-        mvMatSetElem(matrix1, 3,0, mvNaN());
-        val = mvVectorNorm(matrix1);
+        mvmat_set_elem(matrix1, 3,0, mvNaN());
+        val = mvmat_vector_norm(matrix1);
         assert(val == 0.0);
-        mvFreeMat(&matrix1);
+        mvmat_free(&matrix1);
 
-        matrix1 = mvAllocMat(1,4);
+        matrix1 = mvmat_alloc(1,4);
         for (i=0; i< 4; i++)
         {
-            mvMatSetElem(matrix1, 0, i, 1.0 + i);
+            mvmat_set_elem(matrix1, 0, i, 1.0 + i);
         }
-        val = mvVectorNorm(matrix1);
+        val = mvmat_vector_norm(matrix1);
         assert(val == sqrt((1.0*1.0+2.0*2.0+3.0*3.0+4.0*4.0)));
-        mvMatSetElem(matrix1, 0,0, mvNaN());
-        val = mvVectorNorm(matrix1);
+        mvmat_set_elem(matrix1, 0,0, mvNaN());
+        val = mvmat_vector_norm(matrix1);
         assert(val == sqrt((2.0*2.0+3.0*3.0+4.0*4.0)));
-        mvMatSetElem(matrix1, 0,1, mvNaN());
-        val = mvVectorNorm(matrix1);
+        mvmat_set_elem(matrix1, 0,1, mvNaN());
+        val = mvmat_vector_norm(matrix1);
         assert(val == sqrt((3.0*3.0+4.0*4.0)));
-        mvMatSetElem(matrix1, 0,2, mvNaN());
-        val = mvVectorNorm(matrix1);
+        mvmat_set_elem(matrix1, 0,2, mvNaN());
+        val = mvmat_vector_norm(matrix1);
         assert(val == sqrt((4.0*4.0)));
-        mvMatSetElem(matrix1, 0,3, mvNaN());
-        val = mvVectorNorm(matrix1);
+        mvmat_set_elem(matrix1, 0,3, mvNaN());
+        val = mvmat_vector_norm(matrix1);
         assert(val == 0.0);
-        mvFreeMat(&matrix1);
+        mvmat_free(&matrix1);
 
     }
 
     printf("\n**Testing mvColumnMean**\n");
     {
         int i,j;
-        matrix1=mvAllocMat(3,4);
-        matrix3=mvAllocMat(1,4);    // known result;
-        mvMatSetElem(matrix3, 0, 0, 2.0);
-        mvMatSetElem(matrix3, 0, 1, 1.5);
-        mvMatSetElem(matrix3, 0, 2, 1.0);
-        mvMatSetElem(matrix3, 0, 3, mvNaN());
+        matrix1=mvmat_alloc(3,4);
+        matrix3=mvmat_alloc(1,4);    // known result;
+        mvmat_set_elem(matrix3, 0, 0, 2.0);
+        mvmat_set_elem(matrix3, 0, 1, 1.5);
+        mvmat_set_elem(matrix3, 0, 2, 1.0);
+        mvmat_set_elem(matrix3, 0, 3, mvNaN());
         for(i=0;i<3; i++)
         {
             for(j=0;j<4;j++)
             {
-                mvMatSetElem(matrix1, i, j, (double)(i+1));
+                mvmat_set_elem(matrix1, i, j, (double)(i+1));
             }
         }
 
-        mvMatSetElem(matrix1, 2, 1, mvNaN());
-        mvMatSetElem(matrix1, 1, 2, mvNaN());
-        mvMatSetElem(matrix1, 2, 2, mvNaN());
-        mvMatSetElem(matrix1, 0, 3, mvNaN());
-        mvMatSetElem(matrix1, 1, 3, mvNaN());
-        mvMatSetElem(matrix1, 2, 3, mvNaN());
+        mvmat_set_elem(matrix1, 2, 1, mvNaN());
+        mvmat_set_elem(matrix1, 1, 2, mvNaN());
+        mvmat_set_elem(matrix1, 2, 2, mvNaN());
+        mvmat_set_elem(matrix1, 0, 3, mvNaN());
+        mvmat_set_elem(matrix1, 1, 3, mvNaN());
+        mvmat_set_elem(matrix1, 2, 3, mvNaN());
 
-        matrix2=mvAllocMat(1,5);
-        assert(mvColumnMean(matrix2, matrix1)==INCORRECT_DIMENSIONS);
-        mvFreeMat(&matrix2);
-        matrix2=mvAllocMat(1,4);
+        matrix2=mvmat_alloc(1,5);
+        assert(mvmat_column_mean(matrix2, matrix1)==INCORRECT_DIMENSIONS);
+        mvmat_free(&matrix2);
+        matrix2=mvmat_alloc(1,4);
 
-        assert(mvColumnMean(matrix2, matrix1)==SUCCESS);
+        assert(mvmat_column_mean(matrix2, matrix1)==SUCCESS);
         for (j=0; j<4; j++)
         {
             double val1, val2;
-            mvMatGetElem(matrix2, &val1, 0, j);
-            mvMatGetElem(matrix3, &val2, 0, j);
+            mvmat_get_elem(matrix2, &val1, 0, j);
+            mvmat_get_elem(matrix3, &val2, 0, j);
             if (MVISNAN_FUNC(val2))
             {
                 assert(MVISNAN_FUNC(val1));
@@ -637,46 +637,46 @@ int main(int argc, char *argv[])
 
         }
 
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix3);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix3);
     }
 
     printf("\n**Testing mvColumnVar**\n");
     {
         int i,j;
-        matrix1=mvAllocMat(3,4);
-        matrix3=mvAllocMat(1,4);    // known result;
-        mvMatSetElem(matrix3, 0, 0, 0.66666666666666663);
-        mvMatSetElem(matrix3, 0, 1, 0.25);
-        mvMatSetElem(matrix3, 0, 2, 0.0);
-        mvMatSetElem(matrix3, 0, 3, mvNaN());
+        matrix1=mvmat_alloc(3,4);
+        matrix3=mvmat_alloc(1,4);    // known result;
+        mvmat_set_elem(matrix3, 0, 0, 0.66666666666666663);
+        mvmat_set_elem(matrix3, 0, 1, 0.25);
+        mvmat_set_elem(matrix3, 0, 2, 0.0);
+        mvmat_set_elem(matrix3, 0, 3, mvNaN());
         for(i=0;i<3; i++)
         {
             for(j=0;j<4;j++)
             {
-                mvMatSetElem(matrix1, i, j, (double)(i+1));
+                mvmat_set_elem(matrix1, i, j, (double)(i+1));
             }
         }
 
-        mvMatSetElem(matrix1, 2, 1, mvNaN());
-        mvMatSetElem(matrix1, 1, 2, mvNaN());
-        mvMatSetElem(matrix1, 2, 2, mvNaN());
-        mvMatSetElem(matrix1, 0, 3, mvNaN());
-        mvMatSetElem(matrix1, 1, 3, mvNaN());
-        mvMatSetElem(matrix1, 2, 3, mvNaN());
+        mvmat_set_elem(matrix1, 2, 1, mvNaN());
+        mvmat_set_elem(matrix1, 1, 2, mvNaN());
+        mvmat_set_elem(matrix1, 2, 2, mvNaN());
+        mvmat_set_elem(matrix1, 0, 3, mvNaN());
+        mvmat_set_elem(matrix1, 1, 3, mvNaN());
+        mvmat_set_elem(matrix1, 2, 3, mvNaN());
 
-        matrix2=mvAllocMat(1,5);
-        assert(mvColumnVar(matrix2, matrix1, 0)==INCORRECT_DIMENSIONS);
-        mvFreeMat(&matrix2);
-        matrix2=mvAllocMat(1,4);
+        matrix2=mvmat_alloc(1,5);
+        assert(mvmat_column_var(matrix2, matrix1, 0)==INCORRECT_DIMENSIONS);
+        mvmat_free(&matrix2);
+        matrix2=mvmat_alloc(1,4);
 
-        assert(mvColumnVar(matrix2, matrix1, 0)==SUCCESS);
+        assert(mvmat_column_var(matrix2, matrix1, 0)==SUCCESS);
         for (j=0; j<4; j++)
         {
             double val1, val2;
-            mvMatGetElem(matrix2, &val1, 0, j);
-            mvMatGetElem(matrix3, &val2, 0, j);
+            mvmat_get_elem(matrix2, &val1, 0, j);
+            mvmat_get_elem(matrix3, &val2, 0, j);
             if (MVISNAN_FUNC(val2))
             {
                 assert(MVISNAN_FUNC(val1));
@@ -687,175 +687,175 @@ int main(int argc, char *argv[])
 
         }
 
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix3);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix3);
     }
 
     printf("\n**Testing mvMatColumnAdd**\n");
     {
         int i,j;
-        matrix1 = mvAllocMat(4,2);
-        matrix2 = mvAllocMat(1,3);
-        matrix3 = mvAllocMat(4,2);
+        matrix1 = mvmat_alloc(4,2);
+        matrix2 = mvmat_alloc(1,3);
+        matrix3 = mvmat_alloc(4,2);
         for (i=0; i< 4; i++)
         {
             for (j=0; j<2; j++)
             {
-                mvMatSetElem(matrix1,i,j,(double)(i+1));
+                mvmat_set_elem(matrix1,i,j,(double)(i+1));
             }
         }
-        assert(mvMatColumnAdd(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_column_add(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
 
-        mvFreeMat(&matrix2);
-        matrix2 = mvAllocMat(1,2);
-        mvMatSetElem(matrix2, 0, 0, 2.0);
-        mvMatSetElem(matrix2, 0, 1, 4.0);
-        assert(mvMatColumnAdd(matrix3, matrix1, matrix2)==SUCCESS);
+        mvmat_free(&matrix2);
+        matrix2 = mvmat_alloc(1,2);
+        mvmat_set_elem(matrix2, 0, 0, 2.0);
+        mvmat_set_elem(matrix2, 0, 1, 4.0);
+        assert(mvmat_column_add(matrix3, matrix1, matrix2)==SUCCESS);
 
         for (i=0; i<4; i++)
         {
             double val, mat1val;
-            mvMatGetElem(matrix3, &val, i, 0);
-            mvMatGetElem(matrix1, &mat1val, i, 0);
+            mvmat_get_elem(matrix3, &val, i, 0);
+            mvmat_get_elem(matrix1, &mat1val, i, 0);
             assert(val==(mat1val + 2.0));
-            mvMatGetElem(matrix3, &val, i, 1);
-            mvMatGetElem(matrix1, &mat1val, i, 1);
+            mvmat_get_elem(matrix3, &val, i, 1);
+            mvmat_get_elem(matrix1, &mat1val, i, 1);
             assert(val==(mat1val + 4.0));
         }
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix3);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix3);
     }
 
     printf("\n**Testing mvMatColumnSubtract**\n");
     {
         int i,j;
-        matrix1 = mvAllocMat(4,2);
-        matrix2 = mvAllocMat(1,3);
-        matrix3 = mvAllocMat(4,2);
+        matrix1 = mvmat_alloc(4,2);
+        matrix2 = mvmat_alloc(1,3);
+        matrix3 = mvmat_alloc(4,2);
         for (i=0; i< 4; i++)
         {
             for (j=0; j<2; j++)
             {
-                mvMatSetElem(matrix1,i,j,(double)(i+1));
+                mvmat_set_elem(matrix1,i,j,(double)(i+1));
             }
         }
-        assert(mvMatColumnSubtract(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_column_subtract(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
 
-        mvFreeMat(&matrix2);
-        matrix2 = mvAllocMat(1,2);
-        mvMatSetElem(matrix2, 0, 0, 2.0);
-        mvMatSetElem(matrix2, 0, 1, 4.0);
-        assert(mvMatColumnSubtract(matrix3, matrix1, matrix2)==SUCCESS);
+        mvmat_free(&matrix2);
+        matrix2 = mvmat_alloc(1,2);
+        mvmat_set_elem(matrix2, 0, 0, 2.0);
+        mvmat_set_elem(matrix2, 0, 1, 4.0);
+        assert(mvmat_column_subtract(matrix3, matrix1, matrix2)==SUCCESS);
 
         for (i=0; i<4; i++)
         {
             double val, mat1val;
-            mvMatGetElem(matrix3, &val, i, 0);
-            mvMatGetElem(matrix1, &mat1val, i, 0);
+            mvmat_get_elem(matrix3, &val, i, 0);
+            mvmat_get_elem(matrix1, &mat1val, i, 0);
             assert(val==(mat1val - 2.0));
-            mvMatGetElem(matrix3, &val, i, 1);
-            mvMatGetElem(matrix1, &mat1val, i, 1);
+            mvmat_get_elem(matrix3, &val, i, 1);
+            mvmat_get_elem(matrix1, &mat1val, i, 1);
             assert(val==(mat1val - 4.0));
         }
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix3);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix3);
     }
 
     printf("\n**Testing mvMatColumnMult**\n");
     {
         int i,j;
-        matrix1 = mvAllocMat(4,2);
-        matrix2 = mvAllocMat(1,3);
-        matrix3 = mvAllocMat(4,2);
+        matrix1 = mvmat_alloc(4,2);
+        matrix2 = mvmat_alloc(1,3);
+        matrix3 = mvmat_alloc(4,2);
         for (i=0; i< 4; i++)
         {
             for (j=0; j<2; j++)
             {
-                mvMatSetElem(matrix1,i,j,(double)(i+1));
+                mvmat_set_elem(matrix1,i,j,(double)(i+1));
             }
         }
-        assert(mvMatColumnMult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_column_mult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
 
-        mvFreeMat(&matrix2);
-        matrix2 = mvAllocMat(1,2);
-        mvMatSetElem(matrix2, 0, 0, 2.0);
-        mvMatSetElem(matrix2, 0, 1, 4.0);
-        assert(mvMatColumnMult(matrix3, matrix1, matrix2)==SUCCESS);
+        mvmat_free(&matrix2);
+        matrix2 = mvmat_alloc(1,2);
+        mvmat_set_elem(matrix2, 0, 0, 2.0);
+        mvmat_set_elem(matrix2, 0, 1, 4.0);
+        assert(mvmat_column_mult(matrix3, matrix1, matrix2)==SUCCESS);
 
         for (i=0; i<4; i++)
         {
             double val, mat1val;
-            mvMatGetElem(matrix3, &val, i, 0);
-            mvMatGetElem(matrix1, &mat1val, i, 0);
+            mvmat_get_elem(matrix3, &val, i, 0);
+            mvmat_get_elem(matrix1, &mat1val, i, 0);
             assert(val==(mat1val * 2.0));
-            mvMatGetElem(matrix3, &val, i, 1);
-            mvMatGetElem(matrix1, &mat1val, i, 1);
+            mvmat_get_elem(matrix3, &val, i, 1);
+            mvmat_get_elem(matrix1, &mat1val, i, 1);
             assert(val==(mat1val * 4.0));
         }
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix3);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix3);
     }
     printf("\n**Testing mvMatColumnDiv**\n");
     {
         int i,j;
-        matrix1 = mvAllocMat(4,2);
-        matrix2 = mvAllocMat(1,3);
-        matrix3 = mvAllocMat(4,2);
+        matrix1 = mvmat_alloc(4,2);
+        matrix2 = mvmat_alloc(1,3);
+        matrix3 = mvmat_alloc(4,2);
         for (i=0; i< 4; i++)
         {
             for (j=0; j<2; j++)
             {
-                mvMatSetElem(matrix1,i,j,(double)(i+1));
+                mvmat_set_elem(matrix1,i,j,(double)(i+1));
             }
         }
-        assert(mvMatColumnDiv(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_column_div(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
 
-        mvFreeMat(&matrix2);
-        matrix2 = mvAllocMat(1,2);
-        mvMatSetElem(matrix2, 0, 0, 2.0);
-        mvMatSetElem(matrix2, 0, 1, 0.0);
-        assert(mvMatColumnDiv(matrix3, matrix1, matrix2)==SUCCESS);
+        mvmat_free(&matrix2);
+        matrix2 = mvmat_alloc(1,2);
+        mvmat_set_elem(matrix2, 0, 0, 2.0);
+        mvmat_set_elem(matrix2, 0, 1, 0.0);
+        assert(mvmat_column_div(matrix3, matrix1, matrix2)==SUCCESS);
 
         for (i=0; i<4; i++)
         {
             double val, mat1val;
-            mvMatGetElem(matrix3, &val, i, 0);
-            mvMatGetElem(matrix1, &mat1val, i, 0);
+            mvmat_get_elem(matrix3, &val, i, 0);
+            mvmat_get_elem(matrix1, &mat1val, i, 0);
             assert(val==(mat1val / 2.0));
-            mvMatGetElem(matrix3, &val, i, 1);
-            mvMatGetElem(matrix1, &mat1val, i, 1);
+            mvmat_get_elem(matrix3, &val, i, 1);
+            mvmat_get_elem(matrix1, &mat1val, i, 1);
             assert(MVISNAN_FUNC(val));
         }
-        mvFreeMat(&matrix1);
-        mvFreeMat(&matrix2);
-        mvFreeMat(&matrix3);
+        mvmat_free(&matrix1);
+        mvmat_free(&matrix2);
+        mvmat_free(&matrix3);
     }
 
     printf("\n**Testing mvNumMissing & mvPctMissing**\n");
     {
-        matrix1 = mvAllocMat(3,4);
+        matrix1 = mvmat_alloc(3,4);
         for(i=0;i<3; i++)
         {
             for(j=0;j<4;j++)
             {
-                mvMatSetElem(matrix1, i, j, (double)(i+1));
+                mvmat_set_elem(matrix1, i, j, (double)(i+1));
             }
         }
 
-        mvMatSetElem(matrix1, 2, 1, mvNaN());
-        mvMatSetElem(matrix1, 1, 2, mvNaN());
-        mvMatSetElem(matrix1, 2, 2, mvNaN());
-        mvMatSetElem(matrix1, 0, 3, mvNaN());
-        mvMatSetElem(matrix1, 1, 3, mvNaN());
-        mvMatSetElem(matrix1, 2, 3, mvNaN());
+        mvmat_set_elem(matrix1, 2, 1, mvNaN());
+        mvmat_set_elem(matrix1, 1, 2, mvNaN());
+        mvmat_set_elem(matrix1, 2, 2, mvNaN());
+        mvmat_set_elem(matrix1, 0, 3, mvNaN());
+        mvmat_set_elem(matrix1, 1, 3, mvNaN());
+        mvmat_set_elem(matrix1, 2, 3, mvNaN());
 
-        assert(mvNumMissing(matrix1)==6.0);
+        assert(mvmat_pct_missing(matrix1)==6.0);
         assert(mvPctMissing(matrix1)==0.5);
-        mvFreeMat(&matrix1);
+        mvmat_free(&matrix1);
     }
 
     printf("\n**Testing mvRange **\n");
@@ -864,36 +864,36 @@ int main(int argc, char *argv[])
         MVMat * range;
 
         printf("\n\nmvRange(1, 5, -1);");
-        range = mvRange(1, 5, -1);
+        range = mvmat_range(1, 5, -1);
         printf("\nPointer should be NULL - range = %p", range);
         assert(range==NULL);
 
         printf("\nmvRange(1, 5, 1);");
-        range = mvRange(1, 5, 1);
+        range = mvmat_range(1, 5, 1);
         assert(range->nrows == 4 && range->ncolumns==1);
         for (i=0; i<range->nrows; i++)
         {
             printf("\nrange[%d] = %lf", i, range->data[i][0]);
         }
-        mvFreeMat(&range);
+        mvmat_free(&range);
 
         printf("\n\nmvRange(1, 5, 3);");
-        range = mvRange(1, 5, 3);
+        range = mvmat_range(1, 5, 3);
         assert(range->nrows == 2 && range->ncolumns == 1);
         for (i=0; i<range->nrows; i++)
         {
             printf("\nrange[%d] = %lf", i, range->data[i][0]);
         }
-        mvFreeMat(&range);
+        mvmat_free(&range);
 
         printf("\n\nmvRange(5, -5, -2);");
-        range = mvRange(5, -5, -2);
+        range = mvmat_range(5, -5, -2);
         assert(range->nrows == 5 && range->ncolumns == 1);
         for (i=0; i<range->nrows; i++)
         {
             printf("\nrange[%d] = %lf", i, range->data[i][0]);
         }
-        mvFreeMat(&range);
+        mvmat_free(&range);
     }
 
     printf("\n\n**Testing LinSpace**\n");
@@ -902,36 +902,36 @@ int main(int argc, char *argv[])
         MVMat *linspace;
 
         printf("\nmvLinspace(1.0, 5.0, 0, 1);");
-        linspace = mvLinspace(1.0, 5.0, 0, 1);
+        linspace = mvmat_linspace(1.0, 5.0, 0, 1);
         printf("\nPointer should be NULL - linspace = %p", linspace);
         assert(linspace==NULL);
 
         printf("\n\nmvLinspace(1.0, 5.0, 4, 1)");
-        linspace = mvLinspace(1.0, 5.0, 4, 1);
+        linspace = mvmat_linspace(1.0, 5.0, 4, 1);
         assert(linspace->nrows == 4 && linspace->ncolumns == 1);
         for (i=0; i < linspace->nrows; i++)
         {
             printf("\nlinspace[%d] = %lf", i, linspace->data[i][0]);
         }
-        mvFreeMat(&linspace);
+        mvmat_free(&linspace);
 
         printf("\n\nmvLinspace(1.0, 5.0, 10, 0)");
-        linspace = mvLinspace(1.0, 5.0, 10, 0);
+        linspace = mvmat_linspace(1.0, 5.0, 10, 0);
         assert(linspace->nrows == 10 && linspace->ncolumns == 1);
         for (i=0; i < linspace->nrows; i++)
         {
             printf("\nlinspace[%d] = %lf", i, linspace->data[i][0]);
         }
-        mvFreeMat(&linspace);
+        mvmat_free(&linspace);
 
         printf("\n\nmvLinspace(1.0, -5.0, 4, 1)");
-        linspace = mvLinspace(1.0, -5.0, 4, 1);
+        linspace = mvmat_linspace(1.0, -5.0, 4, 1);
         assert(linspace->nrows == 4 && linspace->ncolumns == 1);
         for (i=0; i < linspace->nrows; i++)
         {
             printf("\nlinspace[%d] = %lf", i, linspace->data[i][0]);
         }
-        mvFreeMat(&linspace);
+        mvmat_free(&linspace);
     }
 
     printf("\n\n**Testing mvMatSliceRowsRef && mvMatSliceRows**\n");
@@ -939,21 +939,21 @@ int main(int argc, char *argv[])
         int i, j;
         const double x_data [FOODS_DATA_ROWS][FOODS_DATA_COLUMNS]=FOODS_DATA;
 
-        MVMat *slice = mvRange(0, FOODS_DATA_ROWS, 7);
+        MVMat *slice = mvmat_range(0, FOODS_DATA_ROWS, 7);
         MVMat *XSliceRef = NULL;
-        MVMat *XSlice = mvAllocMat(slice->nrows, FOODS_DATA_COLUMNS);
-        MVMat *X = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVMat *XSlice = mvmat_alloc(slice->nrows, FOODS_DATA_COLUMNS);
+        MVMat *X = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
 
         for (i=0; i<FOODS_DATA_ROWS; i++)
         {
             for (j=0; j<FOODS_DATA_COLUMNS; j++)
             {
-                mvMatSetElem(X, i,j, x_data[i][j]);
+                mvmat_set_elem(X, i,j, x_data[i][j]);
             }
         }
 
-        mvMatSliceRows(XSlice, X, slice);
-        mvMatSliceRowsRef(&XSliceRef, X, slice);
+        mvmat_slice_rows(XSlice, X, slice);
+        mvmat_slice_rows_ref(&XSliceRef, X, slice);
 
         for (i=0; i<slice->nrows;i++)
         {
@@ -966,11 +966,11 @@ int main(int argc, char *argv[])
             }
         }
 
-        assert(mvMatSS(XSliceRef)==mvMatSS(XSlice));
-        mvFreeMat(&XSliceRef);
-        mvFreeMat(&XSlice);
-        mvFreeMat(&slice);
-        mvFreeMat(&X);
+        assert(mvmat_ss(XSliceRef)==mvmat_ss(XSlice));
+        mvmat_free(&XSliceRef);
+        mvmat_free(&XSlice);
+        mvmat_free(&slice);
+        mvmat_free(&X);
     }
 
     printf("\n\n**Testing mvMatDeleteRowsRef**\n");
@@ -978,7 +978,7 @@ int main(int argc, char *argv[])
         int i, j, round, num_rounds;
         const double x_data [FOODS_DATA_ROWS][FOODS_DATA_COLUMNS]=FOODS_DATA;
 
-        MVMat *X = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVMat *X = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
 
 
 
@@ -986,18 +986,18 @@ int main(int argc, char *argv[])
         {
             for (j=0; j<FOODS_DATA_COLUMNS; j++)
             {
-                mvMatSetElem(X, i,j, x_data[i][j]);
+                mvmat_set_elem(X, i,j, x_data[i][j]);
             }
         }
         for (num_rounds = 0; num_rounds<FOODS_DATA_ROWS; num_rounds++)
         {
             for (round = 0; round<num_rounds; round++)
             {
-                MVMat *slice = mvRange(round, FOODS_DATA_ROWS, num_rounds);
+                MVMat *slice = mvmat_range(round, FOODS_DATA_ROWS, num_rounds);
                 MVMat *XSliceRef = NULL;
 
 
-                mvMatDeleteRowsRef(&XSliceRef, X, slice);
+                mvmat_delete_rows_ref(&XSliceRef, X, slice);
                 assert(XSliceRef->nrows == X->nrows - slice->nrows);
 
                 for (i=0; i<XSliceRef->nrows; i++)
@@ -1010,24 +1010,24 @@ int main(int argc, char *argv[])
                         assert(dataX != dataXSlice);
                     }
                 }
-                mvFreeMat(&XSliceRef);
-                mvFreeMat(&slice);
+                mvmat_free(&XSliceRef);
+                mvmat_free(&slice);
             }
         }
-        mvFreeMat(&X);
+        mvmat_free(&X);
     }
 
     printf("\n**Testing PCA**\n");
     {
         const double data [FOODS_DATA_ROWS][FOODS_DATA_COLUMNS]=FOODS_DATA;
-        MVMat * X = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
-        MVMat * X_mcuv = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
-        MVMat *X_mean = mvAllocMat(1,FOODS_DATA_COLUMNS);
-        MVMat *X_std = mvAllocMat(1,FOODS_DATA_COLUMNS);
+        MVMat * X = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVMat * X_mcuv = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVMat *X_mean = mvmat_alloc(1,FOODS_DATA_COLUMNS);
+        MVMat *X_std = mvmat_alloc(1,FOODS_DATA_COLUMNS);
         MVMat *new_t = NULL;
-        MVMat *X_hat = mvAllocMat(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
-        MVMat *HT2 = mvAllocMatZ(X->nrows, 1);
-        MVMat *SPE = mvAllocMatZ(X->nrows, 1);
+        MVMat *X_hat = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVMat *HT2 = mvmat_allocz(X->nrows, 1);
+        MVMat *SPE = mvmat_allocz(X->nrows, 1);
         MVModel *pca_model;
         int i, j;
         for (i=0; i<FOODS_DATA_ROWS; i++)
@@ -1035,19 +1035,19 @@ int main(int argc, char *argv[])
             for (j=0; j<FOODS_DATA_COLUMNS; j++)
             {
                 if (data[i][j]==FOODS_DATA_MASK)
-                    mvMatSetElem(X, i,j, mvNaN());
+                    mvmat_set_elem(X, i,j, mvNaN());
                 else
-                    mvMatSetElem(X, i,j, data[i][j]);
+                    mvmat_set_elem(X, i,j, data[i][j]);
             }
         }
 
 
-        mvColumnMean(X_mean, X);
-        mvColumnStdDev(X_std, X, 1);
+        mvmat_column_mean(X_mean, X);
+        mvmat_column_stddev(X_std, X, 1);
         // mean center
-        mvMatColumnSubtract(X_mcuv, X, X_mean);
+        mvmat_column_subtract(X_mcuv, X, X_mean);
         // scale to unit variance.
-        mvMatColumnDiv(X_mcuv, X_mcuv, X_std);
+        mvmat_column_div(X_mcuv, X_mcuv, X_std);
 
         pca_model = mvInitPCAModel(X_mcuv);
         mvAutoFit(pca_model);
@@ -1074,7 +1074,7 @@ int main(int argc, char *argv[])
             printf("R2X[%d]=%1.8lf\tQ2Cum[%d]=%1.8lf\n",
                   i+1, pca_model->R2X->data[i][0], i+1, pca_model->Q2cum->data[i][0]);
         }
-        new_t = mvAllocMatZ(X->nrows, pca_model->A);
+        new_t = mvmat_allocz(X->nrows, pca_model->A);
 
         mvNewObsT(new_t, NULL, X_mcuv, pca_model, pca_model->A, MV_NEW_SCORE_SCP);
 
@@ -1107,14 +1107,14 @@ int main(int argc, char *argv[])
             printf("\nSPE[%d] = %1.8lf", i+1, pca_model->SPEX->data[i][comp-1]);
         }
         printf("\n");
-        mvFreeMat(&SPE);
-        mvFreeMat(&HT2);
-        mvFreeMat(&new_t);
-        mvFreeMat(&X);
-        mvFreeMat(&X_hat);
-        mvFreeMat(&X_mcuv);
-        mvFreeMat(&X_mean);
-        mvFreeMat(&X_std);
+        mvmat_free(&SPE);
+        mvmat_free(&HT2);
+        mvmat_free(&new_t);
+        mvmat_free(&X);
+        mvmat_free(&X_hat);
+        mvmat_free(&X_mcuv);
+        mvmat_free(&X_mean);
+        mvmat_free(&X_std);
         mvFreeModel(&pca_model);
     }
     printf("\n**Testing PLS**\n");
@@ -1122,18 +1122,18 @@ int main(int argc, char *argv[])
         int ioi = 207; // index of interest
         const double x_data [KAMYR_ROWS][KAMYR_X_COLUMNS]=KAMYR_X;
         const double y_data [KAMYR_ROWS][KAMYR_Y_COLUMNS]=KAMYR_Y;
-        MVMat * X = mvAllocMat(KAMYR_ROWS, KAMYR_X_COLUMNS);
-        MVMat * X_mcuv = mvAllocMat(KAMYR_ROWS, KAMYR_X_COLUMNS);
-        MVMat *X_mean = mvAllocMat(1,KAMYR_X_COLUMNS);
-        MVMat *X_std = mvAllocMat(1,KAMYR_X_COLUMNS);
-        MVMat * Y = mvAllocMat(KAMYR_ROWS, KAMYR_Y_COLUMNS);
-        MVMat * Y_mcuv = mvAllocMat(KAMYR_ROWS, KAMYR_Y_COLUMNS);
-        MVMat *Y_mean = mvAllocMat(1,KAMYR_Y_COLUMNS);
-        MVMat *Y_std = mvAllocMat(1,KAMYR_Y_COLUMNS);
-        MVMat *E_pred = mvAllocMatZ(KAMYR_ROWS, KAMYR_X_COLUMNS);
-        MVMat *F_pred = mvAllocMatZ(KAMYR_ROWS, KAMYR_Y_COLUMNS);
-        MVMat *new_t = mvAllocMatZ(X->nrows, 2);
-        MVMat *new_u = mvAllocMatZ(X->nrows, 2);
+        MVMat * X = mvmat_alloc(KAMYR_ROWS, KAMYR_X_COLUMNS);
+        MVMat * X_mcuv = mvmat_alloc(KAMYR_ROWS, KAMYR_X_COLUMNS);
+        MVMat *X_mean = mvmat_alloc(1,KAMYR_X_COLUMNS);
+        MVMat *X_std = mvmat_alloc(1,KAMYR_X_COLUMNS);
+        MVMat * Y = mvmat_alloc(KAMYR_ROWS, KAMYR_Y_COLUMNS);
+        MVMat * Y_mcuv = mvmat_alloc(KAMYR_ROWS, KAMYR_Y_COLUMNS);
+        MVMat *Y_mean = mvmat_alloc(1,KAMYR_Y_COLUMNS);
+        MVMat *Y_std = mvmat_alloc(1,KAMYR_Y_COLUMNS);
+        MVMat *E_pred = mvmat_allocz(KAMYR_ROWS, KAMYR_X_COLUMNS);
+        MVMat *F_pred = mvmat_allocz(KAMYR_ROWS, KAMYR_Y_COLUMNS);
+        MVMat *new_t = mvmat_allocz(X->nrows, 2);
+        MVMat *new_u = mvmat_allocz(X->nrows, 2);
         MVModel *pls_model;
         int i, j;
         for (i=0; i<KAMYR_ROWS; i++)
@@ -1141,30 +1141,30 @@ int main(int argc, char *argv[])
             for (j=0; j<KAMYR_X_COLUMNS; j++)
             {
                 if (x_data[i][j]==KAMYR_MASK)
-                    mvMatSetElem(X, i,j, mvNaN());
+                    mvmat_set_elem(X, i,j, mvNaN());
                 else
-                    mvMatSetElem(X, i,j, x_data[i][j]);
+                    mvmat_set_elem(X, i,j, x_data[i][j]);
             }
             for (j=0; j<KAMYR_Y_COLUMNS; j++)
             {
                 if (y_data[i][j]==KAMYR_MASK)
-                    mvMatSetElem(Y, i,j, mvNaN());
+                    mvmat_set_elem(Y, i,j, mvNaN());
                 else
-                    mvMatSetElem(Y, i,j, y_data[i][j]);
+                    mvmat_set_elem(Y, i,j, y_data[i][j]);
             }
         }
 
 
-        mvColumnMean(X_mean, X);
-        mvColumnStdDev(X_std, X, 1);
-        mvColumnMean(Y_mean, Y);
-        mvColumnStdDev(Y_std, Y, 1);
+        mvmat_column_mean(X_mean, X);
+        mvmat_column_stddev(X_std, X, 1);
+        mvmat_column_mean(Y_mean, Y);
+        mvmat_column_stddev(Y_std, Y, 1);
         // mean center
-        mvMatColumnSubtract(X_mcuv, X, X_mean);
-        mvMatColumnSubtract(Y_mcuv, Y, Y_mean);
+        mvmat_column_subtract(X_mcuv, X, X_mean);
+        mvmat_column_subtract(Y_mcuv, Y, Y_mean);
         // scale to unit variance.
-        mvMatColumnDiv(X_mcuv, X_mcuv, X_std);
-        mvMatColumnDiv(Y_mcuv, Y_mcuv, Y_std);
+        mvmat_column_div(X_mcuv, X_mcuv, X_std);
+        mvmat_column_div(Y_mcuv, Y_mcuv, Y_std);
 
         pls_model = mvInitPLSModel(X_mcuv, Y_mcuv);
         mvModelAddComponent(pls_model);
@@ -1211,29 +1211,29 @@ int main(int argc, char *argv[])
         assert(fabs(new_t->data[ioi][1]-pls_model->t->data[ioi][1]) < MV_SQRT_EPS);
 
         printf("\n\nR2X test %1.8lf, SSX = %lf, SSE0 = %lf, SSE1 = %lf, SSE2 = %lf, SSE_pred2 = %lf",
-               1.0 - mvMatSS(E_pred) / mvMatSS(X_mcuv), mvMatSS(X_mcuv),
-               pls_model->SSX->data[0][0], pls_model->SSX->data[1][0], pls_model->SSX->data[2][0], mvMatSS(E_pred));
+               1.0 - mvmat_ss(E_pred) / mvmat_ss(X_mcuv), mvmat_ss(X_mcuv),
+               pls_model->SSX->data[0][0], pls_model->SSX->data[1][0], pls_model->SSX->data[2][0], mvmat_ss(E_pred));
 
 
         mvNewObsU(new_u, F_pred, Y_mcuv, new_t, pls_model, 2, MV_NEW_SCORE_SCP);
         printf("\nNew kamyr score U1[%2d] = %1.8lf, U2[%2d] = %1.8lf",
                ioi, new_u->data[ioi][0], ioi, new_u->data[ioi][1]);
         printf("\n\nR2Y test %1.8lf, SSY = %lf, SSF0 = %lf, SSF1 = %lf, SSF2 = %lf, SSF_pred2 = %lf",
-               1.0 - mvMatSS(F_pred) / mvMatSS(Y_mcuv), mvMatSS(Y_mcuv),
-               pls_model->SSY->data[0][0], pls_model->SSY->data[1][0], pls_model->SSY->data[2][0], mvMatSS(F_pred));
+               1.0 - mvmat_ss(F_pred) / mvmat_ss(Y_mcuv), mvmat_ss(Y_mcuv),
+               pls_model->SSY->data[0][0], pls_model->SSY->data[1][0], pls_model->SSY->data[2][0], mvmat_ss(F_pred));
 
-        mvFreeMat(&F_pred);
-        mvFreeMat(&E_pred);
-        mvFreeMat(&new_u);
-        mvFreeMat(&new_t);
-        mvFreeMat(&X);
-        mvFreeMat(&X_mcuv);
-        mvFreeMat(&X_mean);
-        mvFreeMat(&X_std);
-        mvFreeMat(&Y);
-        mvFreeMat(&Y_mcuv);
-        mvFreeMat(&Y_mean);
-        mvFreeMat(&Y_std);
+        mvmat_free(&F_pred);
+        mvmat_free(&E_pred);
+        mvmat_free(&new_u);
+        mvmat_free(&new_t);
+        mvmat_free(&X);
+        mvmat_free(&X_mcuv);
+        mvmat_free(&X_mean);
+        mvmat_free(&X_std);
+        mvmat_free(&Y);
+        mvmat_free(&Y_mcuv);
+        mvmat_free(&Y_mean);
+        mvmat_free(&Y_std);
         mvFreeModel(&pls_model);
     }
 

@@ -82,30 +82,30 @@ double mvHT2Limit(double alpha, int A, int N)
 
 int mvSPE(MVMat *output, const MVMat *residuals)
 {
-    return mvMatRowSS(output, residuals);
+    return mvmat_row_ss(output, residuals);
 }
 
 
 int mvSPEXFromObs(MVMat *output, const MVModel *model, const MVMat *Xobs, const MVMat *tobs, int num_components)
 {
     // todo: error checking
-    MVMat *E = mvAllocMat(Xobs->nrows, Xobs->ncolumns);
+    MVMat *E = mvmat_alloc(Xobs->nrows, Xobs->ncolumns);
     if (tobs == NULL)
     {
-        MVMat *t = mvAllocMat(Xobs->nrows, num_components);
+        MVMat *t = mvmat_alloc(Xobs->nrows, num_components);
         mvNewObsT(t, E, Xobs, model, num_components, MV_NEW_SCORE_SCP);
         mvSPE(output, E);
-        mvFreeMat(&t);
+        mvmat_free(&t);
     }
     else
     {
         MVMat *Xhat = E;
         mvComputeXpred(Xhat, model, tobs, num_components);
-        mvSubtractMat(E, Xobs, Xhat);
+        mvmat_subtract(E, Xobs, Xhat);
         mvSPE(output, E);
     }
 
-    mvFreeMat(&E);
+    mvmat_free(&E);
 
     return SUCCESS;
 }
@@ -113,23 +113,23 @@ int mvSPEXFromObs(MVMat *output, const MVModel *model, const MVMat *Xobs, const 
 int mvSPEYFromObs(MVMat *output, const MVModel *model, const MVMat *Yobs, const MVMat *tobs, int num_components)
 {
     // todo: error checking
-    MVMat *F = mvAllocMat(Yobs->nrows, Yobs->ncolumns);
+    MVMat *F = mvmat_alloc(Yobs->nrows, Yobs->ncolumns);
     if (tobs == NULL)
     {
-        MVMat *t = mvAllocMat(Yobs->nrows, num_components);
+        MVMat *t = mvmat_alloc(Yobs->nrows, num_components);
         mvNewObsT(t, F, Yobs, model, num_components, MV_NEW_SCORE_SCP);
         mvSPE(output, F);
-        mvFreeMat(&t);
+        mvmat_free(&t);
     }
     else
     {
         MVMat *Yhat = F;
         mvComputeYpred(Yhat, model, tobs, num_components);
-        mvSubtractMat(F, Yobs, Yhat);
+        mvmat_subtract(F, Yobs, Yhat);
         mvSPE(output, F);
     }
 
-    mvFreeMat(&F);
+    mvmat_free(&F);
 
     return SUCCESS;
 }
@@ -137,16 +137,16 @@ int mvSPEYFromObs(MVMat *output, const MVModel *model, const MVMat *Yobs, const 
 double mvSPELimit(double alpha, const MVMat *modelSPE_values, int component)
 {
     double m,v,g,h;
-    MVMat *mean = mvAllocMat(1, modelSPE_values->ncolumns);
-    MVMat *var = mvAllocMat(1, modelSPE_values->ncolumns);
+    MVMat *mean = mvmat_alloc(1, modelSPE_values->ncolumns);
+    MVMat *var = mvmat_alloc(1, modelSPE_values->ncolumns);
 
-    mvColumnMean(mean, modelSPE_values);
+    mvmat_column_mean(mean, modelSPE_values);
     // sample variance.
-    mvColumnVar(var, modelSPE_values, 1);
+    mvmat_column_var(var, modelSPE_values, 1);
     m = mean->data[0][component-1];
     v = var->data[0][component-1];
-    mvFreeMat(&var);
-    mvFreeMat(&mean);
+    mvmat_free(&var);
+    mvmat_free(&mean);
 
     g = v / (2.0 * m);
     h = (2.0 * m * m) / v;
