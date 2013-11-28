@@ -175,7 +175,7 @@ int mvmodel_autofit(MVModel *model);
 
   \sa MVNewScoreCalcType
   */
-int mvmodel_new_obs_scores_t(MVMat *t, MVMat * E, const MVMat *newX, const MVModel *pca_model,
+int mvmodel_t_scores_from_obs(MVMat *t, MVMat * E, const MVMat *newX, const MVModel *pca_model,
                   int num_components, MVNewScoreCalcType method);
 
 /*! Computes U-scores for a new observation of Y of a PLS Model
@@ -190,7 +190,7 @@ int mvmodel_new_obs_scores_t(MVMat *t, MVMat * E, const MVMat *newX, const MVMod
 
   \sa MVNewScoreCalcType
   */
-int mvmodel_new_obs_scores_u(MVMat *u, MVMat *F, const MVMat *newY, const MVMat *newT,
+int mvmodel_u_scores_from_obs(MVMat *u, MVMat *F, const MVMat *newY, const MVMat *newT,
                   const MVModel *pls_model, int num_components,
                   MVNewScoreCalcType method);
 

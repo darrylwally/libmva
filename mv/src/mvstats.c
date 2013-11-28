@@ -93,7 +93,7 @@ int mvstats_spex_from_obs(MVMat *output, const MVModel *model, const MVMat *Xobs
     if (tobs == NULL)
     {
         MVMat *t = mvmat_alloc(Xobs->nrows, num_components);
-        mvmodel_new_obs_scores_t(t, E, Xobs, model, num_components, MV_NEW_SCORE_SCP);
+        mvmodel_t_scores_from_obs(t, E, Xobs, model, num_components, MV_NEW_SCORE_SCP);
         mvstats_spe(output, E);
         mvmat_free(&t);
     }
@@ -117,7 +117,7 @@ int mvstats_spey_from_obs(MVMat *output, const MVModel *model, const MVMat *Yobs
     if (tobs == NULL)
     {
         MVMat *t = mvmat_alloc(Yobs->nrows, num_components);
-        mvmodel_new_obs_scores_t(t, F, Yobs, model, num_components, MV_NEW_SCORE_SCP);
+        mvmodel_t_scores_from_obs(t, F, Yobs, model, num_components, MV_NEW_SCORE_SCP);
         mvstats_spe(output, F);
         mvmat_free(&t);
     }

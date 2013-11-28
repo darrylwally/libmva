@@ -243,7 +243,7 @@ static int __crossValidatePCA_FAST(MVModel *pca)
         // Initialize model, add one component, compute new observation scores.
         modelRound = mvmodel_alloc_init_pca(X_model);
         __mvAddPCAComponent(modelRound, 0);
-        mvmodel_new_obs_scores_t(t_pred, E_pred, X_pred, modelRound, 1, MV_NEW_SCORE_SCP);
+        mvmodel_t_scores_from_obs(t_pred, E_pred, X_pred, modelRound, 1, MV_NEW_SCORE_SCP);
 
         // Sum the columns of E_pred and then add those to PRESSV
         mvmat_column_ss(PRESSV_temp, E_pred);
@@ -447,8 +447,8 @@ static int __crossValidatePLS_FAST(MVModel *pls)
         // Initialize model, add one component, compute new observation scores.
         modelRound = mvmodel_alloc_init_pls(X_model, Y_model);
         __mvAddPLSComponent(modelRound, 0);
-        mvmodel_new_obs_scores_t(t_pred, NULL, X_pred, modelRound, 1, MV_NEW_SCORE_SCP);
-        mvmodel_new_obs_scores_u(u_pred, F_pred, Y_pred, t_pred, modelRound, 1, MV_NEW_SCORE_SCP);
+        mvmodel_t_scores_from_obs(t_pred, NULL, X_pred, modelRound, 1, MV_NEW_SCORE_SCP);
+        mvmodel_u_scores_from_obs(u_pred, F_pred, Y_pred, t_pred, modelRound, 1, MV_NEW_SCORE_SCP);
 
         // Sum the columns of F_pred and then add those to PRESSV
         mvmat_column_ss(PRESSV_temp, F_pred);
@@ -1380,7 +1380,7 @@ static int __mvNewObsPLS_T(MVMat *t, MVMat *E, const MVMat *newX, const MVModel 
     return SUCCESS;
 }
 
-int mvmodel_new_obs_scores_u(MVMat *u, MVMat *F, const MVMat *newY, const MVMat *newT,
+int mvmodel_u_scores_from_obs(MVMat *u, MVMat *F, const MVMat *newY, const MVMat *newT,
                   const MVModel *model, int num_components,
                   MVNewScoreCalcType method)
 {
@@ -1469,7 +1469,7 @@ int mvmodel_new_obs_scores_u(MVMat *u, MVMat *F, const MVMat *newY, const MVMat 
 }
 
 
-int mvmodel_new_obs_scores_t(MVMat *t, MVMat * E, const MVMat *newX, const MVModel *model,
+int mvmodel_t_scores_from_obs(MVMat *t, MVMat * E, const MVMat *newX, const MVModel *model,
               int num_components, MVNewScoreCalcType method)
 {
     switch (model->modelType)

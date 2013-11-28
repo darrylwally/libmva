@@ -1076,7 +1076,7 @@ int main(int argc, char *argv[])
         }
         new_t = mvmat_allocz(X->nrows, pca_model->A);
 
-        mvmodel_new_obs_scores_t(new_t, NULL, X_mcuv, pca_model, pca_model->A, MV_NEW_SCORE_SCP);
+        mvmodel_t_scores_from_obs(new_t, NULL, X_mcuv, pca_model, pca_model->A, MV_NEW_SCORE_SCP);
 
         printf("\nNew foods score:\n");
         for (i = 0; i < pca_model->A; i++)
@@ -1201,7 +1201,7 @@ int main(int argc, char *argv[])
                3, pls_model->Q2cum->data[2][0],
                4, pls_model->Q2cum->data[3][0]);
 
-        mvmodel_new_obs_scores_t(new_t, E_pred, X_mcuv, pls_model, 2, MV_NEW_SCORE_SCP);
+        mvmodel_t_scores_from_obs(new_t, E_pred, X_mcuv, pls_model, 2, MV_NEW_SCORE_SCP);
 
 
         ioi=207;
@@ -1215,7 +1215,7 @@ int main(int argc, char *argv[])
                pls_model->SSX->data[0][0], pls_model->SSX->data[1][0], pls_model->SSX->data[2][0], mvmat_ss(E_pred));
 
 
-        mvmodel_new_obs_scores_u(new_u, F_pred, Y_mcuv, new_t, pls_model, 2, MV_NEW_SCORE_SCP);
+        mvmodel_u_scores_from_obs(new_u, F_pred, Y_mcuv, new_t, pls_model, 2, MV_NEW_SCORE_SCP);
         printf("\nNew kamyr score U1[%2d] = %1.8lf, U2[%2d] = %1.8lf",
                ioi, new_u->data[ioi][0], ioi, new_u->data[ioi][1]);
         printf("\n\nR2Y test %1.8lf, SSY = %lf, SSF0 = %lf, SSF1 = %lf, SSF2 = %lf, SSF_pred2 = %lf",
