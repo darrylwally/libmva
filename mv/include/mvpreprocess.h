@@ -76,7 +76,20 @@ int mvpreprocess_set_column(MVPreprocessContext *ctx, int column,
 int mvpreprocess_get_column(MVPreprocessContext *ctx, MVPreprocessColumnInfo *col_info_out,
                             int column);
 
-int mvpreprocess_prep_cs(MVPreprocessContext *ctx, MVMat *matrix);
+/*! Prepares the preprocess context
+    The centering and scaling row vectors are computed based on the columns
+    of ``matrix``.
+
+    This step must be performed before calling mvpreprocess_do or
+    mvprepreocess_undo.
+
+    \arg ctx The MVPreprocessContext
+    \arg matrix The matrix that the context is prepared with
+    \return MVReturnCode
+
+    \sa mvpreprocess_do, mvpreprocess_undo
+  */
+int mvpreprocess_prep(MVPreprocessContext *ctx, MVMat *matrix);
 
 /*! Performs the preprocessing
     Preprocessing is done in the following order:

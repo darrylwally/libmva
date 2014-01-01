@@ -114,9 +114,20 @@ int mvpreprocess_get_column(MVPreprocessContext *ctx,
     return SUCCESS;
 }
 
-int mvpreprocess_prep_cs(MVPreprocessContext *ctx, MVMat *matrix)
+int mvpreprocess_prep(MVPreprocessContext *ctx, MVMat *matrix)
 {
     (void) ctx; (void) matrix;
     return SUCCESS;
 }
 
+int mvpreprocess_do(MVPreprocessContext *ctx, MVMat *preprocessed_out, MVMat *raw_in)
+{
+    (void) ctx; (void) preprocessed_out; (void) raw_in;
+    return SUCCESS;
+}
+
+int mvpreprocess_undo(MVPreprocessContext *ctx, MVMat *raw_out, MVMat *preprocessed_in)
+{
+    (void) ctx; (void) raw_out; (void) preprocessed_in;
+    return SUCCESS;
+}
