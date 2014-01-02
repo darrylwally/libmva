@@ -41,8 +41,8 @@ typedef enum MVPreprocessCentering_e {
 
 typedef enum MVPreprocessScaling_e {
     MV_SCALING_NONE = 0,            /*! No scaling */
-    MV_SCALING_UV,                  /*! Unit Variance */
-    MV_SCALING_PARETO               /*! Pareto scaling */
+    MV_SCALING_UV,                  /*! Unit Variance (1 / std-dev)*/
+    MV_SCALING_PARETO               /*! Pareto scaling (1 / sqrt(std-dev))*/
 
 } MVPreprocessScaling;
 

@@ -555,6 +555,55 @@ int mvmat_column_mult(MVMat *output, const MVMat *A, const MVMat *columnValues);
   */
 int mvmat_column_div(MVMat *output, const MVMat *A, const MVMat *columnValues);
 
+
+/*! Computes the min of each column
+
+  If entire column is missing, then the value for that column will be NsN and
+  set to missing.
+
+  \arg output A MVMat of size 1xK
+  \arg A the input matrix of size NxK
+  \return MVReturnCode
+  */
+int mvmat_column_min(MVMat *output, const MVMat *A);
+
+
+/*! Computes the max of each column
+
+  If entire column is missing, then the value for that column will be NsN and
+  set to missing.
+
+  \arg output A MVMat of size 1xK
+  \arg A the input matrix of size NxK
+  \return MVReturnCode
+  */
+int mvmat_column_max(MVMat *output, const MVMat *A);
+
+
+/*! Computes the min of each row
+
+  If entire row is missing, then the value for that row will be NsN and
+  set to missing.
+
+  \arg output A MVMat of size Nx1
+  \arg A the input matrix of size NxK
+  \return MVReturnCode
+  */
+int mvmat_row_min(MVMat *output, const MVMat *A);
+
+
+/*! Computes the max of each row
+
+  If entire row is missing, then the value for that row will be NsN and
+  set to missing.
+
+  \arg output A MVMat of size Nx1
+  \arg A the input matrix of size NxK
+  \return MVReturnCode
+  */
+int mvmat_row_max(MVMat *output, const MVMat *A);
+
+
 /*! Returns the number of missing values in the matrix
   \arg mat The MVMat matrix.
   \return number of missing values
