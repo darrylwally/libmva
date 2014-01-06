@@ -44,6 +44,24 @@ size_t get_memory_usage()
     return output;
 }
 
+/* Two test functions that square and log the data.  For use in mvmat_row_func
+  and mvmat_column_func */
+double square(double x, void *opaque)
+{
+    (void) opaque;
+    return x*x;
+}
+
+double log_missing(double x, void *opaque)
+{
+    (void) opaque;
+    if (x <= 0.0)
+    {
+        return mv_NaN();
+    }
+    return log(x);
+}
+
 int main(int argc, char *argv[])
 {
     int i,j,k;
@@ -1015,6 +1033,54 @@ int main(int argc, char *argv[])
             }
         }
         mvmat_free(&X);
+    }
+
+    printf("\n**Testing mvmat_column_func**\n");
+    {
+        MVMAT_FUNC_PTR funcs[2] = {square, log_missing} ;
+        void *opaques[2] = {NULL, NULL};
+
+        printf("\nCol 1 func = square, col2 func = log");
+
+        MVMat * A = mvmat_alloc(2,2);
+        mvmat_set_elem(A, 0, 0, 2);
+        mvmat_set_elem(A, 0, 1, -3);
+        mvmat_set_elem(A, 1, 0, -4);
+        mvmat_set_elem(A, 1, 1, 5);
+
+        printf("\nIncoming A:\n[ %lf, %lf,\n  %lf, %lf]",
+               A->data[0][0], A->data[0][1], A->data[1][0], A->data[1][1]);
+
+        mvmat_column_func(A, A, funcs, opaques);
+
+        printf("\nOutgoing A:\n[ %lf, %lf,\n  %lf, %lf]\n",
+               A->data[0][0], A->data[0][1], A->data[1][0], A->data[1][1]);
+
+        mvmat_free(&A);
+    }
+
+    printf("\n**Testing mvmat_row_func**\n");
+    {
+        MVMAT_FUNC_PTR funcs[2] = {square, log_missing} ;
+        void *opaques[2] = {NULL, NULL};
+
+        printf("\nRow 1 func = square, Row 2 func = log");
+
+        MVMat * A = mvmat_alloc(2,2);
+        mvmat_set_elem(A, 0, 0, 2);
+        mvmat_set_elem(A, 0, 1, -3);
+        mvmat_set_elem(A, 1, 0, -4);
+        mvmat_set_elem(A, 1, 1, 5);
+
+        printf("\nIncoming A:\n[ %lf, %lf,\n  %lf, %lf]",
+               A->data[0][0], A->data[0][1], A->data[1][0], A->data[1][1]);
+
+        mvmat_row_func(A, A, funcs, opaques);
+
+        printf("\nOutgoing A:\n[ %lf, %lf,\n  %lf, %lf]\n",
+               A->data[0][0], A->data[0][1], A->data[1][0], A->data[1][1]);
+
+        mvmat_free(&A);
     }
 
     printf("\n**Testing PCA**\n");
