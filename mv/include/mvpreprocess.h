@@ -53,6 +53,11 @@ typedef struct MVPreprocessColumn_s {
     MVPreprocessScaling s;
     double multiplier;
 
+    /* These items are "private" and are set automatically when calling
+      mvpreprocess_set_column() */
+    MVMAT_FUNC_PTR t_func;
+    MVMAT_FUNC_PTR inv_t_func;
+
 } MVPreprocessColumnInfo;
 
 typedef struct MVPreprocessContext_s {
@@ -79,6 +84,8 @@ int mvpreprocess_get_column(MVPreprocessContext *ctx, MVPreprocessColumnInfo *co
 /*! Prepares the preprocess context
     The centering and scaling row vectors are computed based on the columns
     of ``matrix``.
+
+    The centering and scaling are computed after any transformations are set.
 
     This step must be performed before calling mvpreprocess_do or
     mvprepreocess_undo.
@@ -111,5 +118,95 @@ int mvpreprocess_do(MVPreprocessContext *ctx, MVMat *preprocessed_out, MVMat *ra
         - Functional inverse transformation
   */
 int mvpreprocess_undo(MVPreprocessContext *ctx, MVMat *raw_out, MVMat *preprocessed_in);
+
+
+/* Function pointers for transformations */
+
+/*! Linear transformation function
+
+  Performs y = Ax + B
+
+  \arg x the input value
+  \arg opaque pointer to an MVPreprocessCoeffs
+  \return preprocessed value or NaN if transformation fails
+  \sa MVPreprocessCoeffs
+  */
+double mvpreprocess_linear(double x, void *opaque);
+
+
+/*! Inverse Linear transformation function
+
+  Performs x = (y - B) / A
+  \arg y the input value
+  \arg opaque pointer to an MVPreprocessCoeffs
+  \return preprocessed value or NaN if transformation fails
+  \sa MVPreprocessCoeffs
+  */
+double mvpreprocess_invlinear(double y, void *opaque);
+
+/*! Log transformation function
+
+  Performs y = log(Ax + B)
+  \arg y the input value
+  \arg opaque pointer to an MVPreprocessCoeffs
+  \return preprocessed value or NaN if transformation fails
+  \sa MVPreprocessCoeffs
+  */
+double mvpreprocess_log(double x, void *opaque);
+
+/*! Inverse Log transformation function
+
+  Performs x = (10**y - B)/A
+  \arg y the input value
+  \arg opaque pointer to an MVPreprocessCoeffs
+  \return preprocessed value or NaN if transformation fails
+  \sa MVPreprocessCoeffs
+  */
+double mvpreprocess_invlog(double y, void *opaque);
+
+
+/*! Exponential function
+
+  Performes y = e^(Ax + B)
+  \arg x the input value
+  \arg opaque pointer to an MVPreprocessCoeffs
+  \return preprocessed value or NaN if transformation fails
+  \sa MVPreprocessCoeffs
+  */
+double mvpreprocess_exp(double x, void *opaque);
+
+
+/*! Inverse Exponential function
+
+  Performes x = (ln(y) - B) / A
+  \arg y the input value
+  \arg opaque pointer to an MVPreprocessCoeffs
+  \return preprocessed value or NaN if transformation fails
+  \sa MVPreprocessCoeffs
+  */
+double mvpreprocess_invexp(double y, void *opaque);
+
+
+/*! Power function
+
+  Performes y = (Ax + B)^C
+  \arg x the input value
+  \arg opaque pointer to an MVPreprocessCoeffs
+  \return preprocessed value or NaN if transformation fails
+  \sa MVPreprocessCoeffs
+  */
+double mvpreprocess_power(double x, void *opaque);
+
+
+/*! Inverse power function
+
+  Performes x = (y^(1/C) - B) / A
+  \arg y the input value
+  \arg opaque pointer to an MVPreprocessCoeffs
+  \return preprocessed value or NaN if transformation fails
+  \sa MVPreprocessCoeffs
+  */
+double mvpreprocess_invpower(double y, void *opaque);
+
 
 #endif // MVPREPROCESS_H

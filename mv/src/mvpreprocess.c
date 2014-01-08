@@ -15,6 +15,7 @@
 #include "mvconstants.h"
 
 #include <string.h>
+#include <math.h>
 
 
 MVPreprocessContext * mvpreprocess_alloc()
