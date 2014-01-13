@@ -132,3 +132,123 @@ int mvpreprocess_undo(MVPreprocessContext *ctx, MVMat *raw_out, MVMat *preproces
     (void) ctx; (void) raw_out; (void) preprocessed_in;
     return SUCCESS;
 }
+
+double mvpreprocess_linear(double x, void *opaque)
+{
+    MVPreprocessCoeffs *coeffs = (MVPreprocessCoeffs *) opaque;
+
+    if (!coeffs)
+    {
+        return x;
+    }
+    return coeffs->A * x + coeffs->B;
+}
+
+double mvpreprocess_invlinear(double y, void *opaque)
+{
+    MVPreprocessCoeffs *coeffs = (MVPreprocessCoeffs *) opaque;
+
+    if (!coeffs)
+    {
+        return y;
+    }
+    if (coeffs->A == 0)
+    {
+        return mv_NaN();
+    }
+    return ( y - coeffs->B) / coeffs->A;
+}
+
+double mvpreprocess_log(double x, void *opaque)
+{
+    MVPreprocessCoeffs *coeffs = (MVPreprocessCoeffs *) opaque;
+
+    if (!coeffs)
+    {
+        return x;
+    }
+    double tmp = coeffs->A * x + coeffs->B;
+    if (tmp == 0.0)
+    {
+        return mv_NaN();
+    }
+    return log10(coeffs->A * x + coeffs->B);
+}
+
+double mvpreprocess_invlog(double y, void *opaque)
+{
+    MVPreprocessCoeffs *coeffs = (MVPreprocessCoeffs *) opaque;
+
+    if (!coeffs)
+    {
+        return y;
+    }
+
+    if (coeffs->A == 0)
+    {
+        return mv_NaN();
+    }
+    return (pow(10.0, y) - coeffs->B) / coeffs->A;
+}
+
+double mvpreprocess_exp(double x, void *opaque)
+{
+    MVPreprocessCoeffs *coeffs = (MVPreprocessCoeffs *) opaque;
+
+    if (!coeffs)
+    {
+        return x;
+    }
+    return pow(M_E, (coeffs->A * x + coeffs->B));
+}
+
+double mvpreprocess_invexp(double y, void *opaque)
+{
+    MVPreprocessCoeffs *coeffs = (MVPreprocessCoeffs *) opaque;
+
+    if (!coeffs)
+    {
+        return y;
+    }
+    if (coeffs->A == 0)
+    {
+        return mv_NaN();
+    }
+    if (y == 0.0)
+    {
+        return mv_NaN();
+    }
+    return (log(y) - coeffs->B) / coeffs->A;
+}
+
+
+double mvpreprocess_power(double x, void *opaque)
+{
+    MVPreprocessCoeffs *coeffs = (MVPreprocessCoeffs *) opaque;
+
+    if (!coeffs)
+    {
+        return x;
+    }
+    if (coeffs->C == 0.0)
+    {
+        return 1.0;
+    }
+    return pow((coeffs->A * x + coeffs->B), coeffs->C);
+}
+
+double mvpreprocess_invpower(double y, void *opaque)
+{
+    MVPreprocessCoeffs *coeffs = (MVPreprocessCoeffs *) opaque;
+
+    if (!coeffs)
+    {
+        return y;
+    }
+    if (coeffs->C == 0.0 || coeffs->A == 0.0)
+    {
+        return mv_NaN();
+    }
+    return (pow(y, 1.0 / coeffs->C) - coeffs->B) / coeffs->A;
+}
+
