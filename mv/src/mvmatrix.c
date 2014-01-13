@@ -1066,6 +1066,10 @@ int mvmat_column_func(MVMat *output, const MVMat *A, MVMAT_FUNC_PTR *funcs, void
     double NaN = mv_NaN();
     for (j = 0; j < output->ncolumns; j++)
     {
+        if ((*func) == NULL)
+        {
+            continue;
+        }
         for (i = 0; i < output->nrows; i++)
         {
             double result = NaN;
@@ -1177,6 +1181,10 @@ int mvmat_row_func(MVMat *output, const MVMat *A, MVMAT_FUNC_PTR *funcs, void *o
     double NaN = mv_NaN();
     for (i = 0; i < output->nrows; i++)
     {
+        if ((*func) == NULL)
+        {
+            continue;
+        }
         for (j = 0; j < output->ncolumns; j++)
         {
             double result = NaN;

@@ -62,6 +62,27 @@ double log_missing(double x, void *opaque)
     return log(x);
 }
 
+void mvmat_dump(MVMat *A)
+{
+    int i,j;
+    for (i=0; i < A->nrows; i++)
+    {
+        if (i==0)
+        {
+            printf("[");
+        }
+        else
+        {
+            printf(" ");
+        }
+        for (j = 0; j < A->ncolumns; j++)
+        {
+            printf("%lf, ",A->data[i][j]);
+        }
+        printf("\n");
+    }
+}
+
 int main(int argc, char *argv[])
 {
     int i,j,k;
@@ -1037,48 +1058,58 @@ int main(int argc, char *argv[])
 
     printf("\n**Testing mvmat_column_func**\n");
     {
-        MVMAT_FUNC_PTR funcs[2] = {square, log_missing} ;
-        void *opaques[2] = {NULL, NULL};
+        MVMAT_FUNC_PTR funcs[3] = {square, NULL, log_missing} ;
+        void *opaques[3] = {NULL, NULL};
 
-        printf("\nCol 1 func = square, col2 func = log");
+        printf("\nCol 1 func = square, Col 2 func = NULL, Col 3 func = log");
 
-        MVMat * A = mvmat_alloc(2,2);
-        mvmat_set_elem(A, 0, 0, 2);
-        mvmat_set_elem(A, 0, 1, -3);
-        mvmat_set_elem(A, 1, 0, -4);
-        mvmat_set_elem(A, 1, 1, 5);
+        MVMat * A = mvmat_alloc(3,3);
+        mvmat_set_elem(A, 0, 0, 1.0);
+        mvmat_set_elem(A, 0, 1, -2.0);
+        mvmat_set_elem(A, 0, 2, 3.0);
+        mvmat_set_elem(A, 1, 0, -4.0);
+        mvmat_set_elem(A, 1, 1, 5.0);
+        mvmat_set_elem(A, 1, 2, -6.0);
+        mvmat_set_elem(A, 2, 0, 7.0);
+        mvmat_set_elem(A, 2, 1, -8.0);
+        mvmat_set_elem(A, 2, 2, 9.0);
 
-        printf("\nIncoming A:\n[ %lf, %lf,\n  %lf, %lf]",
-               A->data[0][0], A->data[0][1], A->data[1][0], A->data[1][1]);
+        printf("\nIncoming A:\n");
+        mvmat_dump(A);
 
         mvmat_column_func(A, A, funcs, opaques);
 
-        printf("\nOutgoing A:\n[ %lf, %lf,\n  %lf, %lf]\n",
-               A->data[0][0], A->data[0][1], A->data[1][0], A->data[1][1]);
+        printf("\nOutgoing A:\n");
+        mvmat_dump(A);
 
         mvmat_free(&A);
     }
 
     printf("\n**Testing mvmat_row_func**\n");
     {
-        MVMAT_FUNC_PTR funcs[2] = {square, log_missing} ;
-        void *opaques[2] = {NULL, NULL};
+        MVMAT_FUNC_PTR funcs[2] = {square, NULL, log_missing} ;
+        void *opaques[2] = {NULL, NULL, NULL};
 
-        printf("\nRow 1 func = square, Row 2 func = log");
+        printf("\nRow 1 func = square, Row 2 func = NULL, Row 3 func = log");
 
-        MVMat * A = mvmat_alloc(2,2);
-        mvmat_set_elem(A, 0, 0, 2);
-        mvmat_set_elem(A, 0, 1, -3);
-        mvmat_set_elem(A, 1, 0, -4);
-        mvmat_set_elem(A, 1, 1, 5);
+        MVMat * A = mvmat_alloc(3,3);
+        mvmat_set_elem(A, 0, 0, 1.0);
+        mvmat_set_elem(A, 0, 1, -2.0);
+        mvmat_set_elem(A, 0, 2, 3.0);
+        mvmat_set_elem(A, 1, 0, -4.0);
+        mvmat_set_elem(A, 1, 1, 5.0);
+        mvmat_set_elem(A, 1, 2, -6.0);
+        mvmat_set_elem(A, 2, 0, 7.0);
+        mvmat_set_elem(A, 2, 1, -8.0);
+        mvmat_set_elem(A, 2, 2, 9.0);
 
-        printf("\nIncoming A:\n[ %lf, %lf,\n  %lf, %lf]",
-               A->data[0][0], A->data[0][1], A->data[1][0], A->data[1][1]);
+        printf("\nIncoming A:\n");
+        mvmat_dump(A);
 
-        mvmat_row_func(A, A, funcs, opaques);
+        mvmat_column_func(A, A, funcs, opaques);
 
-        printf("\nOutgoing A:\n[ %lf, %lf,\n  %lf, %lf]\n",
-               A->data[0][0], A->data[0][1], A->data[1][0], A->data[1][1]);
+        printf("\nOutgoing A:\n");
+        mvmat_dump(A);
 
         mvmat_free(&A);
     }
