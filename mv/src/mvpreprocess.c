@@ -72,10 +72,10 @@ int mvpreprocess_init_mcuv(MVPreprocessContext *ctx, MVMat *matrix)
     mvmat_column_stddev(ctx->scaling, matrix, 1);
     int i;
     MVPreprocessColumnInfo s = {MV_TRANSFORM_NONE,
-                            {1.0, 1.0, 1.0},
+                            {1.0, 0.0, 1.0},
                             MV_CENTERING_MEAN,
                             MV_SCALING_UV,
-                            1.0};
+                            1.0, NULL, NULL};
     for (i = 0; i < matrix->ncolumns; i++)
     {
         ctx->preprocess_info[i] = s;
