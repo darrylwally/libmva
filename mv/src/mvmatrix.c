@@ -17,11 +17,6 @@
 #include <float.h>
 #include <assert.h>
 
-#ifdef WIN32
-#define MVISNAN_FUNC _isnan
-#else
-#define MVISNAN_FUNC isnan
-#endif
 
 MVMat * mvmat_alloc(int rows, int columns)
 {

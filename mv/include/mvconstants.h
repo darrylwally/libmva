@@ -17,6 +17,8 @@
 extern "C"{
 #endif
 
+#include <math.h>
+
 #define DATA_MISSING 0
 #define DATA_PRESENT 1
 
@@ -35,6 +37,12 @@ typedef enum MVReturnCode_enum {
     CROSSVAL_RULE3 = 3,
     CROSSVAL_RULE4 = 4
 } MVReturnCode;
+
+#ifdef WIN32
+#define MVISNAN_FUNC _isnan
+#else
+#define MVISNAN_FUNC isnan
+#endif
 
 // EPS
 extern const double MV_EPS;
