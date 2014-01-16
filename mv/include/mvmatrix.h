@@ -455,6 +455,42 @@ int mvmat_elem_div(MVMat *output, const MVMat *A, const MVMat *B);
   */
 double mvmat_vector_norm(const MVMat * A);
 
+/*! Computes the mean of a single column
+  The mean of the column is returned.  The value is returned as NaN
+  appropriately.
+
+  \arg output The return value or NaN
+  \arg A the input matrix
+  \arg col_idx The index of the column to operate on
+  \return MVMatReturnCode
+ */
+int mvmat_colidx_mean(double *mean, const MVMat *A, int col_idx);
+/*! Computes the standard deviation of a single column
+
+  The variance of the column is returned.  The value is returned as NaN
+  appropriately.
+
+  \arg output The return value or NaN
+  \arg A the input matrix
+  \arg ddof N-ddof in the denominator.  Default should be zero or one.
+  \arg col_idx The index of the column to operate on
+  \return MVMatReturnCode
+  */
+int mvmat_colidx_stddev(double *stddev, const MVMat *A, int ddof, int col_idx);
+
+/*! Computes the variance of a single column
+
+  The variance of the column is returned.  The value is returned as NaN
+  appropriately.
+
+  \arg output The return value or NaN
+  \arg A the input matrix
+  \arg ddof N-ddof in the denominator.  Default should be zero or one.
+  \arg col_idx The index of the column to operate on
+  \return MVMatReturnCode
+  */
+int mvmat_colidx_var(double *var, const MVMat *A, int ddof, int col_idx);
+
 /*! Computes the sum of each column in a matrix.
   The sum of each column is computed and stored in output.
 

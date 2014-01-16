@@ -756,6 +756,110 @@ double mvmat_vector_norm(const MVMat *A)
     return sqrt(norm);
 }
 
+int mvmat_colidx_mean(double *mean, const MVMat *A, int col_idx)
+{
+    int i, num_missing;
+    double output;
+    if (col_idx >= A->ncolumns || col_idx < 0)
+    {
+        return INCORRECT_DIMENSIONS;
+    }
+    num_missing = 0;
+    output = 0.0;
+    for (i=0; i<A->nrows; i++)
+    {
+        if (A->mask[i][col_idx]==DATA_MISSING)
+        {
+            num_missing++;
+        }
+        else
+        {
+            output += A->data[i][col_idx];
+        }
+    }
+    if (num_missing==A->nrows)
+    {
+        output = mv_NaN();
+    }
+    else
+    {
+        output = output / (A->nrows - num_missing);
+    }
+
+    *mean = output;
+    return SUCCESS;
+}
+
+int mvmat_colidx_stddev(double *stddev, const MVMat *A, int ddof, int col_idx)
+{
+    double output;
+    if (col_idx >= A->ncolumns || col_idx < 0)
+    {
+        return INDEX_OUT_OF_BOUNDS;
+    }
+
+    mvmat_colidx_var(&output, A, ddof, col_idx);
+
+    if (!MVISNAN_FUNC(output))
+    {
+        output = sqrt(output);
+    }
+
+    *stddev = output;
+
+    return SUCCESS;
+
+}
+
+int mvmat_colidx_var(double *var, const MVMat *A, int ddof, int col_idx)
+{
+    int i, num_missing, N;
+    double output, colmean, temp;
+    if (col_idx >= A->ncolumns || col_idx < 0)
+    {
+        return INDEX_OUT_OF_BOUNDS;
+    }
+
+    N = A->nrows - ddof;
+
+    mvmat_colidx_mean(&colmean, A, col_idx);
+    num_missing=0;
+
+    if ( MVISNAN_FUNC(colmean) )
+    {
+        output = mv_NaN();
+    }
+    else
+    {
+        output = 0.0;
+
+        for (i=0; i<A->nrows; i++)
+        {
+            if (A->mask[i][col_idx] == DATA_MISSING)
+            {
+                num_missing++;
+            }
+            else
+            {
+                temp = (A->data[i][col_idx] - colmean);
+                temp = temp * temp;
+                output += temp;
+            }
+        }
+        if ((N-num_missing) <= 0)
+        {
+            output = mv_NaN();
+        }
+        else
+        {
+            output = output / ((double)(N-num_missing));
+        }
+    }
+
+    *var = output;
+    return SUCCESS;
+}
+
 int mvmat_column_sum(MVMat *output, const MVMat *A)
 {
     int i,j, num_missing;
