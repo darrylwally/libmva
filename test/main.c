@@ -1087,8 +1087,8 @@ int main(int argc, char *argv[])
 
     printf("\n**Testing mvmat_row_func**\n");
     {
-        MVMAT_FUNC_PTR funcs[2] = {square, NULL, log_missing} ;
-        void *opaques[2] = {NULL, NULL, NULL};
+        MVMAT_FUNC_PTR funcs[3] = {square, NULL, log_missing} ;
+        void *opaques[3] = {NULL, NULL, NULL};
 
         printf("\nRow 1 func = square, Row 2 func = NULL, Row 3 func = log");
 
