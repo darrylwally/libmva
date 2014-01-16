@@ -105,6 +105,31 @@ int mvpreprocess_set_column(MVPreprocessContext *ctx, int column,
                             const MVPreprocessColumnInfo *col_info)
 {
     ctx->preprocess_info[column] = *col_info;
+    MVPreprocessColumnInfo *c = &ctx->preprocess_info[column];
+    switch (ctx->preprocess_info[column].t)
+    {
+    case MV_TRANSFORM_NONE:
+        c->t_func = NULL;
+        c->inv_t_func = NULL;
+        break;
+    case MV_TRANSFORM_LINEAR:
+        c->t_func = mvpreprocess_linear;
+        c->inv_t_func = mvpreprocess_invlinear;
+        break;
+    case MV_TRANSFORM_LOGARITHMIC:
+        c->t_func = mvpreprocess_log;
+        c->inv_t_func = mvpreprocess_invlog;
+        break;
+    case MV_TRANSFORM_EXPONENTIAL:
+        c->t_func = mvpreprocess_exp;
+        c->inv_t_func = mvpreprocess_invexp;
+        break;
+    case MV_TRANSFORM_POWER:
+        c->t_func = mvpreprocess_power;
+        c->inv_t_func = mvpreprocess_invpower;
+        break;
+    }
+
     return SUCCESS;
 }
 
@@ -118,6 +143,68 @@ int mvpreprocess_get_column(MVPreprocessContext *ctx,
 int mvpreprocess_prep(MVPreprocessContext *ctx, MVMat *matrix)
 {
     (void) ctx; (void) matrix;
+    if (ctx->centering->ncolumns != matrix->ncolumns)
+    {
+        return INCORRECT_DIMENSIONS;
+    }
+    int j;
+    MVMat *tmp = mvmat_alloc(matrix->nrows, matrix->ncolumns);
+    MVMAT_FUNC_PTR * funcs = (MVMAT_FUNC_PTR *)malloc(matrix->ncolumns * sizeof(MVMAT_FUNC_PTR));
+    MVPreprocessCoeffs **opaques = (MVPreprocessCoeffs **)malloc(matrix->ncolumns * sizeof(MVPreprocessCoeffs *));
+    for (j = 0; j < matrix->ncolumns; j++)
+    {
+        funcs[j] = ctx->preprocess_info[j].t_func;
+        opaques[j] = (MVPreprocessCoeffs *)&ctx->preprocess_info[j].t_coeffs;
+    }
+
+    /* Apply column functions */
+    mvmat_column_func(tmp, matrix, funcs, opaques);
+
+    /* Compute centering and scaling*/
+    for (j = 0; j < matrix->ncolumns; j++)
+    {
+        double centering = 0.0;
+        double scaling = 1.0;
+
+
+        switch (ctx->preprocess_info[j].c)
+        {
+        case MV_CENTERING_MEAN:
+            mvmat_colidx_mean(&centering, matrix, j);
+            break;
+        case MV_CENTERING_NONE: // delibarate fall through
+        default:
+            centering = 0.0;
+            break;
+        }
+
+        switch (ctx->preprocess_info[j].s)
+        {
+        case MV_SCALING_UV:
+            mvmat_colidx_stddev(&scaling, matrix, 1, j);
+            break;
+        case MV_SCALING_PARETO:
+            mvmat_colidx_stddev(&scaling, matrix, 1, j);
+            if (!MVISNAN_FUNC(scaling))
+            {
+                scaling = sqrt(scaling);
+            }
+            break;
+        case MV_SCALING_NONE:
+        default:
+            scaling = 1.0;
+            break;
+        }
+
+        scaling = ctx->preprocess_info[j].multiplier / scaling;
+
+        mvmat_set_elem(ctx->centering, 0, j, centering);
+        mvmat_set_elem(ctx->scaling, 0, j, scaling);
+    }
+
+    free(funcs);
+    free(opaques);
+    mvmat_free(&tmp);
     return SUCCESS;
 }
 
