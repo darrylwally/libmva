@@ -17,6 +17,7 @@
 #include <mvMatrix.h>
 #include <mvmodel.h>
 #include <mvstats.h>
+#include <mvpreprocess.h>
 
 #include "data.h"
 
@@ -1112,6 +1113,54 @@ int main(int argc, char *argv[])
         mvmat_dump(A);
 
         mvmat_free(&A);
+    }
+
+    printf("\n**Testing preprocess do and undo **\n");
+    {
+        const double data [FOODS_DATA_ROWS][FOODS_DATA_COLUMNS]=FOODS_DATA;
+        MVMat * X = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVMat * X_pp = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVMat * X_orig = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVMat * diff = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVPreprocessContext *prepro = mvpreprocess_alloc_init_mat(FOODS_DATA_COLUMNS);
+        MVPreprocessColumnInfo info;
+        info.t_coeffs.A = 1.0;
+        info.t_coeffs.B = 2.0;
+        info.t_coeffs.C = 3.0;
+        info.c = MV_CENTERING_MEAN;
+        info.s = MV_SCALING_UV;
+        info.multiplier = 1.0;
+        int i, j;
+        for (i=0; i<FOODS_DATA_ROWS; i++)
+        {
+            for (j=0; j<FOODS_DATA_COLUMNS; j++)
+            {
+
+                info.t = j % 5;
+                mvpreprocess_set_column(prepro, j, &info);
+
+                if (data[i][j]==FOODS_DATA_MASK)
+                    mvmat_set_elem(X, i,j, mv_NaN());
+                else
+                    mvmat_set_elem(X, i,j, data[i][j]);
+
+            }
+        }
+
+        mvpreprocess_prep(prepro, X);
+        mvpreprocess_do(prepro, X_pp, X);
+        mvpreprocess_undo(prepro, X_orig, X_pp);
+
+        mvmat_subtract(diff, X, X_orig);
+
+        double diff_ss = mvmat_ss(diff);
+
+        printf("\n Diff result after preprocessing and undoing = %lf", diff_ss);
+
+        mvmat_free(&X);
+        mvmat_free(&X_pp);
+        mvmat_free(&X_orig);
+        mvpreprocess_free(&prepro);
     }
 
     printf("\n**Testing PCA**\n");

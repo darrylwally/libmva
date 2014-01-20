@@ -210,14 +210,84 @@ int mvpreprocess_prep(MVPreprocessContext *ctx, MVMat *matrix)
 
 int mvpreprocess_do(MVPreprocessContext *ctx, MVMat *preprocessed_out, MVMat *raw_in)
 {
-    (void) ctx; (void) preprocessed_out; (void) raw_in;
-    return SUCCESS;
+    if (!(preprocessed_out->ncolumns == raw_in->ncolumns &&
+            preprocessed_out->nrows == raw_in->nrows &&
+            ctx->centering->ncolumns == preprocessed_out->ncolumns))
+    {
+        return INCORRECT_DIMENSIONS;
+    }
+
+    int ret = SUCCESS;
+    int j;
+
+    MVMAT_FUNC_PTR * funcs = (MVMAT_FUNC_PTR *)malloc(raw_in->ncolumns * sizeof(MVMAT_FUNC_PTR));
+    MVPreprocessCoeffs **opaques = (MVPreprocessCoeffs **)malloc(raw_in->ncolumns * sizeof(MVPreprocessCoeffs *));
+    for (j = 0; j < raw_in->ncolumns; j++)
+    {
+        funcs[j] = ctx->preprocess_info[j].t_func;
+        opaques[j] = (MVPreprocessCoeffs *)&ctx->preprocess_info[j].t_coeffs;
+    }
+
+    /* Apply column functions */
+    ret = mvmat_column_func(preprocessed_out, raw_in, funcs, opaques);
+    free(funcs);
+    free(opaques);
+    if (ret)
+    {
+        return ret;
+    }
+
+    /* Apply Centering */
+    ret = mvmat_column_subtract(preprocessed_out, preprocessed_out, ctx->centering);
+    if (ret)
+    {
+        return ret;
+    }
+
+    /* Apply scaling */
+    ret = mvmat_column_mult(preprocessed_out, preprocessed_out, ctx->scaling);
+
+    return ret;
 }
 
 int mvpreprocess_undo(MVPreprocessContext *ctx, MVMat *raw_out, MVMat *preprocessed_in)
 {
-    (void) ctx; (void) raw_out; (void) preprocessed_in;
-    return SUCCESS;
+    if (!(raw_out->ncolumns == preprocessed_in->ncolumns &&
+            raw_out->nrows == preprocessed_in->nrows &&
+            ctx->centering->ncolumns == raw_out->ncolumns))
+    {
+        return INCORRECT_DIMENSIONS;
+    }
+
+    int ret = SUCCESS;
+    int j;
+
+    /* Undo scaling */
+    ret = mvmat_column_div(raw_out, preprocessed_in, ctx->scaling);
+    if (ret)
+    {
+        return ret;
+    }
+
+    /* Undo Centering */
+    ret = mvmat_column_add(raw_out, raw_out, ctx->centering);
+    if (ret)
+    {
+        return ret;
+    }
+
+    MVMAT_FUNC_PTR * funcs = (MVMAT_FUNC_PTR *)malloc(preprocessed_in->ncolumns * sizeof(MVMAT_FUNC_PTR));
+    MVPreprocessCoeffs **opaques = (MVPreprocessCoeffs **)malloc(preprocessed_in->ncolumns * sizeof(MVPreprocessCoeffs *));
+    for (j = 0; j < preprocessed_in->ncolumns; j++)
+    {
+        funcs[j] = ctx->preprocess_info[j].inv_t_func;
+        opaques[j] = (MVPreprocessCoeffs *)&ctx->preprocess_info[j].t_coeffs;
+    }
+
+    /* Apply column inverse functions */
+    ret = mvmat_column_func(raw_out, raw_out, funcs, opaques);
+
+    return ret;
 }
 
 double mvpreprocess_linear(double x, void *opaque)
