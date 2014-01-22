@@ -1060,7 +1060,7 @@ int main(int argc, char *argv[])
     printf("\n**Testing mvmat_column_func**\n");
     {
         MVMAT_FUNC_PTR funcs[3] = {square, NULL, log_missing} ;
-        void *opaques[3] = {NULL, NULL};
+        void *opaques[3] = {NULL, NULL, NULL};
 
         printf("\nCol 1 func = square, Col 2 func = NULL, Col 3 func = log");
 
