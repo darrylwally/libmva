@@ -621,7 +621,7 @@ int mvmat_column_div(MVMat *output, const MVMat *A, const MVMat *columnValues);
   \arg opaques The array of opaque data.
   \arg Returns MVReturnCode.
   */
-int mvmat_column_func(MVMat *output, const MVMat *A, MVMAT_FUNC_PTR *funcs, void *opaques);
+int mvmat_column_func(MVMat *output, const MVMat *A, MVMAT_FUNC_PTR *funcs, void **opaques);
 
 
 /*! Computes the min of each column

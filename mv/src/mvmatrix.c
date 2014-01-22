@@ -1151,7 +1151,7 @@ int mvmat_column_div(MVMat *output, const MVMat *A, const MVMat *columnValues)
 }
 
 
-int mvmat_column_func(MVMat *output, const MVMat *A, MVMAT_FUNC_PTR *funcs, void *opaques)
+int mvmat_column_func(MVMat *output, const MVMat *A, MVMAT_FUNC_PTR *funcs, void **opaques)
 {
     int i,j;
     if (!(output->nrows == A->nrows && output->ncolumns == A->ncolumns))
@@ -1160,21 +1160,18 @@ int mvmat_column_func(MVMat *output, const MVMat *A, MVMAT_FUNC_PTR *funcs, void
     }
 
     MVMAT_FUNC_PTR *func = funcs;
-    void *opaque = opaques;
+    void **opaque = opaques;
 
     double NaN = mv_NaN();
     for (j = 0; j < output->ncolumns; j++)
     {
-        if ((*func) == NULL)
-        {
-            continue;
-        }
+
         for (i = 0; i < output->nrows; i++)
         {
             double result = NaN;
-            if (A->mask[i][j] == DATA_PRESENT)
+            if (A->mask[i][j] == DATA_PRESENT && (*func) != NULL)
             {
-                result = (*func)(A->data[i][j], opaque);
+                result = (*func)(A->data[i][j], *opaque);
             }
 
             output->mask[i][j] = !(isnan(result));

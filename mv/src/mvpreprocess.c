@@ -158,7 +158,7 @@ int mvpreprocess_prep(MVPreprocessContext *ctx, MVMat *matrix)
     }
 
     /* Apply column functions */
-    mvmat_column_func(tmp, matrix, funcs, opaques);
+    mvmat_column_func(tmp, matrix, funcs, (void**)opaques);
 
     /* Compute centering and scaling*/
     for (j = 0; j < matrix->ncolumns; j++)
@@ -229,7 +229,7 @@ int mvpreprocess_do(MVPreprocessContext *ctx, MVMat *preprocessed_out, MVMat *ra
     }
 
     /* Apply column functions */
-    ret = mvmat_column_func(preprocessed_out, raw_in, funcs, opaques);
+    ret = mvmat_column_func(preprocessed_out, raw_in, funcs, (void**)opaques);
     free(funcs);
     free(opaques);
     if (ret)
@@ -285,7 +285,9 @@ int mvpreprocess_undo(MVPreprocessContext *ctx, MVMat *raw_out, MVMat *preproces
     }
 
     /* Apply column inverse functions */
-    ret = mvmat_column_func(raw_out, raw_out, funcs, opaques);
+    ret = mvmat_column_func(raw_out, raw_out, funcs, (void**) opaques);
+    free(funcs);
+    free(opaques);
 
     return ret;
 }
