@@ -1169,9 +1169,13 @@ int mvmat_column_func(MVMat *output, const MVMat *A, MVMAT_FUNC_PTR *funcs, void
         for (i = 0; i < output->nrows; i++)
         {
             double result = NaN;
-            if (A->mask[i][j] == DATA_PRESENT && (*func) != NULL)
+            if (A->mask[i][j] == DATA_PRESENT)
             {
-                result = (*func)(A->data[i][j], *opaque);
+                result = A->data[i][j];
+                if ((*func) != NULL)
+                {
+                    result = (*func)(A->data[i][j], *opaque);
+                }
             }
 
             output->mask[i][j] = !(isnan(result));
