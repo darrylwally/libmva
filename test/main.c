@@ -1120,13 +1120,13 @@ int main(int argc, char *argv[])
         const double data [FOODS_DATA_ROWS][FOODS_DATA_COLUMNS]=FOODS_DATA;
         MVMat * X = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
         MVMat * X_pp = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
-        MVMat * X_orig = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVMat * X_unpp = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
         MVMat * diff = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
         MVPreprocessContext *prepro = mvpreprocess_alloc_init_mat(FOODS_DATA_COLUMNS);
         MVPreprocessColumnInfo info;
         info.t_coeffs.A = 1.0;
         info.t_coeffs.B = 2.0;
-        info.t_coeffs.C = 3.0;
+        info.t_coeffs.C = 1.1;
         info.c = MV_CENTERING_MEAN;
         info.s = MV_SCALING_UV;
         info.multiplier = 1.0;
@@ -1136,30 +1136,37 @@ int main(int argc, char *argv[])
             for (j=0; j<FOODS_DATA_COLUMNS; j++)
             {
 
-                info.t = j % 5;
-                mvpreprocess_set_column(prepro, j, &info);
-
                 if (data[i][j]==FOODS_DATA_MASK)
                     mvmat_set_elem(X, i,j, mv_NaN());
                 else
                     mvmat_set_elem(X, i,j, data[i][j]);
-
             }
+        }
+
+        // Set preprocess info for each column
+        for (j = 0; j < FOODS_DATA_COLUMNS; j++)
+        {
+            info.t = j % 5;
+            mvpreprocess_set_column(prepro, j, &info);
         }
 
         mvpreprocess_prep(prepro, X);
         mvpreprocess_do(prepro, X_pp, X);
-        mvpreprocess_undo(prepro, X_orig, X_pp);
+        mvpreprocess_undo(prepro, X_unpp, X_pp);
 
-        mvmat_subtract(diff, X, X_orig);
+        mvmat_subtract(diff, X, X_unpp);
 
         double diff_ss = mvmat_ss(diff);
+        double ss_X = mvmat_ss(X);
+        double ss_X_pp = mvmat_ss(X_pp);
+        printf("\nX_pp[0][0] = %lf", X_pp->data[0][0]);
 
-        printf("\n Diff result after preprocessing and undoing = %lf", diff_ss);
+        printf("\n Diff result after preprocessing and undoing = %lf (%lf -> %lf)\n", diff_ss, ss_X, ss_X_pp);
+
 
         mvmat_free(&X);
         mvmat_free(&X_pp);
-        mvmat_free(&X_orig);
+        mvmat_free(&X_unpp);
         mvpreprocess_free(&prepro);
     }
 
