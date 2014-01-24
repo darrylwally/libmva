@@ -28,120 +28,120 @@
 #define MAX(a,b) (((a) > (b)) ? (a) : (b))
 
 // Function prototypes
-static int __mvAddPCAComponent(MVModel *model, int performCrossValidation);
-static int __mvAddPLSComponent(MVModel *model, int performCrossValidation);
+static int __mvmodel_add_PCA_component(MVModel *model, int perform_cv);
+static int __mvmodel_add_PLS_component(MVModel *model, int perform_cv);
 
-static int __freeCrossValData(MVCrossValData **cvData)
+static int __free_cv_data(MVCrossValData **cv_data)
 {
     int i;
     MVCrossValData * cvd = NULL;
-    if (cvData == NULL)
+    if (cv_data == NULL)
         return -1;
-    cvd = *cvData;
+    cvd = *cv_data;
     if (cvd == NULL)
         return -1;
 
     mvmat_free (&cvd->PRESS);
     mvmat_free (&cvd->PRESSV);
-    for (i=0; i< cvd->numRounds; i++)
+    for (i=0; i< cvd->num_rounds; i++)
     {
         mvmodel_free((MVModel **)&cvd->models[i]);
     }
     free(cvd->models);
-    *cvData = NULL;
+    *cv_data = NULL;
     return SUCCESS;
 }
 
-static MVCrossValData * __allocCrossValData(int numRounds)
+static MVCrossValData * __alloc_cv_data(int num_rounds)
 {
     int i;
     MVCrossValData *output = (MVCrossValData*) malloc(sizeof(MVCrossValData));
     if (!output)
         return NULL;
-    output->models = malloc(numRounds * sizeof(MVModel*));
-    for (i=0; i< numRounds; i++)
+    output->models = malloc(num_rounds * sizeof(MVModel*));
+    for (i=0; i< num_rounds; i++)
     {
         output->models[i] = NULL;
     }
     output->PRESSV = NULL;
     output->PRESS = NULL;
-    output->numRounds = numRounds;
+    output->num_rounds = num_rounds;
     return output;
 }
 
-/*! Performs regression of a vector on a matrix.
+/*! Performs column-wise regression of a vector on a matrix.
 
-  When the regression vector has the same number of columns (Kx1) as the
+  When the regression vector(matrix) has the same number of columns (Kx1) as the
   matrix (NxK) and the result has the same number of rows as the matrix (Nx1)
 
   E.g., in the NIPALS algorithm t = X p / p'p
 
   */
-static int __mvRegressCol(MVMat *output, const MVMat *X, const MVMat *vector)
+static int __mvmodel_regress_col(MVMat *output, const MVMat *X, const MVMat *v)
 {
 
     /* TODO size checking.  Right now I'm avoiding it because it's an internal
        function that I think should have checked sizes already.. */
-    double oNum, oDen;
+    double numerator, denominator;
     int i,j;
 
     for (i=0; i<X->nrows; i++)
     {
-        oNum=oDen=0.0;
+        numerator=denominator=0.0;
         for (j=0; j<X->ncolumns; j++)
         {
             if (X->mask[i][j] == DATA_PRESENT)
             {
-                oNum += vector->data[j][0] * X->data[i][j];
-                oDen += vector->data[j][0] * vector->data[j][0];
+                numerator += v->data[j][0] * X->data[i][j];
+                denominator += v->data[j][0] * v->data[j][0];
             }
         }
-        if (oDen==0.0)  //case where entire column is missing
+        if (denominator==0.0)  //case where entire column is missing
         {
             output->data[i][0]=0.0;
         }
         else
         {
-            output->data[i][0]=oNum/oDen;
+            output->data[i][0]=numerator/denominator;
         }
     }
 
     return 0;
 }
 
-/*! Performs regression of a vector on a matrix.
+/*! Performs row-wise regression of a vector on a matrix.
 
-  When the regression vector has the same number of rows (Nx1) as the
+  When the regression vector(matrix) has the same number of rows (Nx1) as the
   matrix (NxK) and the result has the same number of columns as the matrix (Kx1)
 
   E.g., in the NIPALS algorithm p = t' X / t't
 
   */
-static int __mvRegressRow(MVMat *output, const MVMat *X, const MVMat *vector)
+static int __mvmodel_regress_row(MVMat *output, const MVMat *X, const MVMat *v)
 {
     /* TODO size checking.  Right now I'm avoiding it because it's an internal
        function that I think should have checked sizes already.. */
-    double oNum, oDen;
+    double numerator, denominator;
     int i,j;
     for (j=0;j<X->ncolumns;j++)
     {
-        oNum=oDen=0.0;
+        numerator=denominator=0.0;
 
         for (i=0; i<X->nrows;i++)
         {
             if (X->mask[i][j] == DATA_PRESENT)
             {
-                oNum += vector->data[i][0] * X->data[i][j];
-                oDen += vector->data[i][0] * vector->data[i][0];
+                numerator += v->data[i][0] * X->data[i][j];
+                denominator += v->data[i][0] * v->data[i][0];
             }
         }
-        if (oDen==0.0)  //case where entire column is missing
+        if (denominator==0.0)  //case where entire column is missing
         {
             output->data[j][0]=0.0;
         }
         else
         {
-            output->data[j][0]=oNum/oDen;
+            output->data[j][0]=numerator/denominator;
         }
     }
     return 0;
@@ -150,23 +150,23 @@ static int __mvRegressRow(MVMat *output, const MVMat *X, const MVMat *vector)
 /*! \internal WStar will be computed for the a'th component
   This is based on equation equation 30 in Dayal, B.S. & MacGregor, J.F. (1997)
   Improved PLS algorithms. J. Chemometrics 11:73-85
-  \arg wStarOut is a pre-allocated vector of dim Kx1.
+  \arg wstar_out is a pre-allocated vector of dim Kx1.
 */
-static int __computeWStar(MVMat *wStarOut, const MVMat * w, const MVMat *p,
-                          const MVMat *wStarSoFar)
+static int __compute_wstar(MVMat *wstar_out, const MVMat * w, const MVMat *p,
+                          const MVMat *cur_wstar)
 {
     int i,j,a;
     int K = w->nrows;
     MVMat * wa = mvmat_alloc(K, 1); // Ath column of W (permanently)
     MVMat *p_i = mvmat_alloc(K, 1);
-    MVMat *wStarSoFar_i = mvmat_alloc(K,1);
+    MVMat *cur_wstar_i = mvmat_alloc(K,1);
     // start wStarOut as the the most recent vector of w
-    a = wStarSoFar->ncolumns;
+    a = cur_wstar->ncolumns;
     for (i=0; i< w->nrows; i++)
     {
         double val;
         mvmat_get_elem(w, &val, i, a);
-        mvmat_set_elem(wStarOut, i, 0, val);
+        mvmat_set_elem(wstar_out, i, 0, val);
         mvmat_set_elem(wa, i, 0, val);
     }
 
@@ -179,31 +179,31 @@ static int __computeWStar(MVMat *wStarOut, const MVMat * w, const MVMat *p,
             double val;
             mvmat_get_elem(p, &val, j, i);
             mvmat_set_elem(p_i, j, 0, val);
-            mvmat_get_elem(wStarSoFar, &val, j, i);
-            mvmat_set_elem(wStarSoFar_i, j, 0, val);
+            mvmat_get_elem(cur_wstar, &val, j, i);
+            mvmat_set_elem(cur_wstar_i, j, 0, val);
         }
         pTwa = mvmat_dot_product(p_i, wa);
-        mvmat_mult_scalar(wStarSoFar_i, wStarSoFar_i, pTwa);
-        mvmat_subtract(wStarOut, wStarOut, wStarSoFar_i);
+        mvmat_mult_scalar(cur_wstar_i, cur_wstar_i, pTwa);
+        mvmat_subtract(wstar_out, wstar_out, cur_wstar_i);
     }
 
     mvmat_free(&wa);
     mvmat_free(&p_i);
-    mvmat_free(&wStarSoFar_i);
+    mvmat_free(&cur_wstar_i);
 
     return SUCCESS;
 }
 
-static int __crossValidatePCA_FAST(MVModel *pca)
+static int __cross_validate_PCA_FAST(MVModel *pca)
 {
     int round;
     int i;
     MVCrossValData *cv = pca->cvd;
-    int numRounds = cv->numRounds;
+    int numRounds = cv->num_rounds;
     MVMat * PRESS = mvmat_allocz(1,1);
     MVMat * PRESSV = mvmat_allocz(1, pca->X->ncolumns);
     MVMat * PRESSV_temp = mvmat_allocz(1, pca->X->ncolumns); // acts as PRESSV temporary addition location and (PRESSV / SSV)
-    MVMat * componentSlice = mvmat_alloc(1,1);
+    MVMat * component_slice = mvmat_alloc(1,1);
     double Q2;
     MVMat * Q2V = mvmat_alloc(1, pca->X->ncolumns);
     MVMat * X = NULL;
@@ -227,7 +227,7 @@ static int __crossValidatePCA_FAST(MVModel *pca)
     // allocate the models with the sliced rows of the residual matrix.
     for (round = 0; round < numRounds; round++)
     {
-        MVModel *modelRound;
+        MVModel *model_round;
         MVMat * X_model = NULL; // the matrix that the model is built
         MVMat * X_pred = NULL;  // the matrix of the data that is to be predicted
         MVMat * E_pred = NULL;  // will function as the predicted values and the residuals.
@@ -241,9 +241,9 @@ static int __crossValidatePCA_FAST(MVModel *pca)
         t_pred = mvmat_alloc(X_pred->nrows, 1);
 
         // Initialize model, add one component, compute new observation scores.
-        modelRound = mvmodel_alloc_init_pca(X_model);
-        __mvAddPCAComponent(modelRound, 0);
-        mvmodel_t_scores_from_obs(t_pred, E_pred, X_pred, modelRound, 1, MV_NEW_SCORE_SCP);
+        model_round = mvmodel_alloc_init_pca(X_model);
+        __mvmodel_add_PCA_component(model_round, 0);
+        mvmodel_t_scores_from_obs(t_pred, E_pred, X_pred, model_round, 1, MV_NEW_SCORE_SCP);
 
         // Sum the columns of E_pred and then add those to PRESSV
         mvmat_column_ss(PRESSV_temp, E_pred);
@@ -254,15 +254,15 @@ static int __crossValidatePCA_FAST(MVModel *pca)
         mvmat_free(&E_pred);
         mvmat_free(&X_pred);
         mvmat_free(&X_model);
-        mvmodel_free(&modelRound);
+        mvmodel_free(&model_round);
     }
     mvmat_set_elem(PRESS, 0, 0, mvmat_sum(PRESSV));
     // Compute Q2 and Q2V
     {
         MVMat * SSXV_ref = NULL;
-        componentSlice->data[0][0] = pca->_A - 1;
+        component_slice->data[0][0] = pca->_A - 1;
         Q2 = 1.0 - PRESS->data[0][0] / pca->SSX->data[pca->_A-1][0];
-        mvmat_slice_rows_ref(&SSXV_ref, pca->SSXV, componentSlice);
+        mvmat_slice_rows_ref(&SSXV_ref, pca->SSXV, component_slice);
         mvmat_column_div(PRESSV_temp, PRESSV, SSXV_ref);
         mvmat_mult_scalar(PRESSV_temp, PRESSV, -1.0);
         mvmat_add_scalar(Q2V, PRESSV_temp, 1.0);
@@ -349,18 +349,18 @@ static int __crossValidatePCA_FAST(MVModel *pca)
             MVMat *PRESSV_ref, *SSXV_ref;
             PRESSV_ref = NULL;
             SSXV_ref = NULL;
-            componentSlice->data[0][0] = i;
-            mvmat_slice_rows_ref(&PRESSV_ref, cv->PRESSV, componentSlice);
-            mvmat_slice_rows_ref(&SSXV_ref, pca->SSXV, componentSlice);
+            component_slice->data[0][0] = i;
+            mvmat_slice_rows_ref(&PRESSV_ref, cv->PRESSV, component_slice);
+            mvmat_slice_rows_ref(&SSXV_ref, pca->SSXV, component_slice);
             mvmat_column_div(PRESSV_SSV, PRESSV_ref, SSXV_ref);
             mvmat_elem_mult(PRESSV_temp, PRESSV_temp, PRESSV_SSV);
 
             mvmat_free(&PRESSV_ref);
             mvmat_free(&SSXV_ref);
         }
-        componentSlice->data[0][0] = pca->_A - 1;
+        component_slice->data[0][0] = pca->_A - 1;
         newQ2Vcum_ref = NULL;
-        mvmat_slice_rows_ref(&newQ2Vcum_ref, newQ2Vcum, componentSlice);
+        mvmat_slice_rows_ref(&newQ2Vcum_ref, newQ2Vcum, component_slice);
         mvmat_mult_scalar(PRESSV_temp, PRESSV_SSV, -1.0);
         mvmat_add_scalar(newQ2Vcum_ref, PRESSV_temp, 1.0);
         mvmat_free(&PRESSV_SSV);
@@ -368,17 +368,17 @@ static int __crossValidatePCA_FAST(MVModel *pca)
         mvmat_free(&pca->Q2Vcum);
         pca->Q2Vcum = newQ2Vcum;
     }
-    mvmat_free(&componentSlice);
+    mvmat_free(&component_slice);
     mvmat_free(&PRESSV_temp);
     return 0;
 }
 
-static int __crossValidatePCA(MVModel *pca)
+static int __cross_validate_PCA(MVModel *pca)
 {
-    switch (pca->crossValType)
+    switch (pca->cv_type)
     {
     case MV_CROSSVAL_TYPE_FAST:
-        return __crossValidatePCA_FAST(pca);
+        return __cross_validate_PCA_FAST(pca);
 //    case FULL:
 //        return __crossValidatePCA_FULL(pca);
     default:
@@ -388,17 +388,17 @@ static int __crossValidatePCA(MVModel *pca)
     return 0;
 }
 
-static int __crossValidatePLS_FAST(MVModel *pls)
+static int __cross_validate_PLS_FAST(MVModel *pls)
 {
 
     int round;
     int i;
     MVCrossValData *cv = pls->cvd;
-    int numRounds = cv->numRounds;
+    int num_rounds = cv->num_rounds;
     MVMat * PRESS = mvmat_allocz(1,1);
     MVMat * PRESSV = mvmat_allocz(1, pls->Y->ncolumns);
     MVMat * PRESSV_temp = mvmat_allocz(1, pls->Y->ncolumns); // acts as PRESSV temporary addition location and (PRESSV / SSV)
-    MVMat * componentSlice = mvmat_alloc(1,1);
+    MVMat * component_slice = mvmat_alloc(1,1);
     double Q2;
     MVMat * Q2V = mvmat_alloc(1, pls->Y->ncolumns);
     MVMat * X = NULL;
@@ -417,15 +417,15 @@ static int __crossValidatePLS_FAST(MVModel *pls)
     }
 
     // Check for "Leave one out" CV mode.
-    if (numRounds <= 0)
+    if (num_rounds <= 0)
     {
-        numRounds = X->nrows;
+        num_rounds = X->nrows;
     }
 
     // allocate the models with the sliced rows of the residual matrix.
-    for (round = 0; round < numRounds; round++)
+    for (round = 0; round < num_rounds; round++)
     {
-        MVModel *modelRound;
+        MVModel *model_round;
         MVMat * Y_model = NULL; // the matrix that the model is built
         MVMat * Y_pred = NULL;  // the matrix of the data that is to be predicted
         MVMat * X_model = NULL; // the matrix that the model is built
@@ -433,7 +433,7 @@ static int __crossValidatePLS_FAST(MVModel *pls)
         MVMat * F_pred = NULL;  // will function as the predicted values and the residuals.
         MVMat * t_pred = NULL;
         MVMat * u_pred = NULL;
-        MVMat * slice_pred = mvmat_range(round, pls->F->nrows, numRounds);
+        MVMat * slice_pred = mvmat_range(round, pls->F->nrows, num_rounds);
 
         mvmat_slice_rows_ref(&Y_pred, Y, slice_pred);
         mvmat_delete_rows_ref(&Y_model, Y, slice_pred);
@@ -445,10 +445,10 @@ static int __crossValidatePLS_FAST(MVModel *pls)
         u_pred = mvmat_alloc(Y_pred->nrows, 1);
 
         // Initialize model, add one component, compute new observation scores.
-        modelRound = mvmodel_alloc_init_pls(X_model, Y_model);
-        __mvAddPLSComponent(modelRound, 0);
-        mvmodel_t_scores_from_obs(t_pred, NULL, X_pred, modelRound, 1, MV_NEW_SCORE_SCP);
-        mvmodel_u_scores_from_obs(u_pred, F_pred, Y_pred, t_pred, modelRound, 1, MV_NEW_SCORE_SCP);
+        model_round = mvmodel_alloc_init_pls(X_model, Y_model);
+        __mvmodel_add_PLS_component(model_round, 0);
+        mvmodel_t_scores_from_obs(t_pred, NULL, X_pred, model_round, 1, MV_NEW_SCORE_SCP);
+        mvmodel_u_scores_from_obs(u_pred, F_pred, Y_pred, t_pred, model_round, 1, MV_NEW_SCORE_SCP);
 
         // Sum the columns of F_pred and then add those to PRESSV
         mvmat_column_ss(PRESSV_temp, F_pred);
@@ -463,15 +463,15 @@ static int __crossValidatePLS_FAST(MVModel *pls)
         mvmat_free(&X_model);
         mvmat_free(&Y_pred);
         mvmat_free(&Y_model);
-        mvmodel_free(&modelRound);
+        mvmodel_free(&model_round);
     }
     mvmat_set_elem(PRESS, 0, 0, mvmat_sum(PRESSV));
     // Compute Q2 and Q2V
     {
         MVMat * SSYV_ref = NULL;
-        componentSlice->data[0][0] = pls->_A - 1;
+        component_slice->data[0][0] = pls->_A - 1;
         Q2 = 1.0 - PRESS->data[0][0] / pls->SSY->data[pls->_A-1][0];
-        mvmat_slice_rows_ref(&SSYV_ref, pls->SSYV, componentSlice);
+        mvmat_slice_rows_ref(&SSYV_ref, pls->SSYV, component_slice);
         mvmat_column_div(PRESSV_temp, PRESSV, SSYV_ref);
         mvmat_mult_scalar(PRESSV_temp, PRESSV, -1.0);
         mvmat_add_scalar(Q2V, PRESSV_temp, 1.0);
@@ -558,18 +558,18 @@ static int __crossValidatePLS_FAST(MVModel *pls)
             MVMat *PRESSV_ref, *SSYV_ref;
             PRESSV_ref = NULL;
             SSYV_ref = NULL;
-            componentSlice->data[0][0] = i;
-            mvmat_slice_rows_ref(&PRESSV_ref, cv->PRESSV, componentSlice);
-            mvmat_slice_rows_ref(&SSYV_ref, pls->SSYV, componentSlice);
+            component_slice->data[0][0] = i;
+            mvmat_slice_rows_ref(&PRESSV_ref, cv->PRESSV, component_slice);
+            mvmat_slice_rows_ref(&SSYV_ref, pls->SSYV, component_slice);
             mvmat_column_div(PRESSV_SSV, PRESSV_ref, SSYV_ref);
             mvmat_elem_mult(PRESSV_temp, PRESSV_temp, PRESSV_SSV);
 
             mvmat_free(&PRESSV_ref);
             mvmat_free(&SSYV_ref);
         }
-        componentSlice->data[0][0] = pls->_A - 1;
+        component_slice->data[0][0] = pls->_A - 1;
         newQ2Vcum_ref = NULL;
-        mvmat_slice_rows_ref(&newQ2Vcum_ref, newQ2Vcum, componentSlice);
+        mvmat_slice_rows_ref(&newQ2Vcum_ref, newQ2Vcum, component_slice);
         mvmat_mult_scalar(PRESSV_temp, PRESSV_SSV, -1.0);
         mvmat_add_scalar(newQ2Vcum_ref, PRESSV_temp, 1.0);
         mvmat_free(&PRESSV_SSV);
@@ -577,17 +577,17 @@ static int __crossValidatePLS_FAST(MVModel *pls)
         mvmat_free(&pls->Q2Vcum);
         pls->Q2Vcum = newQ2Vcum;
     }
-    mvmat_free(&componentSlice);
+    mvmat_free(&component_slice);
     mvmat_free(&PRESSV_temp);
     return 0;
 }
 
-static int __crossValidatePLS(MVModel *pls)
+static int __cross_validate_PLS(MVModel *pls)
 {
-    switch (pls->crossValType)
+    switch (pls->cv_type)
     {
     case MV_CROSSVAL_TYPE_FAST:
-        return __crossValidatePLS_FAST(pls);
+        return __cross_validate_PLS_FAST(pls);
 //    case FULL:
 //        return __crossValidatePLS_FULL(pls);
     default:
@@ -604,7 +604,7 @@ MVModel * mvmodel_alloc_init_pca(MVMat *X)
     {
         return NULL;
     }
-    output->modelType = MV_MODEL_TYPE_PCA;
+    output->model_type = MV_MODEL_TYPE_PCA;
     output->X = X;
     output->E = mvmat_allocz(X->nrows, X->ncolumns);
     output->p = NULL;
@@ -612,8 +612,8 @@ MVModel * mvmodel_alloc_init_pca(MVMat *X)
     output->t_stddev = NULL;
     output->R2X = NULL;
     output->cvd = NULL;
-    output->crossValType = MV_CROSSVAL_TYPE_FAST;
-    output->numCrossValRounds = 7;
+    output->cv_type = MV_CROSSVAL_TYPE_FAST;
+    output->num_cv_rounds = 7;
     output->A = output->_A = 0;
     output->SSX = mvmat_alloc(1,1);
     output->SSXV = mvmat_alloc(1, X->ncolumns);
@@ -632,7 +632,7 @@ MVModel * mvmodel_alloc_init_pca(MVMat *X)
     output->F = NULL;
     output->w = NULL;
     output->u = NULL;
-    output->wStar = NULL;
+    output->wstar = NULL;
     output->c = NULL;
     output->R2Y =NULL;
     /* TODO ADD Cross validation stuff */
@@ -651,20 +651,20 @@ MVModel * mvmodel_alloc_init_pls(MVMat *X, MVMat *Y)
     {
         return NULL;
     }
-    output->modelType = MV_MODEL_TYPE_PLS;
+    output->model_type = MV_MODEL_TYPE_PLS;
     output->X = X;
     output->Y = Y;
     output->E = mvmat_allocz(X->nrows, X->ncolumns);
     output->F = mvmat_allocz(Y->nrows, Y->ncolumns);
     output->u = NULL;
     output->w = NULL;
-    output->wStar = NULL;
+    output->wstar = NULL;
     output->p = NULL;
     output->t = NULL;
     output->t_stddev = NULL;
     output->cvd = NULL;
-    output->crossValType = MV_CROSSVAL_TYPE_FAST;
-    output->numCrossValRounds = 7;
+    output->cv_type = MV_CROSSVAL_TYPE_FAST;
+    output->num_cv_rounds = 7;
     output->SSX = mvmat_alloc(1,1);
     output->SSXV = mvmat_alloc(1, X->ncolumns);
     mvmat_column_ss(output->SSXV, X);
@@ -687,7 +687,7 @@ MVModel * mvmodel_alloc_init_pls(MVMat *X, MVMat *Y)
 
 }
 
-static int __mvFreePCAModel(MVModel **model)
+static int __mv_free_PCA_model(MVModel **model)
 {
     MVModel *m = NULL;
     if (!model)
@@ -708,13 +708,13 @@ static int __mvFreePCAModel(MVModel **model)
     mvmat_free(&m->Q2cum);
     mvmat_free(&m->Q2Vcum);
     mvmat_free(&m->SPEX);
-    __freeCrossValData((MVCrossValData**) &m->cvd);
+    __free_cv_data((MVCrossValData**) &m->cvd);
     free(m);
     *model = NULL;
     return SUCCESS;
 }
 
-static int __mvFreePLSModel(MVModel **model)
+static int __mv_free_PLS_model(MVModel **model)
 {
     MVModel *m = NULL;
     if (!model)
@@ -726,7 +726,7 @@ static int __mvFreePLSModel(MVModel **model)
     mvmat_free(&m->F);
     mvmat_free(&m->u);
     mvmat_free(&m->w);
-    mvmat_free(&m->wStar);
+    mvmat_free(&m->wstar);
     mvmat_free(&m->t);
     mvmat_free(&m->t_stddev);
     mvmat_free(&m->p);
@@ -742,7 +742,7 @@ static int __mvFreePLSModel(MVModel **model)
     mvmat_free(&m->Q2Vcum);
     mvmat_free(&m->SPEX);
     mvmat_free(&m->SPEY);
-    __freeCrossValData((MVCrossValData **) &m->cvd);
+    __free_cv_data((MVCrossValData **) &m->cvd);
     free(m);
     *model = NULL;
     return SUCCESS;
@@ -756,32 +756,32 @@ int mvmodel_free(MVModel **model)
     {
         return -1;
     }
-    switch (m->modelType)
+    switch (m->model_type)
     {
     case MV_MODEL_TYPE_PCA:
-        return __mvFreePCAModel(model);
+        return __mv_free_PCA_model(model);
     case MV_MODEL_TYPE_PLS:
-        return __mvFreePLSModel(model);
+        return __mv_free_PLS_model(model);
     default:
         return UNKNOWN_MODEL_TYPE;
     }
     return UNKNOWN_MODEL_TYPE;
 }
 
-static int __mvAddPCAComponent(MVModel *model, int performCrossValidation)
+static int __mvmodel_add_PCA_component(MVModel *model, int perform_cv)
 {
     int num_iter = 0;
     int N = model->X->nrows;
     int K = model->X->ncolumns;
     MVMat *p = mvmat_alloc_setval(K, 1, 1.0);
-    MVMat *pOld = mvmat_alloc(K, 1);
-    MVMat *pDiff = mvmat_alloc(K, 1);
+    MVMat *p_last = mvmat_alloc(K, 1);
+    MVMat *p_diff = mvmat_alloc(K, 1);
     MVMat *t = mvmat_alloc(N, 1);
     MVMat *R2 = mvmat_alloc(1,1);
     MVMat *iter = mvmat_allocz(1,1);
     MVMat *X;   // reference -> no clean up req'd.
     MVMat *pT, *tpT;
-    double vectorNorm;
+    double vector_norm;
     double SSE;
     MVMat *SSEV = mvmat_alloc(1, K);
 
@@ -799,24 +799,24 @@ static int __mvAddPCAComponent(MVModel *model, int performCrossValidation)
     // PCA NIPALS Algorithm
     do{
         num_iter++;
-        __mvRegressCol(t, X, p);    // t= Xp / (p'p);
+        __mvmodel_regress_col(t, X, p);    // t= Xp / (p'p);
 
-        mvmat_copy(pOld, p);         // store contents of p into pOld
+        mvmat_copy(p_last, p);         // store contents of p into pOld
 
-        __mvRegressRow(p, X, t);    // p = t'X / (t't);
+        __mvmodel_regress_row(p, X, t);    // p = t'X / (t't);
 
-        vectorNorm = mvmat_vector_norm(p);
+        vector_norm = mvmat_vector_norm(p);
 
-        mvmat_mult_scalar(p, p, 1.0/vectorNorm);  // normalize p
+        mvmat_mult_scalar(p, p, 1.0/vector_norm);  // normalize p
 
-        mvmat_subtract(pDiff, p, pOld);          // get the difference of P
+        mvmat_subtract(p_diff, p, p_last);          // get the difference of P
 
-        vectorNorm = mvmat_vector_norm(pDiff);
-    } while (vectorNorm > MV_SQRT_EPS && num_iter < MAX_NIPALS_ITER);
+        vector_norm = mvmat_vector_norm(p_diff);
+    } while (vector_norm > MV_SQRT_EPS && num_iter < MAX_NIPALS_ITER);
 
     // no longer need, pOld or pDiff
-    mvmat_free(&pOld);
-    mvmat_free(&pDiff);
+    mvmat_free(&p_last);
+    mvmat_free(&p_diff);
 
     // Increment number of internal components
     model->_A++;
@@ -826,13 +826,13 @@ static int __mvAddPCAComponent(MVModel *model, int performCrossValidation)
 
     // XXX: Cross validation must be performed before the new residual E is
     // computed and depends on _A == 1 for the first component (NOT ZERO!)
-    if (performCrossValidation)
+    if (perform_cv)
     {
         if (!model->cvd)
         {
-            model->cvd = __allocCrossValData(model->numCrossValRounds);
+            model->cvd = __alloc_cv_data(model->num_cv_rounds);
         }
-        __crossValidatePCA(model);
+        __cross_validate_PCA(model);
     }
 
     // compute residual
@@ -933,15 +933,15 @@ static int __mvAddPCAComponent(MVModel *model, int performCrossValidation)
     return 0;
 }
 
-static int __mvAddPLSComponent(MVModel *model, int performCrossValidation)
+static int __mvmodel_add_PLS_component(MVModel *model, int perform_cv)
 {
     int num_iter = 0;
     int N = model->X->nrows;
     int K = model->X->ncolumns;
     int M = model->Y->ncolumns;
     MVMat *w = mvmat_alloc_setval(K, 1, 1.0);
-    MVMat *wOld = mvmat_alloc(K, 1);
-    MVMat *wDiff = mvmat_alloc(K, 1);
+    MVMat *w_last = mvmat_alloc(K, 1);
+    MVMat *w_diff = mvmat_alloc(K, 1);
     MVMat *p = mvmat_alloc(K, 1);
     MVMat *c = mvmat_alloc(M, 1);
     MVMat *t = mvmat_alloc(N, 1);
@@ -972,28 +972,28 @@ static int __mvAddPLSComponent(MVModel *model, int performCrossValidation)
     do{
         num_iter++;
 
-        __mvRegressCol(t, X, w);    // t = X w / w'w
+        __mvmodel_regress_col(t, X, w);    // t = X w / w'w
 
-        __mvRegressRow(c, Y, t);    // c = t'Y / t't
+        __mvmodel_regress_row(c, Y, t);    // c = t'Y / t't
 
-        __mvRegressCol(u, Y, c);    // u = Y c / c'c
+        __mvmodel_regress_col(u, Y, c);    // u = Y c / c'c
 
-        mvmat_copy(wOld, w);
+        mvmat_copy(w_last, w);
 
-        __mvRegressRow(w, X, u);    // w = u'X / u'u
+        __mvmodel_regress_row(w, X, u);    // w = u'X / u'u
 
         mvmat_mult_scalar(w, w, 1.0/mvmat_vector_norm(w));  // normalize w
 
-        mvmat_subtract(wDiff, w, wOld);          // get the difference of w
+        mvmat_subtract(w_diff, w, w_last);          // get the difference of w
 
-    } while (mvmat_vector_norm(wDiff)>MV_SQRT_EPS && num_iter < MAX_NIPALS_ITER);
+    } while (mvmat_vector_norm(w_diff)>MV_SQRT_EPS && num_iter < MAX_NIPALS_ITER);
 
     // compute loading p after loop
-    __mvRegressRow(p, X, t);
+    __mvmodel_regress_row(p, X, t);
 
     // no longer need, wOld or wDiff
-    mvmat_free(&wOld);
-    mvmat_free(&wDiff);
+    mvmat_free(&w_last);
+    mvmat_free(&w_diff);
 
     // Increment number of internal components
     model->_A++;
@@ -1003,13 +1003,13 @@ static int __mvAddPLSComponent(MVModel *model, int performCrossValidation)
 
     // XXX: Cross validation must be performed before the new residual E is
     // computed and depends on _A == 1 for the first component (NOT ZERO!)
-    if (performCrossValidation)
+    if (perform_cv)
     {
         if (!model->cvd)
         {
-            model->cvd = __allocCrossValData(model->numCrossValRounds);
+            model->cvd = __alloc_cv_data(model->num_cv_rounds);
         }
-        __crossValidatePLS(model);
+        __cross_validate_PLS(model);
     }
 
     // compute residual E
@@ -1084,10 +1084,10 @@ static int __mvAddPLSComponent(MVModel *model, int performCrossValidation)
         //W*
         wStar = mvmat_alloc(K, 1);
         newWStar = mvmat_alloc(model->X->ncolumns, model->A+1);
-        __computeWStar(wStar, model->w, model->p, model->wStar);
-        mvmat_concat_columns(newWStar, model->wStar, wStar);
-        mvmat_free(&model->wStar);
-        model->wStar = newWStar;
+        __compute_wstar(wStar, model->w, model->p, model->wstar);
+        mvmat_concat_columns(newWStar, model->wstar, wStar);
+        mvmat_free(&model->wstar);
+        model->wstar = newWStar;
         mvmat_free(&wStar);
 
         //R2X
@@ -1137,7 +1137,7 @@ static int __mvAddPLSComponent(MVModel *model, int performCrossValidation)
         model->c=c;
         model->u=u;
         model->w=w;
-        model->wStar = mvmat_alloc_copy(w); // W* = W for the first component
+        model->wstar = mvmat_alloc_copy(w); // W* = W for the first component
         model->R2X = R2X;
         model->R2Y = R2Y;
         model->iter = iter;
@@ -1198,12 +1198,12 @@ static int __mvAddPLSComponent(MVModel *model, int performCrossValidation)
 
 int mvmodel_add_component(MVModel *model)
 {
-    switch(model->modelType)
+    switch(model->model_type)
     {
     case MV_MODEL_TYPE_PCA:
-        return __mvAddPCAComponent(model, 1);
+        return __mvmodel_add_PCA_component(model, 1);
     case MV_MODEL_TYPE_PLS:
-        return __mvAddPLSComponent(model, 1);
+        return __mvmodel_add_PLS_component(model, 1);
     default:
         return UNKNOWN_MODEL_TYPE;
     }
@@ -1211,7 +1211,7 @@ int mvmodel_add_component(MVModel *model)
 }
 
 
-static int __mvNewObsPCA_T(MVMat *t, MVMat *E, const MVMat *newX, const MVModel *model,
+static int __mv_new_obs_PCA_T(MVMat *t, MVMat *E, const MVMat *new_X, const MVModel *model,
                   int num_components, MVNewScoreCalcType method)
 {
     int a, i, j;
@@ -1219,7 +1219,7 @@ static int __mvNewObsPCA_T(MVMat *t, MVMat *E, const MVMat *newX, const MVModel 
     double numerator, denominator;
     MVMat *p, *EHat;
     MVMat *_t, *_p, *_p_T, *_slice; // slices for calculation of E-hat
-    if ( !(t->nrows == newX->nrows && newX->ncolumns == model->p->nrows &&
+    if ( !(t->nrows == new_X->nrows && new_X->ncolumns == model->p->nrows &&
            model->p->ncolumns >= num_components && t->ncolumns >= num_components))
     {
         return INCORRECT_DIMENSIONS;
@@ -1227,15 +1227,15 @@ static int __mvNewObsPCA_T(MVMat *t, MVMat *E, const MVMat *newX, const MVModel 
 
     if (E)
     {
-        if (! (E->nrows == newX->nrows && E->ncolumns == newX->ncolumns))
+        if (! (E->nrows == new_X->nrows && E->ncolumns == new_X->ncolumns))
         {
             return INCORRECT_DIMENSIONS;
         }
-        mvmat_copy(E, newX);
+        mvmat_copy(E, new_X);
     }
     else
     {
-        E = mvmat_alloc_copy(newX);
+        E = mvmat_alloc_copy(new_X);
         freeE = 1;
     }
 
@@ -1294,7 +1294,7 @@ static int __mvNewObsPCA_T(MVMat *t, MVMat *E, const MVMat *newX, const MVModel 
     return SUCCESS;
 }
 
-static int __mvNewObsPLS_T(MVMat *t, MVMat *E, const MVMat *newX, const MVModel *model,
+static int __mv_new_obs_PLS_T(MVMat *t, MVMat *E, const MVMat *new_X, const MVModel *model,
                   int num_components, MVNewScoreCalcType method)
 {
     int a, i, j;
@@ -1302,7 +1302,7 @@ static int __mvNewObsPLS_T(MVMat *t, MVMat *E, const MVMat *newX, const MVModel 
     double numerator, denominator;
     MVMat *p, *w, *EHat;
     MVMat *_t, *_p, *_p_T, *_slice; // slices for calculation of E-hat
-    if ( !(t->nrows == newX->nrows && newX->ncolumns == model->p->nrows &&
+    if ( !(t->nrows == new_X->nrows && new_X->ncolumns == model->p->nrows &&
            model->p->ncolumns >= num_components &&
            t->ncolumns == num_components && model->w->ncolumns >= num_components))
     {
@@ -1311,15 +1311,15 @@ static int __mvNewObsPLS_T(MVMat *t, MVMat *E, const MVMat *newX, const MVModel 
 
     if (E)
     {
-        if (! (E->nrows == newX->nrows && E->ncolumns == newX->ncolumns))
+        if (! (E->nrows == new_X->nrows && E->ncolumns == new_X->ncolumns))
         {
             return INCORRECT_DIMENSIONS;
         }
-        mvmat_copy(E, newX);
+        mvmat_copy(E, new_X);
     }
     else
     {
-        E = mvmat_alloc_copy(newX);
+        E = mvmat_alloc_copy(new_X);
         freeE = 1;
     }
 
@@ -1380,7 +1380,7 @@ static int __mvNewObsPLS_T(MVMat *t, MVMat *E, const MVMat *newX, const MVModel 
     return SUCCESS;
 }
 
-int mvmodel_u_scores_from_obs(MVMat *u, MVMat *F, const MVMat *newY, const MVMat *newT,
+int mvmodel_u_scores_from_obs(MVMat *u, MVMat *F, const MVMat *new_Y, const MVMat *new_T,
                   const MVModel *model, int num_components,
                   MVNewScoreCalcType method)
 {
@@ -1389,28 +1389,28 @@ int mvmodel_u_scores_from_obs(MVMat *u, MVMat *F, const MVMat *newY, const MVMat
     double numerator, denominator;
     MVMat *c, *FHat;
     MVMat *_t, *_c, *_c_T, *_slice; // slices for calculation of E-hat
-    if ( !(u->nrows == newY->nrows && newY->ncolumns == model->c->nrows &&
+    if ( !(u->nrows == new_Y->nrows && new_Y->ncolumns == model->c->nrows &&
            model->c->ncolumns >= num_components &&
-           u->ncolumns == num_components && u->nrows == newT->nrows &&
-           u->ncolumns == newT->ncolumns))
+           u->ncolumns == num_components && u->nrows == new_T->nrows &&
+           u->ncolumns == new_T->ncolumns))
     {
         return INCORRECT_DIMENSIONS;
     }
-    else if (model->modelType != MV_MODEL_TYPE_PLS)
+    else if (model->model_type != MV_MODEL_TYPE_PLS)
     {
         return WRONG_MODEL_TYPE;
     }
     if (F)
     {
-        if (! (F->nrows == newY->nrows && F->ncolumns == newY->ncolumns))
+        if (! (F->nrows == new_Y->nrows && F->ncolumns == new_Y->ncolumns))
         {
             return INCORRECT_DIMENSIONS;
         }
-        mvmat_copy(F, newY);
+        mvmat_copy(F, new_Y);
     }
     else
     {
-        F = mvmat_alloc_copy(newY);
+        F = mvmat_alloc_copy(new_Y);
         freeF = 1;
     }
 
@@ -1418,7 +1418,7 @@ int mvmodel_u_scores_from_obs(MVMat *u, MVMat *F, const MVMat *newY, const MVMat
     (void) method;
     c = model->c;
 
-    _t = mvmat_alloc(newT->nrows, 1);
+    _t = mvmat_alloc(new_T->nrows, 1);
     _c = mvmat_alloc(c->nrows, 1);
     _c_T = mvmat_alloc(1, c->nrows);
     _slice = mvmat_alloc(1, 1);
@@ -1449,7 +1449,7 @@ int mvmodel_u_scores_from_obs(MVMat *u, MVMat *F, const MVMat *newY, const MVMat
         // compute residual and start over.
         _slice->data[0][0]=(double)a;
         mvmat_slice_columns(_c, c, _slice);
-        mvmat_slice_columns(_t, newT, _slice);
+        mvmat_slice_columns(_t, new_T, _slice);
         mvmat_transpose(_c_T, _c);
         mvmat_mult(FHat, _t, _c_T);  // FHat = tcT
         mvmat_subtract(F, F, FHat);
@@ -1469,15 +1469,15 @@ int mvmodel_u_scores_from_obs(MVMat *u, MVMat *F, const MVMat *newY, const MVMat
 }
 
 
-int mvmodel_t_scores_from_obs(MVMat *t, MVMat * E, const MVMat *newX, const MVModel *model,
+int mvmodel_t_scores_from_obs(MVMat *t, MVMat * E, const MVMat *new_X, const MVModel *model,
               int num_components, MVNewScoreCalcType method)
 {
-    switch (model->modelType)
+    switch (model->model_type)
     {
     case MV_MODEL_TYPE_PCA:
-        return __mvNewObsPCA_T(t, E, newX, model, num_components, method);
+        return __mv_new_obs_PCA_T(t, E, new_X, model, num_components, method);
     case MV_MODEL_TYPE_PLS:
-        return __mvNewObsPLS_T(t, E, newX, model, num_components, method);
+        return __mv_new_obs_PLS_T(t, E, new_X, model, num_components, method);
     default:
         return UNKNOWN_MODEL_TYPE;
     }
@@ -1516,7 +1516,7 @@ int mvmodel_autofit(MVModel *model)
         {
             int i;
             double QV;
-            if (model->modelType == MV_MODEL_TYPE_PCA)
+            if (model->model_type == MV_MODEL_TYPE_PCA)
             {
                 int n_QV_gt = 0;
                 for (i = 0; i < model->X->ncolumns; i++)
@@ -1532,7 +1532,7 @@ int mvmodel_autofit(MVModel *model)
                     component_is_valid = 1;
                 }
             }
-            else if (model->modelType == MV_MODEL_TYPE_PLS)
+            else if (model->model_type == MV_MODEL_TYPE_PLS)
             {
                 for (i = 0; i < model->Y->ncolumns; i++)
                 {
@@ -1554,7 +1554,7 @@ int mvmodel_autofit(MVModel *model)
 }
 
 
-static int __mvComputePred(MVMat *pred, const MVMat *scores, const MVMat *weights, int num_components)
+static int __mv_compute_pred(MVMat *pred, const MVMat *scores, const MVMat *weights, int num_components)
 {
     // todo: error checking
     MVMat *weightsT = mvmat_alloc(weights->ncolumns, weights->nrows);
@@ -1582,20 +1582,20 @@ static int __mvComputePred(MVMat *pred, const MVMat *scores, const MVMat *weight
 int mvmodel_compute_xpred(MVMat *Xhat, const MVModel *model, const MVMat *t, int num_components)
 {
     MVMat *weights = NULL;
-    if (model->modelType == MV_MODEL_TYPE_PCA)
+    if (model->model_type == MV_MODEL_TYPE_PCA)
     {
         weights = model->p;
     }
-    else if(model->modelType == MV_MODEL_TYPE_PLS)
+    else if(model->model_type == MV_MODEL_TYPE_PLS)
     {
-        weights = model->wStar;
+        weights = model->wstar;
     }
-    return __mvComputePred(Xhat, t, weights, num_components);
+    return __mv_compute_pred(Xhat, t, weights, num_components);
 }
 
 
 int mvmodel_compute_ypred(MVMat *Yhat, const MVModel *model, const MVMat *t, int num_components)
 {
     // todo: error checking
-    return __mvComputePred(Yhat, t, model->c, num_components);
+    return __mv_compute_pred(Yhat, t, model->c, num_components);
 }

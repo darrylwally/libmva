@@ -1331,10 +1331,10 @@ int main(int argc, char *argv[])
                 ioi, pls_model->u->data[ioi][1]);
         ioi=6;
         printf("Kamyr W* for Variable Uczaa-3[6]: \nW*1[%d]=%1.8lf\nW*2[%d]=%1.8lf\nW*3[%d]=%1.8lf\nW*4[%d]=%1.8lf\n",
-               ioi, pls_model->wStar->data[ioi][0],
-               ioi, pls_model->wStar->data[ioi][1],
-               ioi, pls_model->wStar->data[ioi][2],
-               ioi, pls_model->wStar->data[ioi][3]);
+               ioi, pls_model->wstar->data[ioi][0],
+               ioi, pls_model->wstar->data[ioi][1],
+               ioi, pls_model->wstar->data[ioi][2],
+               ioi, pls_model->wstar->data[ioi][3]);
 
         printf("\nKamyr R2X values:\nR2X[%d]=%1.8lf\nR2X[%d]=%1.8lf\nR2X[%d]=%1.8lf\nR2X[%d]=%1.8lf\n",
                1, pls_model->R2X->data[0][0],

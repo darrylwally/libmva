@@ -46,13 +46,13 @@ typedef struct MVCrossValData_s{
     MVMat * PRESS;      /*! _Ax1 */
     MVMat * PRESSV;     /*! _AxK for PCA or _AxM for PLS */
     void ** models;     /*! array of models of size NUM_ROUNDS */
-    int numRounds;      /*! Number of rounds in this cross val data */
+    int num_rounds;      /*! Number of rounds in this cross val data */
 } MVCrossValData;
 
 /*! Structure for both PCA and PLS models
   */
 typedef struct MVModel_s{
-    MVModelType modelType;
+    MVModelType model_type;
     MVMat * X;           /*! Reference to X-matrix of size(NxK)*/
     MVMat * Y;           /*! Reference to Y-matrix of size(NxM) - PLS only */
     MVMat * E;           /*! X-Residual matrix */
@@ -62,7 +62,7 @@ typedef struct MVModel_s{
     MVMat * p;           /*! P-loadings matrix of size (KxA) */
     MVMat * u;           /*! U-scores matrix of size (NxA) */
     MVMat * w;           /*! W-weightings matrix of size (KxA) */
-    MVMat * wStar;       /*! W*-weightings matrix of size (KxA) */
+    MVMat * wstar;       /*! W*-weightings matrix of size (KxA) */
     MVMat * c;           /*! C-loadings matrix of size (MxA) */
     MVMat * R2X;         /*! Column vector MVMat (_Ax1)*/
     MVMat * R2Y;         /*! Column vector MVMat (_Ax1)*/
@@ -73,8 +73,8 @@ typedef struct MVModel_s{
     MVMat * SPEX;        /*! Squared Prediction Error of X (size NxA) */
     MVMat * SPEY;        /*! Squared Prediction Error of Y - PLS only (size NxA) */
     MVCrossValData * cvd;  /*! Data required for crossValidation */
-    MVCrossValType crossValType; /*! Type of cross validation */
-    int numCrossValRounds; /*! Number of rounds to for cross validation (default = 7) */
+    MVCrossValType cv_type; /*! Type of cross validation */
+    int num_cv_rounds; /*! Number of rounds to for cross validation (default = 7) */
     MVMat * SSX;         /*! Sum of squares of X-matrix for each component size (_A+1x1)*/
     MVMat * SSY;         /*! Sum of squares of Y-matrix for each component size (_A+1x1)*/
     MVMat * SSXV;        /*! Sum of squares of columns of X-matrix for each component size (_A+1xK)*/
@@ -175,7 +175,7 @@ int mvmodel_autofit(MVModel *model);
 
   \sa MVNewScoreCalcType
   */
-int mvmodel_t_scores_from_obs(MVMat *t, MVMat * E, const MVMat *newX, const MVModel *pca_model,
+int mvmodel_t_scores_from_obs(MVMat *t, MVMat * E, const MVMat *new_X, const MVModel *pca_model,
                   int num_components, MVNewScoreCalcType method);
 
 /*! Computes U-scores for a new observation of Y of a PLS Model
@@ -190,7 +190,7 @@ int mvmodel_t_scores_from_obs(MVMat *t, MVMat * E, const MVMat *newX, const MVMo
 
   \sa MVNewScoreCalcType
   */
-int mvmodel_u_scores_from_obs(MVMat *u, MVMat *F, const MVMat *newY, const MVMat *newT,
+int mvmodel_u_scores_from_obs(MVMat *u, MVMat *F, const MVMat *new_Y, const MVMat *new_T,
                   const MVModel *pls_model, int num_components,
                   MVNewScoreCalcType method);
 
