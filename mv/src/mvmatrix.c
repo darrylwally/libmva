@@ -17,11 +17,6 @@
 #include <float.h>
 #include <assert.h>
 
-#ifdef WIN32
-#define MVISNAN_FUNC _isnan
-#else
-#define MVISNAN_FUNC isnan
-#endif
 
 MVMat * mvmat_alloc(int rows, int columns)
 {
@@ -761,6 +756,110 @@ double mvmat_vector_norm(const MVMat *A)
     return sqrt(norm);
 }
 
+int mvmat_colidx_mean(double *mean, const MVMat *A, int col_idx)
+{
+    int i, num_missing;
+    double output;
+    if (col_idx >= A->ncolumns || col_idx < 0)
+    {
+        return INCORRECT_DIMENSIONS;
+    }
+    num_missing = 0;
+    output = 0.0;
+    for (i=0; i<A->nrows; i++)
+    {
+        if (A->mask[i][col_idx]==DATA_MISSING)
+        {
+            num_missing++;
+        }
+        else
+        {
+            output += A->data[i][col_idx];
+        }
+    }
+    if (num_missing==A->nrows)
+    {
+        output = mv_NaN();
+    }
+    else
+    {
+        output = output / (A->nrows - num_missing);
+    }
+
+    *mean = output;
+    return SUCCESS;
+}
+
+int mvmat_colidx_stddev(double *stddev, const MVMat *A, int ddof, int col_idx)
+{
+    double output;
+    if (col_idx >= A->ncolumns || col_idx < 0)
+    {
+        return INDEX_OUT_OF_BOUNDS;
+    }
+
+    mvmat_colidx_var(&output, A, ddof, col_idx);
+
+    if (!MVISNAN_FUNC(output))
+    {
+        output = sqrt(output);
+    }
+
+    *stddev = output;
+
+    return SUCCESS;
+
+}
+
+int mvmat_colidx_var(double *var, const MVMat *A, int ddof, int col_idx)
+{
+    int i, num_missing, N;
+    double output, colmean, temp;
+    if (col_idx >= A->ncolumns || col_idx < 0)
+    {
+        return INDEX_OUT_OF_BOUNDS;
+    }
+
+    N = A->nrows - ddof;
+
+    mvmat_colidx_mean(&colmean, A, col_idx);
+    num_missing=0;
+
+    if ( MVISNAN_FUNC(colmean) )
+    {
+        output = mv_NaN();
+    }
+    else
+    {
+        output = 0.0;
+
+        for (i=0; i<A->nrows; i++)
+        {
+            if (A->mask[i][col_idx] == DATA_MISSING)
+            {
+                num_missing++;
+            }
+            else
+            {
+                temp = (A->data[i][col_idx] - colmean);
+                temp = temp * temp;
+                output += temp;
+            }
+        }
+        if ((N-num_missing) <= 0)
+        {
+            output = mv_NaN();
+        }
+        else
+        {
+            output = output / ((double)(N-num_missing));
+        }
+    }
+
+    *var = output;
+    return SUCCESS;
+}
+
 int mvmat_column_sum(MVMat *output, const MVMat *A)
 {
     int i,j, num_missing;
@@ -1048,6 +1147,234 @@ int mvmat_column_div(MVMat *output, const MVMat *A, const MVMat *columnValues)
             }
         }
     }
+    return SUCCESS;
+}
+
+
+int mvmat_column_func(MVMat *output, const MVMat *A, MVMAT_FUNC_PTR *funcs, void **opaques)
+{
+    int i,j;
+    if (!(output->nrows == A->nrows && output->ncolumns == A->ncolumns))
+    {
+        return INCORRECT_DIMENSIONS;
+    }
+
+    MVMAT_FUNC_PTR *func = funcs;
+    void **opaque = opaques;
+
+    double NaN = mv_NaN();
+    for (j = 0; j < output->ncolumns; j++)
+    {
+
+        for (i = 0; i < output->nrows; i++)
+        {
+            double result = NaN;
+            if (A->mask[i][j] == DATA_PRESENT)
+            {
+                result = A->data[i][j];
+                if ((*func) != NULL)
+                {
+                    result = (*func)(A->data[i][j], *opaque);
+                }
+            }
+
+            output->mask[i][j] = !(isnan(result));
+            output->data[i][j] = result;
+        }
+        func++;
+        opaque++;
+    }
+    return SUCCESS;
+}
+
+
+int mvmat_column_min(MVMat *output, const MVMat *A)
+{
+    if (!(output->nrows == 1 && output->ncolumns == A->ncolumns))
+    {
+        return INCORRECT_DIMENSIONS;
+    }
+    int i,j;
+    for (j = 0; j < A->ncolumns; j++)
+    {
+        int num_missing = 0;
+        double min = mv_inf();
+        for (i=0; i < A->nrows; i++)
+        {
+            if (A->mask[i][j] == DATA_PRESENT)
+            {
+                min = (A->data[i][j] < min) ? A->data[i][j] : min;
+            }
+            else
+            {
+                num_missing++;
+            }
+        }
+        if (num_missing == A->nrows)
+        {
+            output->data[0][j] = mv_NaN();
+            output->mask[0][j] = DATA_MISSING;
+        }
+        else
+        {
+            output->data[0][j] = min;
+            output->mask[0][j] = DATA_PRESENT;
+        }
+    }
+
+    return SUCCESS;
+}
+
+int mvmat_column_max(MVMat *output, const MVMat *A)
+{
+    if (!(output->nrows == 1 && output->ncolumns == A->ncolumns))
+    {
+        return INCORRECT_DIMENSIONS;
+    }
+
+    if (!(output->nrows == 1 && output->ncolumns == A->ncolumns))
+    {
+        return INCORRECT_DIMENSIONS;
+    }
+    int i,j;
+    for (j = 0; j < A->ncolumns; j++)
+    {
+        int num_missing = 0;
+        double max = mv_neg_inf();
+        for (i=0; i < A->nrows; i++)
+        {
+            if (A->mask[i][j] == DATA_PRESENT)
+            {
+                max = (A->data[i][j] > max) ? A->data[i][j] : max;
+            }
+            else
+            {
+                num_missing++;
+            }
+        }
+        if (num_missing == A->nrows)
+        {
+            output->data[0][j] = mv_NaN();
+            output->mask[0][j] = DATA_MISSING;
+        }
+        else
+        {
+            output->data[0][j] = max;
+            output->mask[0][j] = DATA_PRESENT;
+        }
+    }
+
+    return SUCCESS;
+}
+
+int mvmat_row_func(MVMat *output, const MVMat *A, MVMAT_FUNC_PTR *funcs, void *opaques)
+{
+    int i,j;
+    if (!(output->nrows == A->nrows && output->ncolumns == A->ncolumns))
+    {
+        return INCORRECT_DIMENSIONS;
+    }
+
+    MVMAT_FUNC_PTR *func = funcs;
+    void *opaque = opaques;
+
+    double NaN = mv_NaN();
+    for (i = 0; i < output->nrows; i++)
+    {
+        if ((*func) == NULL)
+        {
+            continue;
+        }
+        for (j = 0; j < output->ncolumns; j++)
+        {
+            double result = NaN;
+            if (A->mask[i][j] == DATA_PRESENT)
+            {
+                result = (*func)(A->data[i][j], opaque);
+            }
+
+            output->mask[i][j] = !(isnan(result));
+            output->data[i][j] = result;
+        }
+        func++;
+        opaque++;
+    }
+    return SUCCESS;
+}
+
+int mvmat_row_min(MVMat *output, const MVMat *A)
+{
+    if (!(output->nrows == A->nrows && output->ncolumns == 1))
+    {
+        return INCORRECT_DIMENSIONS;
+    }
+
+    int i,j;
+    for (i = 0; i < A->nrows; i++)
+    {
+        int num_missing = 0;
+        double min = mv_inf();
+        for (j = 0; j < A->ncolumns; i++)
+        {
+            if (A->mask[i][j] == DATA_PRESENT)
+            {
+                min = A->data[i][j] < min ? A->data[i][j] : min;
+            }
+            else
+            {
+                num_missing++;
+            }
+        }
+        if (num_missing == A->ncolumns)
+        {
+            output->data[0][j] = mv_NaN();
+            output->mask[0][j] = DATA_MISSING;
+        }
+        else
+        {
+            output->data[0][j] = min;
+            output->mask[0][j] = DATA_PRESENT;
+        }
+    }
+
+    return SUCCESS;
+}
+
+int mvmat_row_max(MVMat *output, const MVMat *A)
+{
+    if (!(output->nrows == A->nrows && output->ncolumns == 1))
+    {
+        return INCORRECT_DIMENSIONS;
+    }
+
+    int i,j;
+    for (i = 0; i < A->nrows; i++)
+    {
+        int num_missing = 0;
+        double max = mv_neg_inf();
+        for (j = 0; j < A->ncolumns; i++)
+        {
+            if (A->mask[i][j] == DATA_PRESENT)
+            {
+                max = A->data[i][j] < max ? A->data[i][j] : max;
+            }
+            else
+            {
+                num_missing++;
+            }
+        }
+        if (num_missing == A->ncolumns)
+        {
+            output->data[i][0] = mv_NaN();
+            output->mask[i][0] = DATA_MISSING;
+        }
+        else
+        {
+            output->data[i][0] = max;
+            output->mask[i][0] = DATA_PRESENT;
+        }
+    }
+
     return SUCCESS;
 }
 

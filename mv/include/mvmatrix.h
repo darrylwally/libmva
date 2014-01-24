@@ -51,6 +51,13 @@ typedef struct MVMat_s {
 
 } MVMat;
 
+/*! Generic typedef of function pointer that goes in mvmat_column_func,
+  or mvmat_row_func
+
+  \sa mvmat_column_func, mvmat_row_func
+  */
+typedef double (*MVMAT_FUNC_PTR)(double x, void *opaque);
+
 /*! Allocate an MVMat matrix structure.
 
   This structure can be freed with mvFreeMat;
@@ -448,6 +455,42 @@ int mvmat_elem_div(MVMat *output, const MVMat *A, const MVMat *B);
   */
 double mvmat_vector_norm(const MVMat * A);
 
+/*! Computes the mean of a single column
+  The mean of the column is returned.  The value is returned as NaN
+  appropriately.
+
+  \arg output The return value or NaN
+  \arg A the input matrix
+  \arg col_idx The index of the column to operate on
+  \return MVMatReturnCode
+ */
+int mvmat_colidx_mean(double *mean, const MVMat *A, int col_idx);
+/*! Computes the standard deviation of a single column
+
+  The variance of the column is returned.  The value is returned as NaN
+  appropriately.
+
+  \arg output The return value or NaN
+  \arg A the input matrix
+  \arg ddof N-ddof in the denominator.  Default should be zero or one.
+  \arg col_idx The index of the column to operate on
+  \return MVMatReturnCode
+  */
+int mvmat_colidx_stddev(double *stddev, const MVMat *A, int ddof, int col_idx);
+
+/*! Computes the variance of a single column
+
+  The variance of the column is returned.  The value is returned as NaN
+  appropriately.
+
+  \arg output The return value or NaN
+  \arg A the input matrix
+  \arg ddof N-ddof in the denominator.  Default should be zero or one.
+  \arg col_idx The index of the column to operate on
+  \return MVMatReturnCode
+  */
+int mvmat_colidx_var(double *var, const MVMat *A, int ddof, int col_idx);
+
 /*! Computes the sum of each column in a matrix.
   The sum of each column is computed and stored in output.
 
@@ -554,6 +597,105 @@ int mvmat_column_mult(MVMat *output, const MVMat *A, const MVMat *columnValues);
   \return 0 on success or a MVErrorCode.
   */
 int mvmat_column_div(MVMat *output, const MVMat *A, const MVMat *columnValues);
+
+
+/*! Applies the array of functions to the columns in A.
+
+  The functions will be applied in a column-wise fashion.
+
+  The functions are not responsible for handling incoming missing data (NaN)
+  but must be able to return a NaN value for an invalid result (e.g. log(-1)).
+  The function can take an opaque (void*) for custom parameters.
+
+  If a function pointer in the array of functions is NULL the column will be
+  ignored.
+
+  It is assumed that the array of functions will be of size K where the matrix
+  A is NxK.
+
+  \note This function can operate on A in-place by specifying the output
+  argument to be the same as A.
+  \arg output The output matrix
+  \arg A the intput matrix.
+  \arg funcs The array of function pointers of type ``int (*func)(double value, void *opaque)``
+  \arg opaques The array of opaque data.
+  \arg Returns MVReturnCode.
+  */
+int mvmat_column_func(MVMat *output, const MVMat *A, MVMAT_FUNC_PTR *funcs, void **opaques);
+
+
+/*! Computes the min of each column
+
+  If entire column is missing, then the value for that column will be NsN and
+  set to missing.
+
+  \arg output A MVMat of size 1xK
+  \arg A the input matrix of size NxK
+  \return MVReturnCode
+  */
+int mvmat_column_min(MVMat *output, const MVMat *A);
+
+
+/*! Computes the max of each column
+
+  If entire column is missing, then the value for that column will be NsN and
+  set to missing.
+
+  \arg output A MVMat of size 1xK
+  \arg A the input matrix of size NxK
+  \return MVReturnCode
+  */
+int mvmat_column_max(MVMat *output, const MVMat *A);
+
+
+/*! Applies the array of functions to the rows in A.
+
+  The functions will be applied in a row-wise fashion.
+
+  The functions are not responsible for handling incoming missing data (NaN)
+  but must be able to return a NaN value for an invalid result (e.g. log(-1)).
+  The function can take an opaque (void*) for custom parameters.
+
+  If a function pointer in the array of functions is NULL the column will be
+  ignored.
+
+  It is assumed that the array of functions will be of size N where the matrix
+  A is NxK.
+
+  \note This function can operate on A in-place by specifying the output
+  argument to be the same as A.
+  \arg output The output matrix
+  \arg A the intput matrix.
+  \arg funcs The array of function pointers of type ``double (*func)(double value, void *opaque)``
+  \arg opaques The array of opaque data.
+  \arg Returns MVReturnCode.
+  */
+int mvmat_row_func(MVMat *output, const MVMat *A, MVMAT_FUNC_PTR *funcs, void *opaques);
+
+
+/*! Computes the min of each row
+
+  If entire row is missing, then the value for that row will be NsN and
+  set to missing.
+
+  \arg output A MVMat of size Nx1
+  \arg A the input matrix of size NxK
+  \return MVReturnCode
+  */
+int mvmat_row_min(MVMat *output, const MVMat *A);
+
+
+/*! Computes the max of each row
+
+  If entire row is missing, then the value for that row will be NsN and
+  set to missing.
+
+  \arg output A MVMat of size Nx1
+  \arg A the input matrix of size NxK
+  \return MVReturnCode
+  */
+int mvmat_row_max(MVMat *output, const MVMat *A);
+
 
 /*! Returns the number of missing values in the matrix
   \arg mat The MVMat matrix.

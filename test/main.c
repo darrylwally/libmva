@@ -17,6 +17,7 @@
 #include <mvMatrix.h>
 #include <mvmodel.h>
 #include <mvstats.h>
+#include <mvpreprocess.h>
 
 #include "data.h"
 
@@ -42,6 +43,45 @@ size_t get_memory_usage()
     // nothin yet
 #endif
     return output;
+}
+
+/* Two test functions that square and log the data.  For use in mvmat_row_func
+  and mvmat_column_func */
+double square(double x, void *opaque)
+{
+    (void) opaque;
+    return x*x;
+}
+
+double log_missing(double x, void *opaque)
+{
+    (void) opaque;
+    if (x <= 0.0)
+    {
+        return mv_NaN();
+    }
+    return log(x);
+}
+
+void mvmat_dump(MVMat *A)
+{
+    int i,j;
+    for (i=0; i < A->nrows; i++)
+    {
+        if (i==0)
+        {
+            printf("[");
+        }
+        else
+        {
+            printf(" ");
+        }
+        for (j = 0; j < A->ncolumns; j++)
+        {
+            printf("%lf, ",A->data[i][j]);
+        }
+        printf("\n");
+    }
 }
 
 int main(int argc, char *argv[])
@@ -1015,6 +1055,119 @@ int main(int argc, char *argv[])
             }
         }
         mvmat_free(&X);
+    }
+
+    printf("\n**Testing mvmat_column_func**\n");
+    {
+        MVMAT_FUNC_PTR funcs[3] = {square, NULL, log_missing} ;
+        void *opaques[3] = {NULL, NULL, NULL};
+
+        printf("\nCol 1 func = square, Col 2 func = NULL, Col 3 func = log");
+
+        MVMat * A = mvmat_alloc(3,3);
+        mvmat_set_elem(A, 0, 0, 1.0);
+        mvmat_set_elem(A, 0, 1, -2.0);
+        mvmat_set_elem(A, 0, 2, 3.0);
+        mvmat_set_elem(A, 1, 0, -4.0);
+        mvmat_set_elem(A, 1, 1, 5.0);
+        mvmat_set_elem(A, 1, 2, -6.0);
+        mvmat_set_elem(A, 2, 0, 7.0);
+        mvmat_set_elem(A, 2, 1, -8.0);
+        mvmat_set_elem(A, 2, 2, 9.0);
+
+        printf("\nIncoming A:\n");
+        mvmat_dump(A);
+
+        mvmat_column_func(A, A, funcs, opaques);
+
+        printf("\nOutgoing A:\n");
+        mvmat_dump(A);
+
+        mvmat_free(&A);
+    }
+
+    printf("\n**Testing mvmat_row_func**\n");
+    {
+        MVMAT_FUNC_PTR funcs[3] = {square, NULL, log_missing} ;
+        void *opaques[3] = {NULL, NULL, NULL};
+
+        printf("\nRow 1 func = square, Row 2 func = NULL, Row 3 func = log");
+
+        MVMat * A = mvmat_alloc(3,3);
+        mvmat_set_elem(A, 0, 0, 1.0);
+        mvmat_set_elem(A, 0, 1, -2.0);
+        mvmat_set_elem(A, 0, 2, 3.0);
+        mvmat_set_elem(A, 1, 0, -4.0);
+        mvmat_set_elem(A, 1, 1, 5.0);
+        mvmat_set_elem(A, 1, 2, -6.0);
+        mvmat_set_elem(A, 2, 0, 7.0);
+        mvmat_set_elem(A, 2, 1, -8.0);
+        mvmat_set_elem(A, 2, 2, 9.0);
+
+        printf("\nIncoming A:\n");
+        mvmat_dump(A);
+
+        mvmat_column_func(A, A, funcs, opaques);
+
+        printf("\nOutgoing A:\n");
+        mvmat_dump(A);
+
+        mvmat_free(&A);
+    }
+
+    printf("\n**Testing preprocess do and undo **\n");
+    {
+        const double data [FOODS_DATA_ROWS][FOODS_DATA_COLUMNS]=FOODS_DATA;
+        MVMat * X = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVMat * X_pp = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVMat * X_unpp = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVMat * diff = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
+        MVPreprocessContext *prepro = mvpreprocess_alloc_init_mat(FOODS_DATA_COLUMNS);
+        MVPreprocessColumnInfo info;
+        info.t_coeffs.A = 1.0;
+        info.t_coeffs.B = 2.0;
+        info.t_coeffs.C = 1.1;
+        info.c = MV_CENTERING_MEAN;
+        info.s = MV_SCALING_UV;
+        info.multiplier = 1.0;
+        int i, j;
+        for (i=0; i<FOODS_DATA_ROWS; i++)
+        {
+            for (j=0; j<FOODS_DATA_COLUMNS; j++)
+            {
+
+                if (data[i][j]==FOODS_DATA_MASK)
+                    mvmat_set_elem(X, i,j, mv_NaN());
+                else
+                    mvmat_set_elem(X, i,j, data[i][j]);
+            }
+        }
+
+        // Set preprocess info for each column
+        for (j = 0; j < FOODS_DATA_COLUMNS; j++)
+        {
+            info.t = j % 5;
+            mvpreprocess_set_column(prepro, j, &info);
+        }
+
+        mvpreprocess_prep(prepro, X);
+        mvpreprocess_do(prepro, X_pp, X);
+        mvpreprocess_undo(prepro, X_unpp, X_pp);
+
+        mvmat_subtract(diff, X, X_unpp);
+
+        double diff_ss = mvmat_ss(diff);
+        double ss_X = mvmat_ss(X);
+        double ss_X_pp = mvmat_ss(X_pp);
+        printf("\nX_pp[0][0] = %lf", X_pp->data[0][0]);
+
+        printf("\n Diff result after preprocessing and undoing = %lf (%lf -> %lf)\n", diff_ss, ss_X, ss_X_pp);
+
+
+        mvmat_free(&X);
+        mvmat_free(&X_pp);
+        mvmat_free(&X_unpp);
+        mvpreprocess_free(&prepro);
     }
 
     printf("\n**Testing PCA**\n");
