@@ -76,6 +76,9 @@ static MVCrossValData * __alloc_cv_data(int num_rounds)
 
   E.g., in the NIPALS algorithm t = X p / p'p
 
+  Computed as per:
+  Grunge, B., & Manne, R. (1998). Missing values in principal component analysis.
+  Chemometrics and Intelligent Laboratory Systems, 42, 125-139.
   */
 static int __mvmodel_regress_col(MVMat *output, const MVMat *X, const MVMat *v)
 {
@@ -116,6 +119,9 @@ static int __mvmodel_regress_col(MVMat *output, const MVMat *X, const MVMat *v)
 
   E.g., in the NIPALS algorithm p = t' X / t't
 
+  Computed as per:
+  Grunge, B., & Manne, R. (1998). Missing values in principal component analysis.
+  Chemometrics and Intelligent Laboratory Systems, 42, 125-139.
   */
 static int __mvmodel_regress_row(MVMat *output, const MVMat *X, const MVMat *v)
 {
