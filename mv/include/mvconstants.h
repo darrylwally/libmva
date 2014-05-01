@@ -35,12 +35,13 @@ typedef enum MVReturnCode_enum {
     MV_WRONG_MODEL_TYPE = -6,
     MV_UNKNOWN_MODEL_TYPE = -7,
     MV_UNKOWN_CROSSVALIDATION_TYPE = -8,
+    MV_FILE_WRITE_ERROR = -9,
     MV_SUCCESS = 0,
     MV_CROSSVAL_RULE1 = 1,
     MV_CROSSVAL_RULE2 = 2,
     MV_CROSSVAL_RULE3 = 3,
     MV_CROSSVAL_RULE4 = 4
-} MVReturnCode;
+ MVReturnCode;
 
 #ifdef WIN32
 #include <float.h>
