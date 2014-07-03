@@ -1074,12 +1074,13 @@ int main(int argc, char *argv[])
 
     printf("\n**Testing mvmat_column_func**\n");
     {
+        MVMat * A;
         MVMAT_FUNC_PTR funcs[3] = {square, NULL, log_missing} ;
         void *opaques[3] = {NULL, NULL, NULL};
 
         printf("\nCol 1 func = square, Col 2 func = NULL, Col 3 func = log");
 
-        MVMat * A = mvmat_alloc(3,3);
+        A = mvmat_alloc(3,3);
         mvmat_set_elem(A, 0, 0, 1.0);
         mvmat_set_elem(A, 0, 1, -2.0);
         mvmat_set_elem(A, 0, 2, 3.0);
@@ -1103,12 +1104,13 @@ int main(int argc, char *argv[])
 
     printf("\n**Testing mvmat_row_func**\n");
     {
+        MVMat * A;
         MVMAT_FUNC_PTR funcs[3] = {square, NULL, log_missing} ;
         void *opaques[3] = {NULL, NULL, NULL};
 
         printf("\nRow 1 func = square, Row 2 func = NULL, Row 3 func = log");
 
-        MVMat * A = mvmat_alloc(3,3);
+        A = mvmat_alloc(3,3);
         mvmat_set_elem(A, 0, 0, 1.0);
         mvmat_set_elem(A, 0, 1, -2.0);
         mvmat_set_elem(A, 0, 2, 3.0);
@@ -1132,6 +1134,10 @@ int main(int argc, char *argv[])
 
     printf("\n**Testing preprocess do and undo **\n");
     {
+        int i, j;
+        double diff_ss;
+        double ss_X;
+        double ss_X_pp;
         const double data [FOODS_DATA_ROWS][FOODS_DATA_COLUMNS]=FOODS_DATA;
         MVMat * X = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
         MVMat * X_pp = mvmat_alloc(FOODS_DATA_ROWS, FOODS_DATA_COLUMNS);
@@ -1145,7 +1151,6 @@ int main(int argc, char *argv[])
         info.c = MV_CENTERING_MEAN;
         info.s = MV_SCALING_UV;
         info.multiplier = 1.0;
-        int i, j;
         for (i=0; i<FOODS_DATA_ROWS; i++)
         {
             for (j=0; j<FOODS_DATA_COLUMNS; j++)
@@ -1171,9 +1176,9 @@ int main(int argc, char *argv[])
 
         mvmat_subtract(diff, X, X_unpp);
 
-        double diff_ss = mvmat_ss(diff);
-        double ss_X = mvmat_ss(X);
-        double ss_X_pp = mvmat_ss(X_pp);
+        diff_ss = mvmat_ss(diff);
+        ss_X = mvmat_ss(X);
+        ss_X_pp = mvmat_ss(X_pp);
         printf("\nX_pp[0][0] = %lf", X_pp->data[0][0]);
 
         printf("\n Diff result after preprocessing and undoing = %lf (%lf -> %lf)\n", diff_ss, ss_X, ss_X_pp);
@@ -1197,6 +1202,7 @@ int main(int argc, char *argv[])
         MVMat *HT2 = mvmat_allocz(X->nrows, 1);
         MVMat *SPE = mvmat_allocz(X->nrows, 1);
         MVModel *pca_model;
+        int comp = 2;
         int i, j;
         for (i=0; i<FOODS_DATA_ROWS; i++)
         {
@@ -1261,7 +1267,6 @@ int main(int argc, char *argv[])
             printf("\nHT2[%d] = %1.8lf", i+1, HT2->data[i][0]);
         }
 
-        int comp = 2;
         mvstats_spex_from_obs(SPE, pca_model, X_mcuv, pca_model->t, comp);
         printf("\nSPE Limits for Foods at A=%d. 0.95 = %1.8lf, 0.99 = %1.8lf",
                comp, mvstats_spe_limit(0.95, pca_model->SPEX, comp), mvstats_spe_limit(0.99, pca_model->SPEX, comp));
