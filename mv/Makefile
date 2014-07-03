@@ -43,7 +43,8 @@ SOURCES       = cephes/cmath/const.c \
                 src/mvmodel.c \
                 src/mvmatrix.c \
                 src/mvconstants.c \
-                src/mvpreprocess.c
+                src/mvpreprocess.c \
+                src/mvfile.c
 
 OBJECTS       = const.o \
                 isnan.o \
@@ -65,7 +66,8 @@ OBJECTS       = const.o \
                 mvmodel.o \
                 mvmatrix.o \
                 mvconstants.o \
-                mvpreprocess.o
+                mvpreprocess.o \
+                mvfile.o
 
 TARGET        = libmva.a
 DEBUG_TARGET  = libmvad.a
@@ -162,6 +164,9 @@ mvpreprocess.o: src/mvpreprocess.c
 
 mvmatrix.o: src/mvmatrix.c
 	$(CC) -c $(CFLAGS) $(INCPATH) -o mvmatrix.o src/mvmatrix.c
+
+mvfile.o: src/mvmatrix.c
+	$(CC) -c $(CFLAGS) $(INCPATH) -o mvfile.o src/mvfile.c
 
 ##### Clean
 clean: compiler_clean
