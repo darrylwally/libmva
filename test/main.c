@@ -162,8 +162,8 @@ int main(int argc, char *argv[])
     printf("\n**Testing setting out of bounds**\n");
     {
         matrix1 = mvmat_alloc(2,3);
-        assert(mvmat_set_elem(matrix1,3,0, M_PI)==INDEX_OUT_OF_BOUNDS);
-        assert(mvmat_set_elem(matrix1,0,4, M_E)==INDEX_OUT_OF_BOUNDS);
+        assert(mvmat_set_elem(matrix1,3,0, M_PI)==MV_INDEX_OUT_OF_BOUNDS);
+        assert(mvmat_set_elem(matrix1,0,4, M_E)==MV_INDEX_OUT_OF_BOUNDS);
         mvmat_free(&matrix1);
     }
 
@@ -171,8 +171,8 @@ int main(int argc, char *argv[])
     {
         double val;
         matrix1 = mvmat_alloc(4,5);
-        assert(mvmat_get_elem(matrix1,&val, 0,6)==INDEX_OUT_OF_BOUNDS);
-        assert(mvmat_get_elem(matrix1,&val,5,0)==INDEX_OUT_OF_BOUNDS);
+        assert(mvmat_get_elem(matrix1,&val, 0,6)==MV_INDEX_OUT_OF_BOUNDS);
+        assert(mvmat_get_elem(matrix1,&val,5,0)==MV_INDEX_OUT_OF_BOUNDS);
         mvmat_free(&matrix1);
 
     }
@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
         matrix1 = mvmat_alloc_setval(2,3, M_PI);
         matrix2 = mvmat_alloc_setval(2,4, M_E);
         matrix3 = mvmat_alloc(4,3);
-        assert(mvmat_concat_rows(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_concat_rows(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
         mvmat_free(&matrix1);
         mvmat_free(&matrix2);
         mvmat_free(&matrix3);
@@ -208,7 +208,7 @@ int main(int argc, char *argv[])
         matrix1 = mvmat_alloc_setval(2,3, M_PI);
         matrix2 = mvmat_alloc_setval(2,3, M_E);
         matrix3 = mvmat_alloc(4,3);
-        assert(mvmat_concat_rows(matrix3, matrix1, matrix2)==SUCCESS);
+        assert(mvmat_concat_rows(matrix3, matrix1, matrix2)==MV_SUCCESS);
         for (i=0; i<2; i++)
         {
             for (j=0; j<4; j++)
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
         matrix1 = mvmat_alloc_setval(2,3, M_PI);
         matrix2 = mvmat_alloc_setval(3,4, M_E);
         matrix3 = mvmat_alloc(2,7);
-        assert(mvmat_concat_columns(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_concat_columns(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
         mvmat_free(&matrix1);
         mvmat_free(&matrix2);
         mvmat_free(&matrix3);
@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
         matrix1 = mvmat_alloc_setval(2,3, M_PI);
         matrix2 = mvmat_alloc_setval(2,4, M_E);
         matrix3 = mvmat_alloc(2,7);
-        assert(mvmat_concat_columns(matrix3, matrix1, matrix2)==SUCCESS);
+        assert(mvmat_concat_columns(matrix3, matrix1, matrix2)==MV_SUCCESS);
         for (i=0; i<2; i++)
         {
             for (j=0; j<3; j++)
@@ -278,11 +278,11 @@ int main(int argc, char *argv[])
         matrix1 = mvmat_alloc_setval(2, 4, M_PI);
         matrix2 = mvmat_alloc(4,3);
 
-        assert(mvmat_transpose(matrix2, matrix1)==INCORRECT_DIMENSIONS);
+        assert(mvmat_transpose(matrix2, matrix1)==MV_INCORRECT_DIMENSIONS);
 
         mvmat_free(&matrix2);
         matrix2 = mvmat_alloc(3,2);
-        assert(mvmat_transpose(matrix2, matrix1)==INCORRECT_DIMENSIONS);
+        assert(mvmat_transpose(matrix2, matrix1)==MV_INCORRECT_DIMENSIONS);
         mvmat_free(&matrix2);
         mvmat_free(&matrix1);
     }
@@ -296,7 +296,7 @@ int main(int argc, char *argv[])
             mvmat_set_elem(matrix1, 0, j, M_E);
         }
         matrix2 = mvmat_alloc(4,2);
-        assert(mvmat_transpose(matrix2, matrix1)==SUCCESS);
+        assert(mvmat_transpose(matrix2, matrix1)==MV_SUCCESS);
         for (i=0; i<4; i++)
         {
             for (j=0; j<2; j++)
@@ -324,16 +324,16 @@ int main(int argc, char *argv[])
         matrix2 = mvmat_alloc_setval(2, 5, 1.0);
         matrix3 = mvmat_alloc(2,4);
 
-        assert(mvmat_add(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_add(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
 
         mvmat_free(&matrix2);
         matrix2 = mvmat_alloc(3,4);
 
-        assert(mvmat_add(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_add(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
 
         mvmat_free(&matrix3);
         matrix3 = mvmat_alloc(3,4);
-        assert(mvmat_add(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_add(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
         mvmat_free(&matrix2);
         mvmat_free(&matrix1);
         mvmat_free(&matrix3);
@@ -346,7 +346,7 @@ int main(int argc, char *argv[])
         matrix2 = mvmat_alloc_setval(2, 4, 1.0);
         matrix3 = mvmat_alloc(2,4);
 
-        assert(mvmat_add(matrix3, matrix1, matrix2)==SUCCESS);
+        assert(mvmat_add(matrix3, matrix1, matrix2)==MV_SUCCESS);
 
         for(i=0; i<2; i++)
         {
@@ -365,16 +365,16 @@ int main(int argc, char *argv[])
         matrix2 = mvmat_alloc_setval(2, 5, 1.0);
         matrix3 = mvmat_alloc(2,4);
 
-        assert(mvmat_subtract(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_subtract(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
 
         mvmat_free(&matrix2);
         matrix2 = mvmat_alloc(3,4);
 
-        assert(mvmat_subtract(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_subtract(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
 
         mvmat_free(&matrix3);
         matrix3 = mvmat_alloc(3,4);
-        assert(mvmat_subtract(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_subtract(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
         mvmat_free(&matrix2);
         mvmat_free(&matrix1);
         mvmat_free(&matrix3);
@@ -387,7 +387,7 @@ int main(int argc, char *argv[])
         matrix2 = mvmat_alloc_setval(2, 4, 1.0);
         matrix3 = mvmat_alloc(2,4);
 
-        assert(mvmat_subtract(matrix3, matrix1, matrix2)==SUCCESS);
+        assert(mvmat_subtract(matrix3, matrix1, matrix2)==MV_SUCCESS);
 
         for(i=0; i<2; i++)
         {
@@ -405,10 +405,10 @@ int main(int argc, char *argv[])
         matrix1 = mvmat_alloc_setval(2, 4, M_PI);
         matrix2 = mvmat_alloc(2,3);
 
-        assert(mvmat_add_scalar(matrix2, matrix1, 1.0)==INCORRECT_DIMENSIONS);
+        assert(mvmat_add_scalar(matrix2, matrix1, 1.0)==MV_INCORRECT_DIMENSIONS);
         mvmat_free(&matrix2);
         matrix2 = mvmat_alloc(3,4);
-        assert(mvmat_add_scalar(matrix2, matrix1, 1.0)==INCORRECT_DIMENSIONS);
+        assert(mvmat_add_scalar(matrix2, matrix1, 1.0)==MV_INCORRECT_DIMENSIONS);
         mvmat_free(&matrix2);
         mvmat_free(&matrix1);
     }
@@ -419,7 +419,7 @@ int main(int argc, char *argv[])
         matrix1 = mvmat_alloc_setval(2, 4, M_PI);
         matrix2 = mvmat_alloc(2,4);
 
-        assert(mvmat_add_scalar(matrix2, matrix1, -1.0)==SUCCESS);
+        assert(mvmat_add_scalar(matrix2, matrix1, -1.0)==MV_SUCCESS);
 
         for(i=0; i<2; i++)
         {
@@ -440,14 +440,14 @@ int main(int argc, char *argv[])
         matrix2 = mvmat_alloc_setval(3, 3, 2.0);
         matrix3 = mvmat_alloc(2,3);
 
-        assert(mvmat_mult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_mult(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
 
         mvmat_free(&matrix2);
         matrix2 = mvmat_alloc_setval(4,3, 2.0);
         mvmat_free(&matrix3);
         matrix3 = mvmat_alloc(2,4);
 
-        assert(mvmat_mult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_mult(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
 
         mvmat_free(&matrix2);
         mvmat_free(&matrix1);
@@ -460,7 +460,7 @@ int main(int argc, char *argv[])
         matrix2 = mvmat_alloc_setval(3, 1, 2.0);
         matrix3 = mvmat_alloc(3,1);
 
-        assert(mvmat_mult(matrix3, matrix1, matrix2)==SUCCESS);
+        assert(mvmat_mult(matrix3, matrix1, matrix2)==MV_SUCCESS);
 
         for (i=0; i<3; i++)
         {
@@ -474,10 +474,10 @@ int main(int argc, char *argv[])
         matrix1 = mvmat_alloc_setval(2, 4, M_PI);
         matrix2 = mvmat_alloc(2,3);
 
-        assert(mvmat_mult_scalar(matrix2, matrix1, 2.0)==INCORRECT_DIMENSIONS);
+        assert(mvmat_mult_scalar(matrix2, matrix1, 2.0)==MV_INCORRECT_DIMENSIONS);
         mvmat_free(&matrix2);
         matrix2 = mvmat_alloc(3,4);
-        assert(mvmat_mult_scalar(matrix2, matrix1, 2.0)==INCORRECT_DIMENSIONS);
+        assert(mvmat_mult_scalar(matrix2, matrix1, 2.0)==MV_INCORRECT_DIMENSIONS);
         mvmat_free(&matrix2);
         mvmat_free(&matrix1);
     }
@@ -488,7 +488,7 @@ int main(int argc, char *argv[])
         matrix1 = mvmat_alloc_setval(2, 4, M_PI);
         matrix2 = mvmat_alloc(2,4);
 
-        assert(mvmat_mult_scalar(matrix2, matrix1, 2.0)==SUCCESS);
+        assert(mvmat_mult_scalar(matrix2, matrix1, 2.0)==MV_SUCCESS);
 
         for(i=0; i<2; i++)
         {
@@ -509,16 +509,16 @@ int main(int argc, char *argv[])
         matrix2 = mvmat_alloc_setval(2, 5, 1.0);
         matrix3 = mvmat_alloc(2,4);
 
-        assert(mvmat_elem_mult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_elem_mult(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
 
         mvmat_free(&matrix2);
         matrix2 = mvmat_alloc(3,4);
 
-        assert(mvmat_elem_mult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_elem_mult(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
 
         mvmat_free(&matrix3);
         matrix3 = mvmat_alloc(3,4);
-        assert(mvmat_elem_mult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_elem_mult(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
         mvmat_free(&matrix2);
         mvmat_free(&matrix1);
         mvmat_free(&matrix3);
@@ -531,7 +531,7 @@ int main(int argc, char *argv[])
         matrix2 = mvmat_alloc_setval(2, 4, 2.0);
         matrix3 = mvmat_alloc(2,4);
 
-        assert(mvmat_elem_mult(matrix3, matrix1, matrix2)==SUCCESS);
+        assert(mvmat_elem_mult(matrix3, matrix1, matrix2)==MV_SUCCESS);
 
         for(i=0; i<2; i++)
         {
@@ -550,16 +550,16 @@ int main(int argc, char *argv[])
         matrix2 = mvmat_alloc_setval(2, 5, 1.0);
         matrix3 = mvmat_alloc(2,4);
 
-        assert(mvmat_elem_div(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_elem_div(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
 
         mvmat_free(&matrix2);
         matrix2 = mvmat_alloc(3,4);
 
-        assert(mvmat_elem_div(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_elem_div(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
 
         mvmat_free(&matrix3);
         matrix3 = mvmat_alloc(3,4);
-        assert(mvmat_elem_div(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_elem_div(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
         mvmat_free(&matrix2);
         mvmat_free(&matrix1);
         mvmat_free(&matrix3);
@@ -572,7 +572,7 @@ int main(int argc, char *argv[])
         matrix2 = mvmat_alloc_setval(2, 4, 2.0);
         matrix3 = mvmat_alloc(2,4);
 
-        assert(mvmat_elem_div(matrix3, matrix1, matrix2)==SUCCESS);
+        assert(mvmat_elem_div(matrix3, matrix1, matrix2)==MV_SUCCESS);
 
         for(i=0; i<2; i++)
         {
@@ -584,7 +584,7 @@ int main(int argc, char *argv[])
             }
         }
         mvmat_set(matrix2, 0.0);
-        assert(mvmat_elem_div(matrix3,matrix1, matrix2)==SUCCESS);
+        assert(mvmat_elem_div(matrix3,matrix1, matrix2)==MV_SUCCESS);
         for(i=0; i<2; i++)
         {
             for (j=0; j<4; j++)
@@ -672,11 +672,11 @@ int main(int argc, char *argv[])
         mvmat_set_elem(matrix1, 2, 3, mv_NaN());
 
         matrix2=mvmat_alloc(1,5);
-        assert(mvmat_column_mean(matrix2, matrix1)==INCORRECT_DIMENSIONS);
+        assert(mvmat_column_mean(matrix2, matrix1)==MV_INCORRECT_DIMENSIONS);
         mvmat_free(&matrix2);
         matrix2=mvmat_alloc(1,4);
 
-        assert(mvmat_column_mean(matrix2, matrix1)==SUCCESS);
+        assert(mvmat_column_mean(matrix2, matrix1)==MV_SUCCESS);
         for (j=0; j<4; j++)
         {
             double val1, val2;
@@ -722,11 +722,11 @@ int main(int argc, char *argv[])
         mvmat_set_elem(matrix1, 2, 3, mv_NaN());
 
         matrix2=mvmat_alloc(1,5);
-        assert(mvmat_column_var(matrix2, matrix1, 0)==INCORRECT_DIMENSIONS);
+        assert(mvmat_column_var(matrix2, matrix1, 0)==MV_INCORRECT_DIMENSIONS);
         mvmat_free(&matrix2);
         matrix2=mvmat_alloc(1,4);
 
-        assert(mvmat_column_var(matrix2, matrix1, 0)==SUCCESS);
+        assert(mvmat_column_var(matrix2, matrix1, 0)==MV_SUCCESS);
         for (j=0; j<4; j++)
         {
             double val1, val2;
@@ -760,13 +760,13 @@ int main(int argc, char *argv[])
                 mvmat_set_elem(matrix1,i,j,(double)(i+1));
             }
         }
-        assert(mvmat_column_add(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_column_add(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
 
         mvmat_free(&matrix2);
         matrix2 = mvmat_alloc(1,2);
         mvmat_set_elem(matrix2, 0, 0, 2.0);
         mvmat_set_elem(matrix2, 0, 1, 4.0);
-        assert(mvmat_column_add(matrix3, matrix1, matrix2)==SUCCESS);
+        assert(mvmat_column_add(matrix3, matrix1, matrix2)==MV_SUCCESS);
 
         for (i=0; i<4; i++)
         {
@@ -796,13 +796,13 @@ int main(int argc, char *argv[])
                 mvmat_set_elem(matrix1,i,j,(double)(i+1));
             }
         }
-        assert(mvmat_column_subtract(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_column_subtract(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
 
         mvmat_free(&matrix2);
         matrix2 = mvmat_alloc(1,2);
         mvmat_set_elem(matrix2, 0, 0, 2.0);
         mvmat_set_elem(matrix2, 0, 1, 4.0);
-        assert(mvmat_column_subtract(matrix3, matrix1, matrix2)==SUCCESS);
+        assert(mvmat_column_subtract(matrix3, matrix1, matrix2)==MV_SUCCESS);
 
         for (i=0; i<4; i++)
         {
@@ -832,13 +832,13 @@ int main(int argc, char *argv[])
                 mvmat_set_elem(matrix1,i,j,(double)(i+1));
             }
         }
-        assert(mvmat_column_mult(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_column_mult(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
 
         mvmat_free(&matrix2);
         matrix2 = mvmat_alloc(1,2);
         mvmat_set_elem(matrix2, 0, 0, 2.0);
         mvmat_set_elem(matrix2, 0, 1, 4.0);
-        assert(mvmat_column_mult(matrix3, matrix1, matrix2)==SUCCESS);
+        assert(mvmat_column_mult(matrix3, matrix1, matrix2)==MV_SUCCESS);
 
         for (i=0; i<4; i++)
         {
@@ -867,13 +867,13 @@ int main(int argc, char *argv[])
                 mvmat_set_elem(matrix1,i,j,(double)(i+1));
             }
         }
-        assert(mvmat_column_div(matrix3, matrix1, matrix2)==INCORRECT_DIMENSIONS);
+        assert(mvmat_column_div(matrix3, matrix1, matrix2)==MV_INCORRECT_DIMENSIONS);
 
         mvmat_free(&matrix2);
         matrix2 = mvmat_alloc(1,2);
         mvmat_set_elem(matrix2, 0, 0, 2.0);
         mvmat_set_elem(matrix2, 0, 1, 0.0);
-        assert(mvmat_column_div(matrix3, matrix1, matrix2)==SUCCESS);
+        assert(mvmat_column_div(matrix3, matrix1, matrix2)==MV_SUCCESS);
 
         for (i=0; i<4; i++)
         {
