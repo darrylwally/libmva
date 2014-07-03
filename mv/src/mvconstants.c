@@ -14,8 +14,8 @@
 
 const double MV_EPS = 2.2204460492503131e-016;
 const double MV_SQRT_EPS = 1.4901161193847656e-08;
-const float MV_EPS_F = 1.192092896e-07;
-const float MV_SQRT_EPS_F = 3.452669831e-04;
+const float MV_EPS_F = 1.192092896e-07f;
+const float MV_SQRT_EPS_F = 3.452669831e-04f;
 
 static const long long __mv_nan = 0x7ff8000000000000;
 static const int __mv_nanf = 0x7fc00000;

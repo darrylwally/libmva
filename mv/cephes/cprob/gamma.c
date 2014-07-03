@@ -360,7 +360,7 @@ gamnan:
 			goto goverf;
 #endif
 			}
-		i = p;
+        i = (int)p;
 		if( (i & 1) == 0 )
 			sgngam = -1;
 		z = q - p;
@@ -606,7 +606,7 @@ lgsing:
 		goto loverf;
 #endif
 		}
-	i = p;
+    i = (int)p;
 	if( (i & 1) == 0 )
 		sgngam = -1;
 	else

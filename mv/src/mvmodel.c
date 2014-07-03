@@ -1497,11 +1497,11 @@ int mvmodel_autofit(MVModel *model)
     model->A = 0;
     while (component_is_valid)
     {
+        double iter = 0.0;
+        double Q2 = 0.0;
         component_is_valid = 0;
         mvmodel_add_component(model);
-        double iter = 0.0;
-        mvmat_get_elem(model->iter, &iter, model->A-1, 0);
-        double Q2 = 0.0;
+        mvmat_get_elem(model->iter, &iter, model->A-1, 0);      
         mvmat_get_elem(model->Q2, &Q2, model->A-1, 0);
         /* Rule 3 */
         if (model->A > MIN(model->X->nrows, model->X->ncolumns))
@@ -1563,9 +1563,10 @@ int mvmodel_autofit(MVModel *model)
 static int __mv_compute_pred(MVMat *pred, const MVMat *scores, const MVMat *weights, int num_components)
 {
     // todo: error checking
+    MVReturnCode ret;
+    MVMat _weightsT, _scores;
     MVMat *weightsT = mvmat_alloc(weights->ncolumns, weights->nrows);
     mvmat_transpose(weightsT, weights);
-    MVMat _weightsT, _scores;
     _weightsT.nrows = num_components;
     _weightsT.ncolumns = weightsT->ncolumns;
     _weightsT.data = weightsT->data;
@@ -1578,7 +1579,7 @@ static int __mv_compute_pred(MVMat *pred, const MVMat *scores, const MVMat *weig
     _scores.mask = scores->mask;
     _scores.isReference = 1;
 
-    MVReturnCode ret = mvmat_mult(pred, &_scores, &_weightsT);
+    ret = mvmat_mult(pred, &_scores, &_weightsT);
 
     mvmat_free(&weightsT);
     return ret;

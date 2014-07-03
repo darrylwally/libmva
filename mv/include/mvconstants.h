@@ -39,6 +39,7 @@ typedef enum MVReturnCode_enum {
 } MVReturnCode;
 
 #ifdef WIN32
+#include <float.h>
 #define MVISNAN_FUNC _isnan
 #else
 #define MVISNAN_FUNC isnan
