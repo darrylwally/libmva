@@ -27,14 +27,14 @@ double mvstats_t_ppf(double alpha, double df, double loc, double scale)
 {
     // unused variables:
     (void)loc; (void) scale;
-    return stdtri(df, alpha);
+    return stdtri((int)df, alpha);
 }
 
 double mvstats_F_ppf(double alpha, double N1, double N2, double loc, double scale)
 {
     // unused variables:
     (void)loc; (void) scale;
-    return fdtri(N1, N2, alpha);
+    return fdtri((int)N1, (int)N2, alpha);
 }
 
 double mvstats_chi2_ppf(double alpha, double df, double loc, double scale)

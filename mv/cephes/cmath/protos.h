@@ -41,7 +41,9 @@ extern void cmul ( cmplx *a, cmplx *b, cmplx *c );
 extern void cdiv ( cmplx *a, cmplx *b, cmplx *c );
 extern void cmov ( void *a, void *b );
 extern void cneg ( cmplx *a );
+#ifndef WIN32
 extern double cabs ( cmplx *z );
+#endif
 extern void csqrt ( cmplx *z, cmplx *w );
 extern double hypot ( double, double );
 extern double cosh ( double );
@@ -61,11 +63,13 @@ extern double fdtrc ( int ia, int ib, double x );
 extern double fdtr ( int ia, int ib, double x );
 extern double fdtri ( int ia, int ib, double y );
 extern int fftr ( double x[], int m0, double sine[] );
+#ifndef WIN32
 extern double ceil ( double x );
 extern double fabs ( double );
 extern double floor ( double );
 extern double frexp ( double, int * );
 extern double ldexp ( double, int );
+#endif
 extern int signbit ( double );
 extern int isnan ( double );
 extern int isfinite ( double );
@@ -95,11 +99,13 @@ extern double igami ( double, double );
 extern double incbet ( double, double, double );
 extern double incbi ( double, double, double );
 extern double iv ( double v, double x );
+#ifndef WIN32
 extern double j0 ( double );
 extern double y0 ( double );
 extern double j1 ( double );
 extern double y1 ( double );
 extern double jn ( int n, double x );
+#endif
 extern double jv ( double, double );
 extern double k0 ( double x );
 extern double k0e ( double x );
@@ -160,7 +166,9 @@ extern double tanh ( double );
 extern double log1p ( double );
 extern double exmp1 ( double );
 extern double cosm1 ( double x );
+#ifndef WIN32
 extern double yn ( int, double );
+#endif
 extern double zeta ( double x, double q );
 extern double zetac ( double );
 extern int drand ( double *a );
