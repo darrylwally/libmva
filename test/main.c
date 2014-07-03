@@ -14,7 +14,7 @@
 #endif
 
 #include <mvconstants.h>
-#include <mvMatrix.h>
+#include <mvmatrix.h>
 #include <mvmodel.h>
 #include <mvstats.h>
 #include <mvpreprocess.h>
