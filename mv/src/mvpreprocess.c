@@ -55,14 +55,14 @@ int mvpreprocess_init_mat(MVPreprocessContext *ctx, int ncolumns)
     int size;
     if (!ctx)
     {
-        return ERROR;
+        return MV_ERROR;
     }
     size = ncolumns * sizeof(MVPreprocessColumnInfo);
     ctx->preprocess_info = (MVPreprocessColumnInfo *) malloc(size);
     memset(ctx->preprocess_info, 0, size);
     ctx->centering = mvmat_alloc(1, ncolumns);
     ctx->scaling = mvmat_alloc(1, ncolumns);
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvpreprocess_init_mcuv(MVPreprocessContext *ctx, MVMat *matrix)
@@ -75,7 +75,7 @@ int mvpreprocess_init_mcuv(MVPreprocessContext *ctx, MVMat *matrix)
                             1.0, NULL, NULL};
     if (!ctx)
     {
-        return ERROR;
+        return MV_ERROR;
     }
     mvpreprocess_init_mat(ctx, matrix->ncolumns);
     mvmat_column_mean(ctx->centering, matrix);
@@ -87,7 +87,7 @@ int mvpreprocess_init_mcuv(MVPreprocessContext *ctx, MVMat *matrix)
         ctx->preprocess_info[i] = s;
     }
 
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvpreprocess_free(MVPreprocessContext **ctx)
@@ -101,10 +101,10 @@ int mvpreprocess_free(MVPreprocessContext **ctx)
             mvmat_free(&c->scaling);
             free(c->preprocess_info);
             *ctx = NULL;
-            return SUCCESS;
+            return MV_SUCCESS;
         }
     }
-    return ATTEMPT_TO_FREE_NULL_MATRIX;
+    return MV_ATTEMPT_TO_FREE_NULL_MATRIX;
 }
 
 int mvpreprocess_set_column(MVPreprocessContext *ctx, int column,
@@ -137,14 +137,14 @@ int mvpreprocess_set_column(MVPreprocessContext *ctx, int column,
         break;
     }
 
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvpreprocess_get_column(MVPreprocessContext *ctx,
                             MVPreprocessColumnInfo *col_info_out, int column)
 {
     *col_info_out = ctx->preprocess_info[column];
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvpreprocess_prep(MVPreprocessContext *ctx, MVMat *matrix)
@@ -156,7 +156,7 @@ int mvpreprocess_prep(MVPreprocessContext *ctx, MVMat *matrix)
     (void) ctx; (void) matrix;
     if (ctx->centering->ncolumns != matrix->ncolumns)
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     tmp = mvmat_alloc(matrix->nrows, matrix->ncolumns);
@@ -216,12 +216,12 @@ int mvpreprocess_prep(MVPreprocessContext *ctx, MVMat *matrix)
     free(funcs);
     free(opaques);
     mvmat_free(&tmp);
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvpreprocess_do(MVPreprocessContext *ctx, MVMat *preprocessed_out, MVMat *raw_in)
 {
-    int ret = SUCCESS;
+    int ret = MV_SUCCESS;
     int j;
     MVMAT_FUNC_PTR * funcs;
     MVPreprocessCoeffs **opaques;
@@ -229,7 +229,7 @@ int mvpreprocess_do(MVPreprocessContext *ctx, MVMat *preprocessed_out, MVMat *ra
             preprocessed_out->nrows == raw_in->nrows &&
             ctx->centering->ncolumns == preprocessed_out->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     funcs = (MVMAT_FUNC_PTR *)malloc(raw_in->ncolumns * sizeof(MVMAT_FUNC_PTR));
@@ -264,7 +264,7 @@ int mvpreprocess_do(MVPreprocessContext *ctx, MVMat *preprocessed_out, MVMat *ra
 
 int mvpreprocess_undo(MVPreprocessContext *ctx, MVMat *raw_out, MVMat *preprocessed_in)
 {
-    int ret = SUCCESS;
+    int ret = MV_SUCCESS;
     int j;
     MVMAT_FUNC_PTR * funcs;
     MVPreprocessCoeffs **opaques;
@@ -272,7 +272,7 @@ int mvpreprocess_undo(MVPreprocessContext *ctx, MVMat *raw_out, MVMat *preproces
             raw_out->nrows == preprocessed_in->nrows &&
             ctx->centering->ncolumns == raw_out->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     /* Undo scaling */
