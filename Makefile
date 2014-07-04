@@ -3,13 +3,21 @@
 
 all: libmv test
 
-.PHONY: libmv test
+.PHONY: libmv test libmv_debug test_debug
+
+debug: libmv_debug test_debug
 
 libmv:
 	@cd mv && $(MAKE)
 
 test:
 	@cd test && $(MAKE)
+
+libmv_debug:
+	@cd mv && $(MAKE) debug
+
+test_debug:
+	@cd test && $(MAKE) debug
 
 clean: libmv_clean test_clean
 

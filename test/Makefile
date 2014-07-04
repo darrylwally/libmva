@@ -5,7 +5,7 @@
 AR            = ar cq
 RANLIB        = ranlib -s
 CC            = clang
-CLFAGS        = -pipe -g -gdwarf-2 -fPIC -arch x86_64 -Wall
+CLFAGS        = -pipe -gdwarf-2 -fPIC -arch x86_64 -Wall
 INCPATH       = -I. -I../mv/include
 LIBS          = ../mv/libmv.a
 LINK          = clang++
@@ -19,6 +19,7 @@ SOURCES       = main.c
 OBJECTS       = main.o
 
 TARGET        = mvlib_test
+DEBUG_TARGET  = mvlib_testd
 
 first: all
 ##### Implicit rules
@@ -27,9 +28,17 @@ first: all
 
 ##### Build Rules
 
-all: $(TARGET)
+all: release
 
-$(TARGET): $(OBJECTS)
+release: CFLAGS += -O3
+release: executable
+
+debug: CFLAGS += -g
+debug: LIBS = ../mv/libmvd.a
+debug: TARGET = $(DEBUG_TARGET)
+debug: executable
+
+executable: $(OBJECTS)
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(LIBS)
 
 ##### Clean
@@ -38,6 +47,7 @@ clean: compiler_clean
 
 distclean: clean
 	-$(DEL_FILE) $(TARGET)
+	-$(DEL_FILE) $(DEBUG_TARGET)
 
 compiler_clean:
 

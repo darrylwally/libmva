@@ -5,7 +5,7 @@
 AR            = ar cq
 RANLIB        = ranlib -s
 CC            = clang
-CLFAGS        = -pipe -g -gdwarf-2 -fPIC -arch x86_64 -Wall
+CFLAGS        = -pipe -gdwarf-2 -fPIC -arch x86_64 -Wall
 INCPATH       = -I. -Iinclude
 DEL_FILE      = rm -f
 DEL_DIR       = rmdir
@@ -57,6 +57,7 @@ OBJECTS       = const.o \
                 mvpreprocess.o
 
 TARGET        = libmv.a
+DEBUG_TARGET  = libmvd.a
 
 first: all
 ####### Implicit rules
@@ -68,11 +69,18 @@ first: all
 
 ####### Build rules
 
-all: $(TARGET)
+all:    release
 
-staticlib: $(TARGET)
+#staticlib: $(TARGET)
 
-$(TARGET):  $(OBJECTS) $(OBJCOMP)
+release: CFLAGS += -O3
+release: staticlib
+
+debug: CFLAGS += -g
+debug: TARGET = $(DEBUG_TARGET)
+debug: staticlib
+
+staticlib:  $(OBJECTS) $(OBJCOMP)
 	-$(DEL_FILE) $(TARGET)	
 	$(AR) $(TARGET) $(OBJECTS)
 	$(RANLIB) $(TARGET)
@@ -150,6 +158,7 @@ clean: compiler_clean
 
 distclean: clean
 	-$(DEL_FILE) $(TARGET)
+	-$(DEL_FILE) $(DEBUG_TARGET)
 
 compiler_clean:
 
