@@ -1,15 +1,19 @@
-/*! \file mvpreprocess.c
-  \brief Implementation of preprocess information.
-  \author Darryl Wallace - wallacdj@gmail.com, darryl@wallynet.ca
-  \date 2013
-
-  THIS CODE IS COPYRIGHT DARRYL WALLACE (c) 2013.
-  UNAUTHORIZED DISTRIBUTION, USE, OR VIEWING THE CONTENTS OF THIS FILE
-  IS STRICTLY PROHIBITED.
-  IF YOU HAVE RECEIVED THIS CODE WITHOUT AUTHORIZATION IT MUST BE DESTROYED
-  IMMEDIATELY
-  */
-
+/*
+* Filename: mvprprocess.c
+* Description: Implementation of structures and functions for preprocessing a
+               matrix
+* Author: Darryl Wallace <wallacdj@gmail.com
+* Copyright (c) 2014 - Darryl Wallace
+*
+* License:
+* libmva is subject to the terms of the Mozilla Public
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*
+* libmva is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+*/
 
 #include "mvpreprocess.h"
 #include "mvconstants.h"

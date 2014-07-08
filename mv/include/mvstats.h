@@ -1,3 +1,20 @@
+/*
+* Filename: mvstats.h
+* Description: Contains various univariate statistical calculations that are
+*              used in conjunction with PCA, PLS, etc.
+* Author: Darryl Wallace <wallacdj@gmail.com
+* Copyright (c) 2014 - Darryl Wallace
+*
+* License:
+* libmva is subject to the terms of the Mozilla Public
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/.
+*
+* libmva is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+*/
+
 /*! \file mvstats.h
   \brief Contains functions to compute necessary statistics for
   \author Darryl Wallace - wallacdj@gmail.com, darryl@wallynet.ca
