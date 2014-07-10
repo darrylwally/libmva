@@ -4,6 +4,18 @@ CONFIG -= qt
 
 include(cephes/cephes.pri)
 
+TARGET = mv
+win32 {
+    CONFIG(debug, debug|release) {
+         TARGET = $$join(TARGET,,,d)
+     }
+    else{
+        TARGET = $$TARGET
+    }
+}
+
+DESTDIR = ./
+
 INCLUDEPATH += include \
                ./
 HEADERS += \
