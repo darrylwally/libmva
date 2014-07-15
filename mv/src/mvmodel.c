@@ -52,7 +52,7 @@ static int __free_cv_data(MVCrossValData **cv_data)
     }
     free(cvd->models);
     *cv_data = NULL;
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 static MVCrossValData * __alloc_cv_data(int num_rounds)
@@ -200,7 +200,7 @@ static int __compute_wstar(MVMat *wstar_out, const MVMat * w, const MVMat *p,
     mvmat_free(&p_i);
     mvmat_free(&cur_wstar_i);
 
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 static int __cross_validate_PCA_FAST(MVModel *pca)
@@ -391,7 +391,7 @@ static int __cross_validate_PCA(MVModel *pca)
 //    case FULL:
 //        return __crossValidatePCA_FULL(pca);
     default:
-        return UNKNOWN_MODEL_TYPE;
+        return MV_UNKNOWN_MODEL_TYPE;
     }
 
     return 0;
@@ -600,7 +600,7 @@ static int __cross_validate_PLS(MVModel *pls)
 //    case FULL:
 //        return __crossValidatePLS_FULL(pls);
     default:
-        return UNKNOWN_MODEL_TYPE;
+        return MV_UNKNOWN_MODEL_TYPE;
     }
 
     return 0;
@@ -720,7 +720,7 @@ static int __mv_free_PCA_model(MVModel **model)
     __free_cv_data((MVCrossValData**) &m->cvd);
     free(m);
     *model = NULL;
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 static int __mv_free_PLS_model(MVModel **model)
@@ -754,7 +754,7 @@ static int __mv_free_PLS_model(MVModel **model)
     __free_cv_data((MVCrossValData **) &m->cvd);
     free(m);
     *model = NULL;
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmodel_free(MVModel **model)
@@ -772,9 +772,9 @@ int mvmodel_free(MVModel **model)
     case MV_MODEL_TYPE_PLS:
         return __mv_free_PLS_model(model);
     default:
-        return UNKNOWN_MODEL_TYPE;
+        return MV_UNKNOWN_MODEL_TYPE;
     }
-    return UNKNOWN_MODEL_TYPE;
+    return MV_UNKNOWN_MODEL_TYPE;
 }
 
 static int __mvmodel_add_PCA_component(MVModel *model, int perform_cv)
@@ -1214,9 +1214,9 @@ int mvmodel_add_component(MVModel *model)
     case MV_MODEL_TYPE_PLS:
         return __mvmodel_add_PLS_component(model, 1);
     default:
-        return UNKNOWN_MODEL_TYPE;
+        return MV_UNKNOWN_MODEL_TYPE;
     }
-    return UNKNOWN_MODEL_TYPE;
+    return MV_UNKNOWN_MODEL_TYPE;
 }
 
 
@@ -1231,14 +1231,14 @@ static int __mv_new_obs_PCA_T(MVMat *t, MVMat *E, const MVMat *new_X, const MVMo
     if ( !(t->nrows == new_X->nrows && new_X->ncolumns == model->p->nrows &&
            model->p->ncolumns >= num_components && t->ncolumns >= num_components))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     if (E)
     {
         if (! (E->nrows == new_X->nrows && E->ncolumns == new_X->ncolumns))
         {
-            return INCORRECT_DIMENSIONS;
+            return MV_INCORRECT_DIMENSIONS;
         }
         mvmat_copy(E, new_X);
     }
@@ -1300,7 +1300,7 @@ static int __mv_new_obs_PCA_T(MVMat *t, MVMat *E, const MVMat *new_X, const MVMo
         mvmat_free(&E);
     }
 
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 static int __mv_new_obs_PLS_T(MVMat *t, MVMat *E, const MVMat *new_X, const MVModel *model,
@@ -1315,14 +1315,14 @@ static int __mv_new_obs_PLS_T(MVMat *t, MVMat *E, const MVMat *new_X, const MVMo
            model->p->ncolumns >= num_components &&
            t->ncolumns == num_components && model->w->ncolumns >= num_components))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     if (E)
     {
         if (! (E->nrows == new_X->nrows && E->ncolumns == new_X->ncolumns))
         {
-            return INCORRECT_DIMENSIONS;
+            return MV_INCORRECT_DIMENSIONS;
         }
         mvmat_copy(E, new_X);
     }
@@ -1386,7 +1386,7 @@ static int __mv_new_obs_PLS_T(MVMat *t, MVMat *E, const MVMat *new_X, const MVMo
         mvmat_free(&E);
     }
 
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmodel_u_scores_from_obs(MVMat *u, MVMat *F, const MVMat *new_Y, const MVMat *new_T,
@@ -1403,17 +1403,17 @@ int mvmodel_u_scores_from_obs(MVMat *u, MVMat *F, const MVMat *new_Y, const MVMa
            u->ncolumns == num_components && u->nrows == new_T->nrows &&
            u->ncolumns == new_T->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
     else if (model->model_type != MV_MODEL_TYPE_PLS)
     {
-        return WRONG_MODEL_TYPE;
+        return MV_WRONG_MODEL_TYPE;
     }
     if (F)
     {
         if (! (F->nrows == new_Y->nrows && F->ncolumns == new_Y->ncolumns))
         {
-            return INCORRECT_DIMENSIONS;
+            return MV_INCORRECT_DIMENSIONS;
         }
         mvmat_copy(F, new_Y);
     }
@@ -1474,7 +1474,7 @@ int mvmodel_u_scores_from_obs(MVMat *u, MVMat *F, const MVMat *new_Y, const MVMa
         mvmat_free(&F);
     }
 
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 
@@ -1488,33 +1488,33 @@ int mvmodel_t_scores_from_obs(MVMat *t, MVMat * E, const MVMat *new_X, const MVM
     case MV_MODEL_TYPE_PLS:
         return __mv_new_obs_PLS_T(t, E, new_X, model, num_components, method);
     default:
-        return UNKNOWN_MODEL_TYPE;
+        return MV_UNKNOWN_MODEL_TYPE;
     }
-    return UNKNOWN_MODEL_TYPE;
+    return MV_UNKNOWN_MODEL_TYPE;
 }
 
 int mvmodel_autofit(MVModel *model)
 {
-    int return_val = SUCCESS;
+    int return_val = MV_SUCCESS;
     int component_is_valid = 1;
     model->A = 0;
     while (component_is_valid)
     {
+        double iter = 0.0;
+        double Q2 = 0.0;
         component_is_valid = 0;
         mvmodel_add_component(model);
-        double iter = 0.0;
-        mvmat_get_elem(model->iter, &iter, model->A-1, 0);
-        double Q2 = 0.0;
+        mvmat_get_elem(model->iter, &iter, model->A-1, 0);      
         mvmat_get_elem(model->Q2, &Q2, model->A-1, 0);
         /* Rule 3 */
         if (model->A > MIN(model->X->nrows, model->X->ncolumns))
         {
-            return_val = CROSSVAL_RULE3;
+            return_val = MV_CROSSVAL_RULE3;
         }
         /* RULE 4 */
         else if (iter >= MAX_NIPALS_ITER)
         {
-            return_val = CROSSVAL_RULE4;
+            return_val = MV_CROSSVAL_RULE4;
         }
         /* Rule 1 */
         else if (Q2 >= AUTOFIT_THRESHOLD)
@@ -1559,16 +1559,17 @@ int mvmodel_autofit(MVModel *model)
     /* Subtract one at the end because we've left the loop because the last
        component was invalid / insignificant */
     model->A--;
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 
 static int __mv_compute_pred(MVMat *pred, const MVMat *scores, const MVMat *weights, int num_components)
 {
     // todo: error checking
+    MVReturnCode ret;
+    MVMat _weightsT, _scores;
     MVMat *weightsT = mvmat_alloc(weights->ncolumns, weights->nrows);
     mvmat_transpose(weightsT, weights);
-    MVMat _weightsT, _scores;
     _weightsT.nrows = num_components;
     _weightsT.ncolumns = weightsT->ncolumns;
     _weightsT.data = weightsT->data;
@@ -1581,7 +1582,7 @@ static int __mv_compute_pred(MVMat *pred, const MVMat *scores, const MVMat *weig
     _scores.mask = scores->mask;
     _scores.isReference = 1;
 
-    MVReturnCode ret = mvmat_mult(pred, &_scores, &_weightsT);
+    ret = mvmat_mult(pred, &_scores, &_weightsT);
 
     mvmat_free(&weightsT);
     return ret;

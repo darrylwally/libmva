@@ -27,14 +27,14 @@ double mvstats_t_ppf(double alpha, double df, double loc, double scale)
 {
     // unused variables:
     (void)loc; (void) scale;
-    return stdtri(df, alpha);
+    return stdtri((int)df, alpha);
 }
 
 double mvstats_F_ppf(double alpha, double N1, double N2, double loc, double scale)
 {
     // unused variables:
     (void)loc; (void) scale;
-    return fdtri(N1, N2, alpha);
+    return fdtri((int)N1, (int)N2, alpha);
 }
 
 double mvstats_chi2_ppf(double alpha, double df, double loc, double scale)
@@ -60,7 +60,7 @@ int mvstats_ht2(MVMat *output, const MVMat *t, const MVMat *t_stddev,
           first_component > -1 && last_component <= t->ncolumns &&
           t_stddev->nrows == 1 && t_stddev->ncolumns <= t->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (i=0; i < output->nrows; i++)
@@ -75,7 +75,7 @@ int mvstats_ht2(MVMat *output, const MVMat *t, const MVMat *t_stddev,
             }
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 double mvstats_ht2_limit(double alpha, int A, int N)
@@ -112,7 +112,7 @@ int mvstats_spex_from_obs(MVMat *output, const MVModel *model, const MVMat *Xobs
 
     mvmat_free(&E);
 
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvstats_spey_from_obs(MVMat *output, const MVModel *model, const MVMat *Yobs, const MVMat *tobs, int num_components)
@@ -136,7 +136,7 @@ int mvstats_spey_from_obs(MVMat *output, const MVModel *model, const MVMat *Yobs
 
     mvmat_free(&F);
 
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 double mvstats_spe_limit(double alpha, const MVMat *modelSPE_values, int component)

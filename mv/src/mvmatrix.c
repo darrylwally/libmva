@@ -208,7 +208,7 @@ int mvmat_free(MVMat **matrix)
 {
     MVMat *mat = *matrix;
     if (!mat)
-        return ATTEMPT_TO_FREE_NULL_MATRIX;
+        return MV_ATTEMPT_TO_FREE_NULL_MATRIX;
     if (!mat->isReference)
     {
         free(mat->data[0]);
@@ -218,14 +218,14 @@ int mvmat_free(MVMat **matrix)
     free(mat->mask);
     free(mat);
     *matrix = NULL;
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_copy(MVMat *output, const MVMat *other)
 {
     if (!(other->nrows==output->nrows && other->ncolumns==other->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
     if (output->isReference || other->isReference)
     {
@@ -254,7 +254,7 @@ int mvmat_copy(MVMat *output, const MVMat *other)
             output_mask[i]=other_mask[i];
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_concat_columns(MVMat *output, const MVMat *A, const MVMat *B)
@@ -263,7 +263,7 @@ int mvmat_concat_columns(MVMat *output, const MVMat *A, const MVMat *B)
     if (!(output->ncolumns==(A->ncolumns+B->ncolumns) &&
           output->nrows==A->nrows && A->nrows==B->nrows))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (i=0; i<output->nrows; i++)
@@ -288,7 +288,7 @@ int mvmat_concat_rows(MVMat *output, const MVMat *A, const MVMat *B)
     if (!(output->nrows==(A->nrows+B->nrows) &&
           output->ncolumns==A->ncolumns && A->ncolumns==B->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (i=0; i<A->nrows; i++)
@@ -308,7 +308,7 @@ int mvmat_concat_rows(MVMat *output, const MVMat *A, const MVMat *B)
             output->mask[i][j] = B->mask[bRow][j];
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_slice_rows(MVMat *output, const MVMat *A, const MVMat *rows)
@@ -316,7 +316,7 @@ int mvmat_slice_rows(MVMat *output, const MVMat *A, const MVMat *rows)
     int i,j;
     if ( !(output->nrows == rows->nrows && output->ncolumns == A->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (i=0; i<rows->nrows; i++)
@@ -324,7 +324,7 @@ int mvmat_slice_rows(MVMat *output, const MVMat *A, const MVMat *rows)
         int row = (int)rows->data[i][0];
         if (row >= A->nrows || row < 0)
         {
-            return INDEX_OUT_OF_BOUNDS;
+            return MV_INDEX_OUT_OF_BOUNDS;
         }
 
         for (j=0; j<output->ncolumns; j++)
@@ -333,7 +333,7 @@ int mvmat_slice_rows(MVMat *output, const MVMat *A, const MVMat *rows)
             output->mask[i][j] = A->mask[row][j];
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_delete_rows(MVMat *output, const MVMat *A, const MVMat *rows)
@@ -344,7 +344,7 @@ int mvmat_delete_rows(MVMat *output, const MVMat *A, const MVMat *rows)
     int out_index = 0;
     if ( !(output->nrows == num_rows && output->ncolumns == A->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
     for (i=0; i<A->nrows; i++)
     {
@@ -354,7 +354,7 @@ int mvmat_delete_rows(MVMat *output, const MVMat *A, const MVMat *rows)
             row = (int) rows->data[slice_index][0];
             if (row >= (int)A->nrows || row < 0)
             {
-                return INDEX_OUT_OF_BOUNDS;
+                return MV_INDEX_OUT_OF_BOUNDS;
             }
         }
         if (row == i)
@@ -368,7 +368,7 @@ int mvmat_delete_rows(MVMat *output, const MVMat *A, const MVMat *rows)
             out_index++;
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_slice_rows_ref(MVMat **output, const MVMat *A, const MVMat *rows)
@@ -377,11 +377,11 @@ int mvmat_slice_rows_ref(MVMat **output, const MVMat *A, const MVMat *rows)
     MVMat *o = *output;
     if (o && !o->isReference)
     {
-        return REFERENCE_MAT_REQUIRED;
+        return MV_REFERENCE_MAT_REQUIRED;
     }
     if (o && o->nrows != rows->nrows)
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
     if (!o)
     {
@@ -393,14 +393,14 @@ int mvmat_slice_rows_ref(MVMat **output, const MVMat *A, const MVMat *rows)
         if (row >= A->nrows || row < 0)
         {
             mvmat_free (&o);
-            return INDEX_OUT_OF_BOUNDS;
+            return MV_INDEX_OUT_OF_BOUNDS;
         }
         o->data[i] = A->data[row];
         o->mask[i] = A->mask[row];
     }
     o->ncolumns = A->ncolumns;
     *output = o;
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_delete_rows_ref(MVMat **output, const MVMat *A, const MVMat *rows)
@@ -412,11 +412,11 @@ int mvmat_delete_rows_ref(MVMat **output, const MVMat *A, const MVMat *rows)
     int out_index = 0;
     if (o && !o->isReference)
     {
-        return REFERENCE_MAT_REQUIRED;
+        return MV_REFERENCE_MAT_REQUIRED;
     }
     if (o && o->nrows != num_rows)
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
     if (!o)
     {
@@ -431,7 +431,7 @@ int mvmat_delete_rows_ref(MVMat **output, const MVMat *A, const MVMat *rows)
             if (row >= (int)A->nrows || row < 0)
             {
                 mvmat_free (&o);
-                return INDEX_OUT_OF_BOUNDS;
+                return MV_INDEX_OUT_OF_BOUNDS;
             }
         }
 
@@ -448,7 +448,7 @@ int mvmat_delete_rows_ref(MVMat **output, const MVMat *A, const MVMat *rows)
     }
     o->ncolumns = A->ncolumns;
     *output = o;
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 
@@ -457,7 +457,7 @@ int mvmat_slice_columns(MVMat *output, const MVMat *A, const MVMat *columns)
     int i,j;
     if ( !(output->ncolumns == columns->nrows && output->nrows == A->nrows))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (j=0; j<columns->nrows; j++)
@@ -465,7 +465,7 @@ int mvmat_slice_columns(MVMat *output, const MVMat *A, const MVMat *columns)
         int column = (int)columns->data[j][0];
         if (column >= A->ncolumns || column < 0)
         {
-            return INDEX_OUT_OF_BOUNDS;
+            return MV_INDEX_OUT_OF_BOUNDS;
         }
 
         for (i=0; i<output->nrows; i++)
@@ -474,7 +474,7 @@ int mvmat_slice_columns(MVMat *output, const MVMat *A, const MVMat *columns)
             output->mask[i][j] = A->mask[i][column];
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_transpose(MVMat *output, const MVMat *mat)
@@ -483,7 +483,7 @@ int mvmat_transpose(MVMat *output, const MVMat *mat)
     if (! (mat->ncolumns==output->nrows &&
            mat->nrows==output->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (i=0; i<mat->nrows; i++)
@@ -494,7 +494,7 @@ int mvmat_transpose(MVMat *output, const MVMat *mat)
             output->mask[j][i]=mat->mask[i][j];
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_set(MVMat *mat, double val)
@@ -530,14 +530,14 @@ int mvmat_set(MVMat *mat, double val)
             }
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_set_elem(MVMat *mat, int row, int column, double value)
 {
     if ( row> (mat->nrows-1)  || column>(mat->ncolumns-1) )
     {
-        return INDEX_OUT_OF_BOUNDS;
+        return MV_INDEX_OUT_OF_BOUNDS;
     }
 
     mat->data[row][column] = value;
@@ -549,14 +549,14 @@ int mvmat_set_elem(MVMat *mat, int row, int column, double value)
     {
         mat->mask[row][column] = DATA_PRESENT;
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_get_elem(const MVMat *mat, double *value, int row, int column)
 {
     if ( row> (mat->nrows-1)  || column>(mat->ncolumns-1) )
     {
-        return INDEX_OUT_OF_BOUNDS;
+        return MV_INDEX_OUT_OF_BOUNDS;
     }
     if (mat->mask[row][column] == DATA_PRESENT)
     {
@@ -566,7 +566,7 @@ int mvmat_get_elem(const MVMat *mat, double *value, int row, int column)
     {
         *value = mv_NaN();
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_add(MVMat *output, const MVMat *A, const MVMat *B)
@@ -575,7 +575,7 @@ int mvmat_add(MVMat *output, const MVMat *A, const MVMat *B)
     if ( !(A->nrows == B->nrows && A->nrows == output->nrows &&
           A->ncolumns == B->ncolumns && A->ncolumns == output->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (i=0; i<output->nrows; i++)
@@ -587,7 +587,7 @@ int mvmat_add(MVMat *output, const MVMat *A, const MVMat *B)
             output->mask[i][j] = (MVISNAN_FUNC(result) ? DATA_MISSING : DATA_PRESENT);
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_add_scalar(MVMat *output, const MVMat *A, double value)
@@ -595,7 +595,7 @@ int mvmat_add_scalar(MVMat *output, const MVMat *A, double value)
     int i,j;
     if ( !(A->nrows == output->nrows && A->ncolumns == output->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (i=0; i<output->nrows; i++)
@@ -607,7 +607,7 @@ int mvmat_add_scalar(MVMat *output, const MVMat *A, double value)
             output->mask[i][j] = (MVISNAN_FUNC(result) ? DATA_MISSING : DATA_PRESENT);
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_subtract(MVMat *output, const MVMat *A, const MVMat *B)
@@ -616,7 +616,7 @@ int mvmat_subtract(MVMat *output, const MVMat *A, const MVMat *B)
     if ( !(A->nrows == B->nrows && A->nrows == output->nrows &&
           A->ncolumns == B->ncolumns && A->ncolumns == output->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (i=0; i<output->nrows; i++)
@@ -635,7 +635,7 @@ int mvmat_subtract(MVMat *output, const MVMat *A, const MVMat *B)
             }
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 
@@ -645,7 +645,7 @@ int mvmat_mult(MVMat *output, const MVMat *A, const MVMat *B)
     if ( !(A->ncolumns == B->nrows && A->nrows == output->nrows &&
           B->ncolumns == output->ncolumns ))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (i=0; i<output->nrows; i++)
@@ -660,7 +660,7 @@ int mvmat_mult(MVMat *output, const MVMat *A, const MVMat *B)
             output->data[i][j] = sum;
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_mult_scalar(MVMat *output, const MVMat *A, double scalar)
@@ -668,7 +668,7 @@ int mvmat_mult_scalar(MVMat *output, const MVMat *A, double scalar)
     int i,j;
     if (!(A->nrows == output->nrows && A->ncolumns == output->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (i=0; i<output->nrows; i++)
@@ -679,7 +679,7 @@ int mvmat_mult_scalar(MVMat *output, const MVMat *A, double scalar)
             output->mask[i][j] = MVISNAN_FUNC(output->data[i][j]) ? DATA_MISSING : DATA_PRESENT;
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_elem_mult(MVMat *output, const MVMat *A, const MVMat *B)
@@ -688,7 +688,7 @@ int mvmat_elem_mult(MVMat *output, const MVMat *A, const MVMat *B)
     if ( !(A->nrows == B->nrows && A->nrows == output->nrows &&
           A->ncolumns == B->ncolumns && A->ncolumns == output->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (i=0; i<output->nrows; i++)
@@ -699,7 +699,7 @@ int mvmat_elem_mult(MVMat *output, const MVMat *A, const MVMat *B)
             output->mask[i][j] = MVISNAN_FUNC(output->data[i][j]) ? DATA_MISSING : DATA_PRESENT;
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_elem_div(MVMat *output, const MVMat *A, const MVMat *B)
@@ -708,7 +708,7 @@ int mvmat_elem_div(MVMat *output, const MVMat *A, const MVMat *B)
     if ( !(A->nrows == B->nrows && A->nrows == output->nrows &&
           A->ncolumns == B->ncolumns && A->ncolumns == output->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (i=0; i<output->nrows; i++)
@@ -727,7 +727,7 @@ int mvmat_elem_div(MVMat *output, const MVMat *A, const MVMat *B)
             }
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 double mvmat_vector_norm(const MVMat *A)
@@ -765,7 +765,7 @@ int mvmat_colidx_mean(double *mean, const MVMat *A, int col_idx)
     double output;
     if (col_idx >= A->ncolumns || col_idx < 0)
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
     num_missing = 0;
     output = 0.0;
@@ -790,7 +790,7 @@ int mvmat_colidx_mean(double *mean, const MVMat *A, int col_idx)
     }
 
     *mean = output;
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_colidx_stddev(double *stddev, const MVMat *A, int ddof, int col_idx)
@@ -798,7 +798,7 @@ int mvmat_colidx_stddev(double *stddev, const MVMat *A, int ddof, int col_idx)
     double output;
     if (col_idx >= A->ncolumns || col_idx < 0)
     {
-        return INDEX_OUT_OF_BOUNDS;
+        return MV_INDEX_OUT_OF_BOUNDS;
     }
 
     mvmat_colidx_var(&output, A, ddof, col_idx);
@@ -810,7 +810,7 @@ int mvmat_colidx_stddev(double *stddev, const MVMat *A, int ddof, int col_idx)
 
     *stddev = output;
 
-    return SUCCESS;
+    return MV_SUCCESS;
 
 }
 
@@ -820,7 +820,7 @@ int mvmat_colidx_var(double *var, const MVMat *A, int ddof, int col_idx)
     double output, colmean, temp;
     if (col_idx >= A->ncolumns || col_idx < 0)
     {
-        return INDEX_OUT_OF_BOUNDS;
+        return MV_INDEX_OUT_OF_BOUNDS;
     }
 
     N = A->nrows - ddof;
@@ -860,7 +860,7 @@ int mvmat_colidx_var(double *var, const MVMat *A, int ddof, int col_idx)
     }
 
     *var = output;
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_column_sum(MVMat *output, const MVMat *A)
@@ -868,7 +868,7 @@ int mvmat_column_sum(MVMat *output, const MVMat *A)
     int i,j, num_missing;
     if (output->ncolumns!=A->ncolumns)
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (j=0; j<A->ncolumns; j++)
@@ -883,7 +883,7 @@ int mvmat_column_sum(MVMat *output, const MVMat *A)
             }
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_column_ss(MVMat *output, const MVMat *A)
@@ -891,7 +891,7 @@ int mvmat_column_ss(MVMat *output, const MVMat *A)
     int i,j;
     if (!(output->ncolumns == A->ncolumns && output->nrows == 1))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (j=0; j<A->ncolumns; j++)
@@ -905,7 +905,7 @@ int mvmat_column_ss(MVMat *output, const MVMat *A)
             }
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_column_mean(MVMat *output, const MVMat *A)
@@ -913,7 +913,7 @@ int mvmat_column_mean(MVMat *output, const MVMat *A)
     int i,j, num_missing;
     if (output->ncolumns!=A->ncolumns)
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (j=0; j<A->ncolumns; j++)
@@ -941,7 +941,7 @@ int mvmat_column_mean(MVMat *output, const MVMat *A)
             output->data[0][j] = output->data[0][j] / (A->nrows - num_missing);
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_column_var(MVMat *output, const MVMat *A, int ddof)
@@ -952,7 +952,7 @@ int mvmat_column_var(MVMat *output, const MVMat *A, int ddof)
     MVMat *colmean;
     if (output->ncolumns!=A->ncolumns)
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     N = A->nrows - ddof;
@@ -996,7 +996,7 @@ int mvmat_column_var(MVMat *output, const MVMat *A, int ddof)
     }
 
     mvmat_free(&colmean);
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_column_stddev(MVMat *output, const MVMat *A, int ddof)
@@ -1015,7 +1015,7 @@ int mvmat_column_stddev(MVMat *output, const MVMat *A, int ddof)
         }
     }
 
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_row_ss(MVMat *output, const MVMat *A)
@@ -1023,7 +1023,7 @@ int mvmat_row_ss(MVMat *output, const MVMat *A)
     int i,j;
     if (!(output->nrows == A->nrows && output->ncolumns == 1))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (i=0; i<A->nrows; i++)
@@ -1037,7 +1037,7 @@ int mvmat_row_ss(MVMat *output, const MVMat *A)
             }
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_column_add(MVMat *output, const MVMat *A, const MVMat *columnValues)
@@ -1046,7 +1046,7 @@ int mvmat_column_add(MVMat *output, const MVMat *A, const MVMat *columnValues)
     if (!(output->nrows == A->nrows && output->ncolumns && A->ncolumns
             && columnValues->ncolumns == A->ncolumns && columnValues->nrows==1))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (i=0; i<output->nrows; i++)
@@ -1065,7 +1065,7 @@ int mvmat_column_add(MVMat *output, const MVMat *A, const MVMat *columnValues)
             }
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_column_subtract(MVMat *output, const MVMat *A, const MVMat *columnValues)
@@ -1074,7 +1074,7 @@ int mvmat_column_subtract(MVMat *output, const MVMat *A, const MVMat *columnValu
     if (!(output->nrows == A->nrows && output->ncolumns && A->ncolumns
             && columnValues->ncolumns == A->ncolumns && columnValues->nrows==1))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (i=0; i<output->nrows; i++)
@@ -1093,7 +1093,7 @@ int mvmat_column_subtract(MVMat *output, const MVMat *A, const MVMat *columnValu
             }
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_column_mult(MVMat *output, const MVMat *A, const MVMat *columnValues)
@@ -1102,7 +1102,7 @@ int mvmat_column_mult(MVMat *output, const MVMat *A, const MVMat *columnValues)
     if (!(output->nrows == A->nrows && output->ncolumns && A->ncolumns
             && columnValues->ncolumns == A->ncolumns && columnValues->nrows==1))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (i=0; i<output->nrows; i++)
@@ -1121,7 +1121,7 @@ int mvmat_column_mult(MVMat *output, const MVMat *A, const MVMat *columnValues)
             }
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_column_div(MVMat *output, const MVMat *A, const MVMat *columnValues)
@@ -1130,7 +1130,7 @@ int mvmat_column_div(MVMat *output, const MVMat *A, const MVMat *columnValues)
     if (!(output->nrows == A->nrows && output->ncolumns == A->ncolumns
             && columnValues->ncolumns == A->ncolumns && columnValues->nrows==1))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     for (i=0; i<output->nrows; i++)
@@ -1150,22 +1150,25 @@ int mvmat_column_div(MVMat *output, const MVMat *A, const MVMat *columnValues)
             }
         }
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 
 int mvmat_column_func(MVMat *output, const MVMat *A, MVMAT_FUNC_PTR *funcs, void **opaques)
 {
     int i,j;
+    MVMAT_FUNC_PTR *func;
+    void **opaque;
+    double NaN;
     if (!(output->nrows == A->nrows && output->ncolumns == A->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
-    MVMAT_FUNC_PTR *func = funcs;
-    void **opaque = opaques;
+    func = funcs;
+    opaque = opaques;
 
-    double NaN = mv_NaN();
+    NaN = mv_NaN();
     for (j = 0; j < output->ncolumns; j++)
     {
 
@@ -1181,23 +1184,24 @@ int mvmat_column_func(MVMat *output, const MVMat *A, MVMAT_FUNC_PTR *funcs, void
                 }
             }
 
-            output->mask[i][j] = !(isnan(result));
+            output->mask[i][j] = !(MVISNAN_FUNC(result));
             output->data[i][j] = result;
         }
         func++;
         opaque++;
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 
 int mvmat_column_min(MVMat *output, const MVMat *A)
 {
+    int i,j;
     if (!(output->nrows == 1 && output->ncolumns == A->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
-    int i,j;
+
     for (j = 0; j < A->ncolumns; j++)
     {
         int num_missing = 0;
@@ -1225,21 +1229,22 @@ int mvmat_column_min(MVMat *output, const MVMat *A)
         }
     }
 
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_column_max(MVMat *output, const MVMat *A)
 {
+    int i,j;
     if (!(output->nrows == 1 && output->ncolumns == A->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
     if (!(output->nrows == 1 && output->ncolumns == A->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
-    int i,j;
+
     for (j = 0; j < A->ncolumns; j++)
     {
         int num_missing = 0;
@@ -1267,21 +1272,24 @@ int mvmat_column_max(MVMat *output, const MVMat *A)
         }
     }
 
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_row_func(MVMat *output, const MVMat *A, MVMAT_FUNC_PTR *funcs, void *opaques)
 {
     int i,j;
+    MVMAT_FUNC_PTR *func;
+    void *opaque;
+    double NaN;
     if (!(output->nrows == A->nrows && output->ncolumns == A->ncolumns))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
-    MVMAT_FUNC_PTR *func = funcs;
-    void *opaque = opaques;
+    func = funcs;
+    opaque = opaques;
 
-    double NaN = mv_NaN();
+    NaN = mv_NaN();
     for (i = 0; i < output->nrows; i++)
     {
         if ((*func) == NULL)
@@ -1296,23 +1304,27 @@ int mvmat_row_func(MVMat *output, const MVMat *A, MVMAT_FUNC_PTR *funcs, void *o
                 result = (*func)(A->data[i][j], opaque);
             }
 
-            output->mask[i][j] = !(isnan(result));
+            output->mask[i][j] = !(MVISNAN_FUNC(result));
             output->data[i][j] = result;
         }
         func++;
+#ifdef WIN32
+        (*(char *)&opaque) += 1;
+#else
         opaque++;
+#endif
     }
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_row_min(MVMat *output, const MVMat *A)
 {
+    int i,j;
     if (!(output->nrows == A->nrows && output->ncolumns == 1))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
-    int i,j;
     for (i = 0; i < A->nrows; i++)
     {
         int num_missing = 0;
@@ -1340,17 +1352,17 @@ int mvmat_row_min(MVMat *output, const MVMat *A)
         }
     }
 
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_row_max(MVMat *output, const MVMat *A)
 {
+    int i,j;
     if (!(output->nrows == A->nrows && output->ncolumns == 1))
     {
-        return INCORRECT_DIMENSIONS;
+        return MV_INCORRECT_DIMENSIONS;
     }
 
-    int i,j;
     for (i = 0; i < A->nrows; i++)
     {
         int num_missing = 0;
@@ -1378,7 +1390,7 @@ int mvmat_row_max(MVMat *output, const MVMat *A)
         }
     }
 
-    return SUCCESS;
+    return MV_SUCCESS;
 }
 
 int mvmat_pct_missing(const MVMat *mat)
