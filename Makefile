@@ -1,5 +1,5 @@
 # Filename: Makefile
-# Description: Master makefile to make and build libmv.a and mvlib_test
+# Description: Master makefile to make and build libmva.a and mvlib_test
 # Author: Darryl Wallace <wallacdj@gmail.com
 # Copyright (c) 2014 - Darryl Wallace
 #
@@ -12,35 +12,35 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-all: libmv test
+all: libmva test 
 
-.PHONY: libmv test libmv_debug test_debug
+.PHONY: libmva test libmva_debug test_debug
 
-debug: libmv_debug test_debug
+debug: libmva_debug test_debug
 
-libmv:
+libmva:
 	@cd mv && $(MAKE)
 
 test:
 	@cd test && $(MAKE)
 
-libmv_debug:
+libmva_debug:
 	@cd mv && $(MAKE) debug
 
 test_debug:
 	@cd test && $(MAKE) debug
 
-clean: libmv_clean test_clean
+clean: libmva_clean test_clean
 
-libmv_clean:
+libmva_clean:
 	@cd mv && $(MAKE) clean
 
 test_clean: 
 	@cd test && $(MAKE) clean
 
-distclean: libmv_distclean test_distclean
+distclean: libmva_distclean test_distclean
 
-libmv_distclean:
+libmva_distclean:
 	@cd mv && $(MAKE) distclean
 
 test_distclean:

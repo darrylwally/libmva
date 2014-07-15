@@ -1,5 +1,5 @@
 # Filename: Makefile
-# Description: Makefile to test program for libmv
+# Description: Makefile to test program for libmva
 # Author: Darryl Wallace <wallacdj@gmail.com
 # Copyright (c) 2014 - Darryl Wallace
 #
@@ -19,7 +19,7 @@ RANLIB        = ranlib -s
 CC            = clang
 CLFAGS        = -pipe -gdwarf-2 -fPIC -arch x86_64 -Wall
 INCPATH       = -I. -I../mv/include
-LIBS          = ../mv/libmv.a
+LIBS          = ../mv/libmva.a
 LINK          = clang++
 LFLAGS        = -arch x86_64
 DEL_FILE      = rm -f
@@ -46,7 +46,7 @@ release: CFLAGS += -O3
 release: executable
 
 debug: CFLAGS += -g
-debug: LIBS = ../mv/libmvd.a
+debug: LIBS = ../mv/libmvad.a
 debug: TARGET = $(DEBUG_TARGET)
 debug: executable
 

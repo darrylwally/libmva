@@ -67,8 +67,8 @@ OBJECTS       = const.o \
                 mvconstants.o \
                 mvpreprocess.o
 
-TARGET        = libmv.a
-DEBUG_TARGET  = libmvd.a
+TARGET        = libmva.a
+DEBUG_TARGET  = libmvad.a
 
 first: all
 ####### Implicit rules
