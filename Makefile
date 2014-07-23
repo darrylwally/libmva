@@ -21,13 +21,13 @@ debug: libmva_debug test_debug
 libmva:
 	@cd mv && $(MAKE)
 
-test:
+test: libmva
 	@cd test && $(MAKE)
 
 libmva_debug:
 	@cd mv && $(MAKE) debug
 
-test_debug:
+test_debug: libmva_debug
 	@cd test && $(MAKE) debug
 
 clean: libmva_clean test_clean
