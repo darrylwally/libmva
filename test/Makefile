@@ -25,6 +25,7 @@ LFLAGS        = -arch x86_64
 DEL_FILE      = rm -f
 DEL_DIR       = rmdir
 COPY_FILE     = cp -f
+STRIPSYMBOL   = strip -S
 
 ##### Files
 SOURCES       = main.c
@@ -43,7 +44,7 @@ first: all
 all: release
 
 release: CFLAGS += -O3
-release: executable
+release: stripsymbols
 
 debug: CFLAGS += -g
 debug: LIBS = ../mv/libmvad.a
@@ -53,6 +54,8 @@ debug: executable
 executable: $(OBJECTS)
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(LIBS)
 
+stripsymbols: executable
+	$(STRIPSYMBOL) $(TARGET)
 ##### Clean
 clean: compiler_clean
 	-$(DEL_FILE) $(OBJECTS)

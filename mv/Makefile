@@ -21,6 +21,7 @@ INCPATH       = -I. -Iinclude
 DEL_FILE      = rm -f
 DEL_DIR       = rmdir
 COPY_FILE     = cp -f
+STRIPSYMBOL   = strip -S
 
 ##### Files
 SOURCES       = cephes/cmath/const.c \
@@ -85,7 +86,7 @@ all:    release
 #staticlib: $(TARGET)
 
 release: CFLAGS += -O3
-release: staticlib
+release: stripsymbols
 
 debug: CFLAGS += -g
 debug: TARGET = $(DEBUG_TARGET)
@@ -95,6 +96,9 @@ staticlib:  $(OBJECTS) $(OBJCOMP)
 	-$(DEL_FILE) $(TARGET)	
 	$(AR) $(TARGET) $(OBJECTS)
 	$(RANLIB) $(TARGET)
+
+stripsymbols: staticlib 
+	$(STRIPSYMBOL) $(TARGET)
 
 ####### Compile
 
